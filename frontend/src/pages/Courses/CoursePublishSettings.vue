@@ -187,7 +187,7 @@
 			<p class="text-p-base text-ink-gray-7">
 				{{
 					__(
-						'Selling a paid course or certificate needs the Payments app. Install it from the Frappe Marketplace, then turn on pricing here.'
+						'Selling a paid course or certificate needs the Payments app. Ask your administrator to install it, then turn on pricing here.'
 					)
 				}}
 			</p>

@@ -1,7 +1,7 @@
 <template>
 	<Dialog v-model:open="showDialog">
 		<template #title>
-			<h2 class="text-lg-bold">{{ __('Install Frappe Learning') }}</h2>
+			<h2 class="text-lg-bold">{{ __('Install Learno') }}</h2>
 		</template>
 		<template #default>
 			<p>
@@ -29,7 +29,7 @@
 					class="mb-1 flex flex-row items-center justify-between px-3 text-center"
 				>
 					<span class="text-base-bold text-ink-gray-9">
-						{{ __('Install Frappe Learning') }}
+						{{ __('Install Learno') }}
 					</span>
 					<span class="inline-flex items-baseline">
 						<button
@@ -51,7 +51,7 @@
 						</span>
 						<span class="inline-flex items-start whitespace-nowrap">
 							<span>{{ __('Tap') }}&nbsp;</span>
-							<span class="lucide-share size-4 text-blue-600" />
+							<span class="lucide-share size-4 text-ink-blue-link" />
 							<span>&nbsp;{{ __("and then 'Add to Home Screen'") }}</span>
 						</span>
 					</span>

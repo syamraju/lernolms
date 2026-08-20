@@ -29,7 +29,8 @@
   "column_break_15",
   "file_type",
   "column_break_syza",
-  "help"
+  "help",
+  "video_duration"
  ],
  "fields": [
   {
@@ -72,6 +73,13 @@
   {
    "fieldname": "help",
    "fieldtype": "HTML"
+  },
+  {
+   "description": "Length of this lesson's video in seconds. Recorded by the curriculum editor when a video is attached, and summed to report total video content on the course.",
+   "fieldname": "video_duration",
+   "fieldtype": "Float",
+   "label": "Video Duration (seconds)",
+   "precision": "2"
   },
   {
    "fetch_from": "chapter.course",

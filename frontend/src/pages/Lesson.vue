@@ -1401,7 +1401,7 @@ usePageMeta(() => {
 }
 
 .tc-table {
-	border-inline-start: 1px solid #e8e8eb;
+	border-inline-start: 1px solid var(--outline-gray-1);
 }
 
 .plyr__volume input[type='range'] {

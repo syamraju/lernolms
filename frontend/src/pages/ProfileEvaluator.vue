@@ -82,7 +82,7 @@
 						v-if="isSessionUser()"
 						type="button"
 						:aria-label="__('Delete slot')"
-						class="lucide-x size-6 text-red-900 rounded-md cursor-pointer p-1 bg-surface-red-2 md:sr-only md:group-hover:not-sr-only md:focus:not-sr-only"
+						class="lucide-x size-6 text-ink-red-9 rounded-md cursor-pointer p-1 bg-surface-red-2 md:sr-only md:group-hover:not-sr-only md:focus:not-sr-only"
 						@click="deleteRow(slot.name)"
 					/>
 				</div>
@@ -175,7 +175,7 @@
 				</h2>
 				<div
 					v-if="evaluator.data?.calendar && evaluator.data?.is_authorized"
-					class="flex items-center bg-surface-green-2 text-green-900 text-sm p-1 rounded-md mb-4 w-fit"
+					class="flex items-center bg-surface-green-2 text-ink-green-9 text-sm p-1 rounded-md mb-4 w-fit"
 				>
 					<span class="lucide-check size-4 me-2" />
 					{{ __('Your calendar is set.') }}

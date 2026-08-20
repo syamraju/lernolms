@@ -1,7 +1,7 @@
 {
-  "name": "frappe_lms",
+  "name": "learno_lms",
   "version": "1.0.0",
-  "description": "Easy to use, open-source, Learning Management System",
+  "description": "Learno \u2014 easy to use, open-source Learning Management System",
   "type": "module",
   "workspaces1": [
     "frappe-ui",
@@ -18,7 +18,7 @@
     "type": "git",
     "url": "git+https://github.com/frappe/lms.git"
   },
-  "author": "Frappe",
+  "author": "Learno",
   "license": "AGPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/frappe/lms/issues"

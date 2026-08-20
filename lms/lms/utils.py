@@ -3145,9 +3145,15 @@ def get_field_meta(doctype, fieldnames):
 	return fieldnames_meta
 
 
+# The demo course was seeded as "A guide to Frappe Learning" before the Learno
+# rebrand, so sites seeded on an older build still carry the old title. Both
+# spellings identify the same demo course.
+DEMO_COURSE_TITLES = ("A guide to Learno", "A guide to Frappe Learning")
+
+
 def is_demo_course(course: str) -> bool:
 	title = frappe.db.get_value("LMS Course", course, "title")
-	return title == "A guide to Frappe Learning"
+	return title in DEMO_COURSE_TITLES
 
 
 def sanitize_editorjs(raw):

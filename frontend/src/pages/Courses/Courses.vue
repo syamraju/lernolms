@@ -349,8 +349,20 @@ const courseMenu = computed(() => {
 			label: __('New Course'),
 			icon: 'lucide-book-open',
 			onClick() {
-				// openFormRoute, not a bare router.push: it stamps the history
-				// entry so the form's own close() pops it instead of replacing.
+				// A plain push, not openFormRoute: the guided wizard is a
+				// full-screen page with its own Exit, not a modal form whose
+				// close() pops a stamped history entry.
+				router.push({ name: 'CourseCreate' })
+			},
+		},
+		{
+			label: __('Quick create'),
+			icon: 'lucide-zap',
+			onClick() {
+				// The old one-screen form, kept for authors who already know
+				// exactly what they want and would rather not walk the wizard.
+				// openFormRoute stamps the history entry so close() pops it
+				// instead of replacing.
 				openFormRoute(router, { name: 'NewCourse' })
 			},
 		},

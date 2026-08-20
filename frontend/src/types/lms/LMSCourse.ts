@@ -1,5 +1,6 @@
 import { ChapterReference } from './ChapterReference'
 import { CourseInstructor } from './CourseInstructor'
+import { LMSCourseObjective } from './LMSCourseObjective'
 import { RelatedCourses } from './RelatedCourses'
 
 export interface LMSCourse {
@@ -85,4 +86,61 @@ export interface LMSCourse {
 	timezone?: string
 	/**	Notification Sent : Check	*/
 	notification_sent?: 0 | 1
+
+	/* ---- Guided course creation ---- */
+
+	/**	Course Type : Select	*/
+	course_type?: 'Course' | 'Practice Test'
+	/**	Time Commitment : Select	*/
+	time_commitment?:
+		| ''
+		| '0-2 hours per week'
+		| '2-4 hours per week'
+		| '5+ hours per week'
+		| 'Not decided yet'
+	/**	Test Video : Attach	*/
+	test_video?: string
+	/**	Test Video Feedback Areas : Small Text	*/
+	test_video_feedback?: string
+	/**	What will students learn : Table - LMS Course Objective	*/
+	learning_objectives?: LMSCourseObjective[]
+	/**	Requirements or prerequisites : Table - LMS Course Objective	*/
+	requirements?: LMSCourseObjective[]
+	/**	Who this course is for : Table - LMS Course Objective	*/
+	intended_learners?: LMSCourseObjective[]
+	/**	Course Subtitle : Data	*/
+	subtitle?: string
+	/**	Language : Data	*/
+	language?: string
+	/**	Level : Select	*/
+	level?:
+		| 'All Levels'
+		| 'Beginner Level'
+		| 'Intermediate Level'
+		| 'Expert Level'
+	/**	Primarily Taught : Data	*/
+	primary_topic?: string
+	/**	Promotional Video : Attach	*/
+	promo_video?: string
+	/**	Welcome Message : Text Editor	*/
+	welcome_message?: string
+	/**	Congratulations Message : Text Editor	*/
+	congratulations_message?: string
+	/**	Enrollment (Privacy) : Select	*/
+	enrollment_privacy?:
+		| 'Public'
+		| 'Private (Invite Only)'
+		| 'Private (Password Protected)'
+	/**	Enrollment Password : Password	*/
+	enrollment_password?: string
+	/**	Auto-generate Captions : Check	*/
+	captions_enabled?: 0 | 1
+	/**	Captions Language : Data	*/
+	captions_language?: string
+	/**	Daily Q&A digest : Check	*/
+	daily_qa_digest?: 0 | 1
+	/**	Lecture ready emails : Check	*/
+	lecture_ready_emails?: 0 | 1
+	/**	Submitted for Review On : Datetime	*/
+	submitted_on?: string
 }

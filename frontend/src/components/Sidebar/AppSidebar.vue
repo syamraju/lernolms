@@ -183,7 +183,7 @@
 					</Tooltip>
 					<Tooltip
 						v-if="showAppointmentIcon"
-						:text="__('Book a free onboarding session with the Frappe team')"
+						:text="__('Book a free onboarding session with the Learno team')"
 					>
 						<span
 							class="lucide-phone size-4 text-ink-gray-7 cursor-pointer"
@@ -201,7 +201,7 @@
 							"
 						/>
 					</Tooltip>
-					<Tooltip :text="__('Powered by Frappe Learning')">
+					<Tooltip :text="__('Powered by Learno')">
 						<span
 							class="lucide-zap size-4 text-ink-gray-7 cursor-pointer"
 							@click="redirectToWebsite()"
@@ -232,7 +232,7 @@
 			v-model="showHelpModal"
 			v-model:articles="articles"
 			appName="learning"
-			title="Frappe Learning"
+			title="Learno"
 			:logo="LMSLogo"
 			:afterSkip="(step) => capture('onboarding_step_skipped_' + step)"
 			:afterSkipAll="() => capture('onboarding_steps_skipped')"

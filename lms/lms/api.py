@@ -38,6 +38,7 @@ from lms.lms.doctype.course_lesson.course_lesson import (
 	save_progress,
 )
 from lms.lms.utils import (
+	DEMO_COURSE_TITLES,
 	LMS_ROLES,
 	can_modify_batch,
 	can_modify_course,
@@ -469,6 +470,52 @@ def get_branding():
 			settings.update({field: value})
 
 	return settings
+
+
+@frappe.whitelist(allow_guest=True)
+def get_login_options():
+	"""Sign-in options for the app's own login page.
+
+	The SPA login page replaces Frappe's /login, so it has to render the same
+	choices that page would: whichever social login keys the site has switched
+	on, and whether self sign-up is allowed. Everything returned here is already
+	public on /login — no key material, only the authorize URLs a visitor would
+	be redirected to anyway.
+	"""
+	from frappe.utils.oauth import get_oauth2_authorize_url
+
+	redirect_to = get_lms_route("/")
+	providers = []
+
+	for key in frappe.get_all(
+		"Social Login Key",
+		filters={"enable_social_login": 1},
+		fields=["name", "provider_name", "icon", "client_id", "base_url"],
+	):
+		# A key can be enabled before it is configured. Such a provider produces a
+		# URL that fails at the provider's end, so it is dropped rather than shown.
+		if not (key.client_id and key.base_url):
+			continue
+		try:
+			auth_url = get_oauth2_authorize_url(key.name, redirect_to)
+		except Exception:
+			# One misconfigured provider must not cost the visitor the whole page.
+			frappe.log_error(title=f"Social login URL failed for {key.name}")
+			continue
+
+		providers.append(
+			{
+				"name": key.name,
+				"label": key.provider_name or key.name,
+				"icon": key.icon,
+				"auth_url": auth_url,
+			}
+		)
+
+	return {
+		"providers": providers,
+		"allow_signup": not frappe.db.get_single_value("Website Settings", "disable_signup"),
+	}
 
 
 @frappe.whitelist()
@@ -2336,7 +2383,7 @@ def get_progress_distribution(progressList: list):
 @frappe.whitelist(allow_guest=True)
 def get_pwa_manifest():
 	"""Web app manifest for installing the LMS as a PWA."""
-	title = frappe.db.get_single_value("Website Settings", "app_name") or "Frappe Learning"
+	title = frappe.db.get_single_value("Website Settings", "app_name") or "Learno"
 	route = get_lms_route()
 
 	# `display` was absent, so it defaulted to "browser" and the installed app
@@ -2949,14 +2996,17 @@ def get_badges(member: str):
 @frappe.whitelist()
 def clear_demo_data():
 	frappe.only_for("Moderator")
-	quiz_title = "Do you know Frappe Learning?"
-	if frappe.db.exists("LMS Quiz", {"title": quiz_title}):
-		frappe.db.delete("LMS Quiz", {"title": quiz_title})
+	# Sites seeded before the Learno rebrand still carry the old titles, so clear
+	# both spellings.
+	quiz_titles = ["Do you know Learno?", "Do you know Frappe Learning?"]
+	frappe.db.delete("LMS Quiz", {"title": ["in", quiz_titles]})
 
-	demo_course = frappe.get_all("LMS Course", {"title": "A guide to Frappe Learning"}, pluck="name")
+	demo_courses = frappe.get_all(
+		"LMS Course", {"title": ["in", list(DEMO_COURSE_TITLES)]}, pluck="name"
+	)
 
-	if len(demo_course):
-		delete_course(demo_course[0])
+	for demo_course in demo_courses:
+		delete_course(demo_course)
 
 	users = ["ash@ipp.com", "john.doe@example.com", "jane.smith@example.com", "jannat@example.com"]
 	for user in users:

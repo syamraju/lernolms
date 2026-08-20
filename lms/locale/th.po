@@ -66,11 +66,11 @@ msgstr "<a href=\"https://docs.frappe.io/learning\">เอกสารประ�
 #: frontend/src/components/Modals/EmailTemplateModal.vue:48
 #: frontend/src/components/Settings/EmailTemplate/EmailTemplateAdd.vue:106
 #: frontend/src/components/Settings/EmailTemplate/EmailTemplateEdit.vue:105
-msgid "<p>Dear {{ member_name }},</p>\\n\\n<p>You have been enrolled in our upcoming batch {{ batch_name }}.</p>\\n\\n<p>Thanks,</p>\\n<p>Frappe Learning</p>"
+msgid "<p>Dear {{ member_name }},</p>\\n\\n<p>You have been enrolled in our upcoming batch {{ batch_name }}.</p>\\n\\n<p>Thanks,</p>\\n<p>Learno</p>"
 msgstr "<p>เรียน {{ member_name }},</p>\n\n"
 "<p>คุณได้รับการลงทะเบียนในรุ่น {{ batch_name }} ที่กำลังจะมาถึงของเรา</p>\n\n"
 "<p>ขอบคุณ,</p>\n"
-"<p>Frappe Learning</p>"
+"<p>Learno</p>"
 
 #. Header text in the Learning Workspace
 #: lms/lms/workspace/learning/learning.json
@@ -494,7 +494,7 @@ msgid "Answer"
 msgstr "คำตอบ"
 
 #: frontend/src/pages/PersonaForm.vue:18
-msgid "Answer a few quick questions so we can set Frappe Learning up for you"
+msgid "Answer a few quick questions so we can set Learno up for you"
 msgstr ""
 
 #: frontend/src/components/Settings/BrandSettings.vue:63
@@ -564,7 +564,7 @@ msgid "Are you sure you want to cancel this evaluation? This action cannot be un
 msgstr "คุณแน่ใจหรือไม่ว่าต้องการยกเลิกการประเมินนี้ การดำเนินการนี้ไม่สามารถย้อนกลับได้"
 
 #: frontend/src/components/Sidebar/UserDropdown.vue:237
-msgid "Are you sure you want to clear the demo data? This would delete the course \"A guide  to Frappe Learning\" along with all its associated data. This action cannot be undone."
+msgid "Are you sure you want to clear the demo data? This would delete the course \"A guide  to Learno\" along with all its associated data. This action cannot be undone."
 msgstr ""
 
 #: frontend/src/pages/Programs/ProgramForm.vue:556
@@ -2433,11 +2433,11 @@ msgstr "เรียน "
 #: frontend/src/components/Modals/EmailTemplateModal.vue:64
 #: frontend/src/components/Settings/EmailTemplate/EmailTemplateAdd.vue:109
 #: frontend/src/components/Settings/EmailTemplate/EmailTemplateEdit.vue:108
-msgid "Dear {{ member_name }},\\n\\nYou have been enrolled in our upcoming batch {{ batch_name }}.\\n\\nThanks,\\nFrappe Learning"
+msgid "Dear {{ member_name }},\\n\\nYou have been enrolled in our upcoming batch {{ batch_name }}.\\n\\nThanks,\\nLearno"
 msgstr "เรียน {{ member_name }},\n\n"
 "คุณได้รับการลงทะเบียนในรุ่น {{ batch_name }} ที่กำลังจะมาถึงของเรา\n\n"
 "ขอบคุณ,\n"
-"Frappe Learning"
+"Learno"
 
 #: frontend/src/pages/QuizForm.vue:234
 msgid "Deduct marks for incorrect answers."
@@ -3566,7 +3566,7 @@ msgstr "ชุดทางการ"
 
 #. Label of a Desktop Icon
 #: lms/desktop_icon/frappe_learning.json
-msgid "Frappe Learning"
+msgid "Learno"
 msgstr ""
 
 #: frontend/src/components/CourseCardOverlay.vue:222
@@ -4092,8 +4092,8 @@ msgstr "ติดตั้ง"
 
 #: frontend/src/components/InstallPrompt.vue:4
 #: frontend/src/components/InstallPrompt.vue:32
-msgid "Install Frappe Learning"
-msgstr "ติดตั้ง Frappe Learning"
+msgid "Install Learno"
+msgstr "ติดตั้ง Learno"
 
 #. Label of the institution_name (Data) field in DocType 'Education Detail'
 #: lms/lms/doctype/education_detail/education_detail.json
@@ -6551,7 +6551,7 @@ msgid "Postal Code"
 msgstr "รหัสไปรษณีย์"
 
 #: frontend/src/components/Sidebar/AppSidebar.vue:204
-msgid "Powered by Frappe Learning"
+msgid "Powered by Learno"
 msgstr ""
 
 #. Name of a DocType
@@ -8993,7 +8993,7 @@ msgid "Where did you hear about us?"
 msgstr "คุณได้ยินเกี่ยวกับเราจากที่ไหน?"
 
 #: frontend/src/pages/PersonaForm.vue:108
-msgid "Where will you be using Frappe Learning?"
+msgid "Where will you be using Learno?"
 msgstr ""
 
 #: lms/templates/emails/certification.html:10

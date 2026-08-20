@@ -32,6 +32,39 @@
   "section_break_gglp",
   "chapters",
   "related_courses",
+  "planning_tab",
+  "planning_section",
+  "course_type",
+  "time_commitment",
+  "column_break_plan",
+  "test_video",
+  "test_video_feedback",
+  "objectives_section",
+  "learning_objectives",
+  "requirements",
+  "intended_learners",
+  "landing_section",
+  "subtitle",
+  "language",
+  "column_break_landing",
+  "level",
+  "primary_topic",
+  "promo_video_section",
+  "promo_video",
+  "messages_section",
+  "welcome_message",
+  "congratulations_message",
+  "access_section",
+  "enrollment_privacy",
+  "enrollment_password",
+  "column_break_access",
+  "captions_enabled",
+  "captions_language",
+  "notifications_section",
+  "daily_qa_digest",
+  "lecture_ready_emails",
+  "column_break_notify",
+  "submitted_on",
   "pricing_tab",
   "pricing_section",
   "paid_course",
@@ -65,7 +98,7 @@
    "fieldname": "description",
    "fieldtype": "Text Editor",
    "label": "Description",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.published"
   },
   {
    "default": "0",
@@ -88,7 +121,7 @@
    "fieldname": "short_introduction",
    "fieldtype": "Small Text",
    "label": "Short Introduction",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.published"
   },
   {
    "default": "0",
@@ -219,6 +252,188 @@
   {
    "fieldname": "section_break_gglp",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "planning_tab",
+   "fieldtype": "Tab Break",
+   "label": "Course Creation"
+  },
+  {
+   "fieldname": "planning_section",
+   "fieldtype": "Section Break",
+   "label": "Plan your course"
+  },
+  {
+   "default": "Course",
+   "fieldname": "course_type",
+   "fieldtype": "Select",
+   "label": "Course Type",
+   "options": "Course\nPractice Test"
+  },
+  {
+   "fieldname": "time_commitment",
+   "fieldtype": "Select",
+   "label": "Time Commitment",
+   "options": "\n0-2 hours per week\n2-4 hours per week\n5+ hours per week\nNot decided yet"
+  },
+  {
+   "fieldname": "column_break_plan",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "A short practice recording used to get feedback before filming the real lectures.",
+   "fieldname": "test_video",
+   "fieldtype": "Attach",
+   "label": "Test Video"
+  },
+  {
+   "description": "Comma separated feedback areas requested for the test video.",
+   "fieldname": "test_video_feedback",
+   "fieldtype": "Small Text",
+   "label": "Test Video Feedback Areas"
+  },
+  {
+   "fieldname": "objectives_section",
+   "fieldtype": "Section Break",
+   "label": "Intended Learners"
+  },
+  {
+   "fieldname": "learning_objectives",
+   "fieldtype": "Table",
+   "label": "What will students learn",
+   "options": "LMS Course Objective"
+  },
+  {
+   "fieldname": "requirements",
+   "fieldtype": "Table",
+   "label": "Requirements or prerequisites",
+   "options": "LMS Course Objective"
+  },
+  {
+   "fieldname": "intended_learners",
+   "fieldtype": "Table",
+   "label": "Who this course is for",
+   "options": "LMS Course Objective"
+  },
+  {
+   "fieldname": "landing_section",
+   "fieldtype": "Section Break",
+   "label": "Course Landing Page"
+  },
+  {
+   "fieldname": "subtitle",
+   "fieldtype": "Data",
+   "label": "Course Subtitle",
+   "length": 120
+  },
+  {
+   "default": "English",
+   "fieldname": "language",
+   "fieldtype": "Data",
+   "label": "Language"
+  },
+  {
+   "fieldname": "column_break_landing",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "All Levels",
+   "fieldname": "level",
+   "fieldtype": "Select",
+   "label": "Level",
+   "options": "All Levels\nBeginner Level\nIntermediate Level\nExpert Level"
+  },
+  {
+   "description": "The single skill this course primarily teaches, e.g. Landscape Photography.",
+   "fieldname": "primary_topic",
+   "fieldtype": "Data",
+   "label": "Primarily Taught"
+  },
+  {
+   "fieldname": "promo_video_section",
+   "fieldtype": "Section Break",
+   "label": "Promotional Video"
+  },
+  {
+   "fieldname": "promo_video",
+   "fieldtype": "Attach",
+   "label": "Promotional Video"
+  },
+  {
+   "fieldname": "messages_section",
+   "fieldtype": "Section Break",
+   "label": "Course Messages"
+  },
+  {
+   "fieldname": "welcome_message",
+   "fieldtype": "Text Editor",
+   "label": "Welcome Message"
+  },
+  {
+   "fieldname": "congratulations_message",
+   "fieldtype": "Text Editor",
+   "label": "Congratulations Message"
+  },
+  {
+   "fieldname": "access_section",
+   "fieldtype": "Section Break",
+   "label": "Enrollment"
+  },
+  {
+   "default": "Public",
+   "fieldname": "enrollment_privacy",
+   "fieldtype": "Select",
+   "label": "Enrollment (Privacy)",
+   "options": "Public\nPrivate (Invite Only)\nPrivate (Password Protected)"
+  },
+  {
+   "depends_on": "eval:doc.enrollment_privacy == 'Private (Password Protected)'",
+   "fieldname": "enrollment_password",
+   "fieldtype": "Password",
+   "label": "Enrollment Password"
+  },
+  {
+   "fieldname": "column_break_access",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "captions_enabled",
+   "fieldtype": "Check",
+   "label": "Auto-generate Captions"
+  },
+  {
+   "default": "English (US)",
+   "fieldname": "captions_language",
+   "fieldtype": "Data",
+   "label": "Captions Language"
+  },
+  {
+   "fieldname": "notifications_section",
+   "fieldtype": "Section Break",
+   "label": "Email Notifications"
+  },
+  {
+   "default": "0",
+   "fieldname": "daily_qa_digest",
+   "fieldtype": "Check",
+   "label": "Daily Q&A digest"
+  },
+  {
+   "default": "0",
+   "fieldname": "lecture_ready_emails",
+   "fieldtype": "Check",
+   "label": "Lecture ready emails"
+  },
+  {
+   "fieldname": "column_break_notify",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "submitted_on",
+   "fieldtype": "Datetime",
+   "label": "Submitted for Review On",
+   "read_only": 1
   },
   {
    "fieldname": "pricing_tab",

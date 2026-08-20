@@ -190,11 +190,20 @@ const MANIFEST: Record<string, Privacy[]> = {
 	'components/Modals/EditCoverImage.vue': ['public'],
 	'components/UnsplashImageBrowser.vue': ['public'],
 	'components/Courses/CourseThumbnailField.vue': ['public', 'public'],
+	// A caption track is fetched by the video player alongside the lecture, on
+	// the same terms as the poster image — it has to be readable without the
+	// player holding a session for the File itself.
+	'pages/Courses/Manage/StepCaptions.vue': ['public'],
 	// Deliberately not readable by other users.
 	'components/Assignment.vue': ['private', 'private', 'private'],
 	'components/Modals/JobApplicationModal.vue': ['private'],
 	'pages/Forms/ChapterForm.vue': ['private'],
 	'components/Notes/Notes.vue': ['private'],
+	// Lecture video, uploaded from the curriculum editor. Private and attached
+	// to its Course Lesson, so access follows the lesson's own permission —
+	// the same shape UploadPlugin uses for video dropped into a lesson body,
+	// and what keeps paid course content out of reach of a bare URL.
+	'pages/Courses/Manage/StepCurriculum.vue': ['private'],
 	// Neither literal. `per-field` reads the field's own `public` flag and
 	// `computed` is any other expression. `undeclared` passes no uploadArgs at
 	// all — for a RichTextEditor that means private, because its uploadFile
@@ -217,6 +226,11 @@ const MANIFEST: Record<string, Privacy[]> = {
 	'pages/Forms/EmailTemplateForm.vue': ['undeclared'],
 	'pages/Forms/NewBatchForm.vue': ['undeclared'],
 	'components/Courses/CourseOverviewSection.vue': ['undeclared'],
+	// RichTextEditor bodies in the guided creation flow: the course description
+	// and the two automated course messages. Same standing caveat as the other
+	// `undeclared` rows — a pasted image lands private.
+	'pages/Courses/Manage/StepLandingPage.vue': ['undeclared'],
+	'pages/Courses/Manage/StepMessages.vue': ['undeclared', 'undeclared'],
 	'pages/Forms/NewCourseForm.vue': ['undeclared'],
 	'pages/JobApplications.vue': ['undeclared'],
 	'pages/Forms/JobForm.vue': ['undeclared'],

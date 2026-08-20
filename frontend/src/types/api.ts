@@ -53,8 +53,10 @@ export interface Membership {
 	certificate?: string
 }
 
-export interface CourseDetails
-	extends Omit<LMSCourse, 'instructors' | 'rating'> {
+export interface CourseDetails extends Omit<
+	LMSCourse,
+	'instructors' | 'rating'
+> {
 	price?: string
 	current_lesson?: string
 	instructors: CourseInstructorInfo[]
@@ -132,4 +134,58 @@ export interface CourseFormContext {
 	relatedCourses: Ref<string[]>
 	meta: CourseFormMeta
 	markDirty: () => void
+}
+
+/** One unmet requirement standing between a draft and "Under Review". */
+export interface CourseSubmitBlocker {
+	/** Rail step the author has to visit to clear it. */
+	step: string
+	message: string
+}
+
+/** Shape of `lms.lms.course_creation.get_course_creation_status`. */
+export interface CourseCreationStatus {
+	course: string
+	title: string
+	status: 'In Progress' | 'Under Review' | 'Approved'
+	published: 0 | 1
+	/** Rail step key → whether that step reads as done. */
+	steps: Record<string, boolean>
+	blockers: CourseSubmitBlocker[]
+	can_submit: boolean
+	lectures: number
+	video_seconds: number
+	/** Lectures whose video length was never recorded, so it can be disclosed. */
+	lectures_without_duration: number
+	objectives: number
+	requirements: number
+	intended_learners: number
+	description_words: number
+}
+
+/** What the manage shell provides to every step body. */
+export interface CourseManageContext {
+	resource: Resource<LMSCourse | null>
+	status: Resource<CourseCreationStatus | null>
+	isDirty: Ref<boolean>
+	/** Queue an autosave; steps call this after mutating `resource.doc`. */
+	markDirty: () => void
+	/** Save now and resolve once the write lands. */
+	save: () => Promise<void>
+	goToStep: (key: string) => void
+}
+
+export interface CourseInstructorRow {
+	name: string
+	instructor: string
+	full_name: string
+	user_image?: string | null
+	invitation_status?: 'Accepted' | 'Pending'
+	is_visible: 0 | 1
+	can_manage_course: 0 | 1
+	can_manage_captions: 0 | 1
+	can_view_performance: 0 | 1
+	can_manage_qa: 0 | 1
+	can_manage_assignments: 0 | 1
+	can_manage_reviews: 0 | 1
 }

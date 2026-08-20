@@ -15,11 +15,11 @@
 
 		<!-- Non-brand options: neutral Lucide glyphs. Fixed gray, not an ink
 		     token: the tile stays white in dark mode, so the glyph must too. -->
-		<component :is="glyph" v-else-if="glyph" class="size-3.5 text-[#525252]" />
+		<component :is="glyph" v-else-if="glyph" class="size-3.5 text-[#656871]" />
 
 		<!-- Unknown tool: neutral placeholder -->
 		<svg v-else viewBox="0 0 20 20" width="14" height="14">
-			<rect width="20" height="20" rx="5" fill="#F1F1F1" />
+			<rect width="20" height="20" rx="5" fill="#f3f3f7" />
 			<text
 				x="10"
 				y="10"
@@ -28,7 +28,7 @@
 				font-size="11"
 				font-weight="600"
 				font-family="ui-sans-serif, system-ui, sans-serif"
-				fill="#6B6B6B"
+				fill="#656871"
 			>
 				?
 			</text>

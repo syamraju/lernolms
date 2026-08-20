@@ -1,11 +1,11 @@
 <template>
 	<div
 		v-if="course.title"
-		class="flex flex-col h-full rounded-md overflow-auto text-ink-gray-9 bg-surface-elevation-1"
+		class="flex flex-col h-full rounded-7 overflow-hidden border border-outline-gray-2 text-ink-gray-9 bg-surface-elevation-1"
 		style="min-height: 350px"
 	>
 		<div
-			class="w-[100%] h-[168px] bg-cover bg-center bg-no-repeat border-t border-x rounded-t-md"
+			class="w-[100%] h-[168px] bg-cover bg-center bg-no-repeat border-b border-outline-gray-2"
 			:style="
 				course.image
 					? { backgroundImage: `url('${encodeURI(course.image)}')` }
@@ -47,7 +47,7 @@
 				{{ course.title }}
 			</div>
 		</div>
-		<div class="flex flex-col flex-auto p-4 border-x-2 border-b-2 rounded-b-md">
+		<div class="flex flex-col flex-auto p-4">
 			<div class="flex items-center justify-between mb-2">
 				<div v-if="course.lessons">
 					<Tooltip :text="__('Lessons')">
@@ -160,16 +160,23 @@ const gradientColor = computed(() => {
 })
 </script>
 <style>
+/* Also worn by the server-rendered widget (lms/lms/widgets/CourseCard.html).
+   The pill sits on the course image, so it stays light in both themes —
+   --white is a fixed palette value, not a themed token. On the CDS scale 12px
+   is the smallest step and 700 the heading weight; Open Sans needs no
+   tracking. */
 .course-card-pills {
-	background: #ffffff;
+	background: var(--white);
+	color: var(--cds-text-body-default);
 	margin-left: 0;
 	margin-right: 0.5rem;
 	padding: 3.5px 8px;
-	font-size: 11px;
+	border-radius: var(--cds-radius-badge);
+	font-size: 12px;
 	text-align: center;
-	letter-spacing: 0.011em;
+	letter-spacing: normal;
 	text-transform: uppercase;
-	font-weight: 600;
+	font-weight: 700;
 	width: fit-content;
 }
 

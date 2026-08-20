@@ -35,7 +35,7 @@
 							>
 								{{ branding.data?.app_name }}
 							</span>
-							<span v-else> Learning </span>
+							<span v-else> Learno </span>
 						</div>
 						<div
 							v-if="userResource.data"
@@ -74,12 +74,10 @@ import { usersStore } from '@/stores/user'
 import { useSettings } from '@/stores/settings'
 import { h, watch, ref, computed } from 'vue'
 import { createDialog } from '@/utils/dialogs'
-import FrappeCloudIcon from '@/components/Icons/FrappeCloudIcon.vue'
 import LMSLogo from '@/components/Icons/LMSLogo.vue'
 import SettingsModal from '@/components/Settings/Settings.vue'
 import { Moon, Sun } from 'lucide-vue-next'
 import { safeUrl } from '@/utils/safeUrl'
-import { openExternal } from '@/utils/openExternal'
 
 const router = useRouter()
 const { logout, branding } = sessionStore()
@@ -87,7 +85,6 @@ let { userResource } = usersStore()
 const settingsStore = useSettings()
 let { isLoggedIn } = sessionStore()
 const showSettingsModal = ref(false)
-const frappeCloudBaseEndpoint = 'https://frappecloud.com'
 const $dialog = createDialog
 
 const props = defineProps({
@@ -229,34 +226,6 @@ const userDropdownOptions = computed(() => {
 					},
 				},
 				{
-					icon: FrappeCloudIcon,
-					label: 'Login to Frappe Cloud',
-					onClick: () => {
-						$dialog({
-							title: __('Login to Frappe Cloud?'),
-							message: __(
-								'Are you sure you want to login to your Frappe Cloud dashboard?'
-							),
-							actions: [
-								{
-									label: __('Confirm'),
-									variant: 'solid',
-									onClick(close) {
-										loginToFrappeCloud()
-										close()
-									},
-								},
-							],
-						})
-					},
-					condition: () => {
-						return (
-							userResource.data?.is_system_manager &&
-							userResource.data?.is_fc_site
-						)
-					},
-				},
-				{
 					icon: 'lucide-log-out',
 					label: 'Log out',
 					onClick: () => {
@@ -283,16 +252,11 @@ const userDropdownOptions = computed(() => {
 	]
 })
 
-const loginToFrappeCloud = () => {
-	let redirect_to = '/dashboard/sites/' + userResource.data.sitename
-	openExternal(`${frappeCloudBaseEndpoint}${redirect_to}`)
-}
-
 const clearDemoDataConfirmation = () => {
 	$dialog({
 		title: __('Confirm clearing demo data?'),
 		message: __(
-			'Are you sure you want to clear the demo data? This would delete the course "A guide  to Frappe Learning" along with all its associated data. This action cannot be undone.'
+			'Are you sure you want to clear the demo data? This would delete the course "A guide to Learno" along with all its associated data. This action cannot be undone.'
 		),
 		actions: [
 			{

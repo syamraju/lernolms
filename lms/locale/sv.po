@@ -66,7 +66,7 @@ msgstr "<a href=\"https://docs.frappe.io/learning\">Dokumentation</a>"
 #: frontend/src/components/Modals/EmailTemplateModal.vue:48
 #: frontend/src/components/Settings/EmailTemplate/EmailTemplateAdd.vue:106
 #: frontend/src/components/Settings/EmailTemplate/EmailTemplateEdit.vue:105
-msgid "<p>Dear {{ member_name }},</p>\\n\\n<p>You have been enrolled in our upcoming batch {{ batch_name }}.</p>\\n\\n<p>Thanks,</p>\\n<p>Frappe Learning</p>"
+msgid "<p>Dear {{ member_name }},</p>\\n\\n<p>You have been enrolled in our upcoming batch {{ batch_name }}.</p>\\n\\n<p>Thanks,</p>\\n<p>Learno</p>"
 msgstr "<p>Kära {{ member_name }},</p>\\n\\n<p>Du har blivit inskriven i vår kommande grupp {{ batch_name }}.</p>\\n\\n<p>Tack så mycket,</p>\\n<p>Frappe Lärande</p>"
 
 #. Header text in the Learning Workspace
@@ -491,7 +491,7 @@ msgid "Answer"
 msgstr "Svara"
 
 #: frontend/src/pages/PersonaForm.vue:18
-msgid "Answer a few quick questions so we can set Frappe Learning up for you"
+msgid "Answer a few quick questions so we can set Learno up for you"
 msgstr "Svara på några snabba frågor så att vi kan ordna Lärande åt dig"
 
 #: frontend/src/components/Settings/BrandSettings.vue:63
@@ -561,8 +561,8 @@ msgid "Are you sure you want to cancel this evaluation? This action cannot be un
 msgstr "Är du säker på att du vill avbryta denna utvärdering? Denna åtgärd kan inte ångras."
 
 #: frontend/src/components/Sidebar/UserDropdown.vue:237
-msgid "Are you sure you want to clear the demo data? This would delete the course \"A guide  to Frappe Learning\" along with all its associated data. This action cannot be undone."
-msgstr "Är du säker på att du vill rensa demo data? Detta skulle ta bort kurs \"En guide till Frappe Learning\" tillsammans med all tillhörande data. Åtgärd kan inte ångras."
+msgid "Are you sure you want to clear the demo data? This would delete the course \"A guide  to Learno\" along with all its associated data. This action cannot be undone."
+msgstr "Är du säker på att du vill rensa demo data? Detta skulle ta bort kurs \"En guide till Learno\" tillsammans med all tillhörande data. Åtgärd kan inte ångras."
 
 #: frontend/src/pages/Programs/ProgramForm.vue:556
 msgid "Are you sure you want to delete this program? This action cannot be undone."
@@ -2430,7 +2430,7 @@ msgstr "Hej "
 #: frontend/src/components/Modals/EmailTemplateModal.vue:64
 #: frontend/src/components/Settings/EmailTemplate/EmailTemplateAdd.vue:109
 #: frontend/src/components/Settings/EmailTemplate/EmailTemplateEdit.vue:108
-msgid "Dear {{ member_name }},\\n\\nYou have been enrolled in our upcoming batch {{ batch_name }}.\\n\\nThanks,\\nFrappe Learning"
+msgid "Dear {{ member_name }},\\n\\nYou have been enrolled in our upcoming batch {{ batch_name }}.\\n\\nThanks,\\nLearno"
 msgstr "Kära {{ member_name }},\\n\\nDu har blivit inskriven i vår kommande grupp {{ batch_name }}.\\n\\nTack,\\nFrappe Lärande"
 
 #: frontend/src/pages/QuizForm.vue:234
@@ -3560,7 +3560,7 @@ msgstr "Formella Kläder"
 
 #. Label of a Desktop Icon
 #: lms/desktop_icon/frappe_learning.json
-msgid "Frappe Learning"
+msgid "Learno"
 msgstr "Utbildning"
 
 #: frontend/src/components/CourseCardOverlay.vue:222
@@ -4086,8 +4086,8 @@ msgstr "Installera"
 
 #: frontend/src/components/InstallPrompt.vue:4
 #: frontend/src/components/InstallPrompt.vue:32
-msgid "Install Frappe Learning"
-msgstr "Installera Frappe Learning"
+msgid "Install Learno"
+msgstr "Installera Learno"
 
 #. Label of the institution_name (Data) field in DocType 'Education Detail'
 #: lms/lms/doctype/education_detail/education_detail.json
@@ -6545,8 +6545,8 @@ msgid "Postal Code"
 msgstr "Postnummer"
 
 #: frontend/src/components/Sidebar/AppSidebar.vue:204
-msgid "Powered by Frappe Learning"
-msgstr "Drivs av Frappe Learning"
+msgid "Powered by Learno"
+msgstr "Drivs av Learno"
 
 #. Name of a DocType
 #: lms/lms/doctype/preferred_function/preferred_function.json
@@ -8987,7 +8987,7 @@ msgid "Where did you hear about us?"
 msgstr "Var har du hört talas om oss?"
 
 #: frontend/src/pages/PersonaForm.vue:108
-msgid "Where will you be using Frappe Learning?"
+msgid "Where will you be using Learno?"
 msgstr "Var kommer du att använda Lärande?"
 
 #: lms/templates/emails/certification.html:10

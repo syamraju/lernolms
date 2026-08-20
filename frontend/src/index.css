@@ -1,6 +1,19 @@
+@import '@fontsource-variable/open-sans';
 @import 'frappe-ui/style.css';
 @import 'frappe-ui/list-style.css';
+/* Cloudscape (CDS) layer. Must follow frappe-ui: both declare the same custom
+   properties at the same specificity, so source order decides. Generated from
+   the Figma library — see tailwind/cds/. */
+@import './styles/cds-tokens.css';
+@import './styles/cds-typography.css';
+@import './styles/cds-components.css';
 @import './styles/blockEditor.css';
+/* Learno student layer. Everything in it is scoped under `.learno`, which only
+   the student shell carries, so it cannot reach the author/admin app — see the
+   note at the top of the file for why the two designs are kept apart. DM Sans
+   is the student design's typeface; the admin app stays on Open Sans. */
+@import '@fontsource-variable/dm-sans';
+@import './styles/learno.css';
 
 /* Nothing has ever painted the document. frappe-ui's style.css declares the
    theme variables but sets no background on html or body, so the canvas stayed
@@ -72,11 +85,12 @@ main#main-content {
 	@apply text-p-base py-0;
 }
 
-/* This build makes --surface-sidebar transparent in dark mode; point it at
-   gray-1 so the sidebar keeps a visible surface. */
+/* The CDS layer gives --surface-sidebar a concrete value in both themes (a
+   grey one step darker than the page, matching Cloudscape's side navigation),
+   so the old gray-1 fallback for frappe-ui's transparent dark value is gone.
+   color-scheme still has to be set here — it is not a custom property. */
 [data-theme='dark'] {
 	color-scheme: dark;
-	--surface-sidebar: var(--surface-gray-1);
 }
 
 /* frappe-ui beta.7 FormLabel differs from InputLabel; match standalone labels

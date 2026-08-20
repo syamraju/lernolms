@@ -17,7 +17,7 @@ const decl = vi.hoisted(() => ({
 	providers: [
 		{
 			name: 'LMS',
-			label: 'Frappe Learning',
+			label: 'Learno',
 			rule_types: [
 				{
 					type: 'All Enrolled Students',

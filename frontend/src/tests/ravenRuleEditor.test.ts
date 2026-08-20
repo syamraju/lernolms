@@ -56,7 +56,7 @@ vi.stubGlobal('__', (s: string) => s)
 
 const LMS: ProviderDeclaration = {
 	name: 'LMS',
-	label: 'Frappe Learning',
+	label: 'Learno',
 	rule_types: [
 		{
 			type: 'All Enrolled Students',

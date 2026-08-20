@@ -9,6 +9,23 @@
 		doc-prop="course"
 	>
 		<template #actions="{ tab }">
+			<!-- The guided setup is the front door for finishing a course, so it
+			     stays reachable from every tab rather than living inside one. -->
+			<Tooltip v-if="isAdmin" :text="__('Guided course setup')">
+				<Button
+					variant="ghost"
+					:class="isMobile ? '!size-9' : ''"
+					:label="__('Course setup')"
+					@click="openCourseSetup()"
+				>
+					<template #icon v-if="isMobile">
+						<span class="lucide-list-checks size-4" />
+					</template>
+					<template #prefix v-else>
+						<span class="lucide-list-checks size-4" />
+					</template>
+				</Button>
+			</Tooltip>
 			<template v-if="tab?.key === 'settings' && courseFormRef">
 				<Badge v-if="courseFormRef.isDirty" theme="orange">
 					{{ __('Not Saved') }}
@@ -346,6 +363,13 @@ function togglePublishCourse() {
 // so the button navigates instead of reaching into the tab instance. Hash and
 // query both travel: the hash names the tab this page returns to, and the query
 // holds CourseEditor's open lesson.
+function openCourseSetup() {
+	router.push({
+		name: 'CourseManage',
+		params: { courseName: props.courseName, step: 'intended-learners' },
+	})
+}
+
 function openEnrollForm() {
 	openFormRoute(router, {
 		name: 'NewCourseEnrollment',

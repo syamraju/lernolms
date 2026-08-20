@@ -3,11 +3,11 @@ import frappe
 from . import __version__ as app_version
 
 app_name = "frappe_lms"
-app_title = "Learning"
-app_publisher = "Frappe"
-app_description = "Open Source Learning Management System built with Frappe Framework"
+app_title = "Learno"
+app_publisher = "Learno"
+app_description = "Learno — an easy to use, open source Learning Management System"
 app_icon_url = "/assets/lms/images/lms-logo.png"
-app_icon_title = "Learning"
+app_icon_title = "Learno"
 app_icon_route = "/lms"
 app_color = "grey"
 app_email = "jannat@frappe.io"
@@ -53,7 +53,11 @@ web_include_js = []
 # ----------
 
 # application home page (will override Website Settings)
-# home_page = "login"
+# The site root is the app, and the app's first screen is its own login page.
+# Without this, `/` falls through to whatever Website Settings points at — on a
+# fresh site, Frappe's default website home — so the first thing a visitor sees
+# before signing in is a page that is not ours.
+home_page = get_lms_path()
 
 # website user home page (by Role)
 # role_home_page = {

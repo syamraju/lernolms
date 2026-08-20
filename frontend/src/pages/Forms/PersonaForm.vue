@@ -49,7 +49,7 @@ const steps = computed(() => [
 	{
 		key: 'discovery_source',
 		type: 'tags',
-		title: __('How did you hear about Frappe Learning?'),
+		title: __('How did you hear about Learno?'),
 		subtitle: PERSONALISE_HINT,
 		options: [
 			{
@@ -57,14 +57,6 @@ const steps = computed(() => [
 				value: 'Search engine',
 			},
 			{ label: __('GitHub'), value: 'GitHub' },
-			{
-				label: __('Already using Frappe / ERPNext'),
-				value: 'Already using Frappe / ERPNext',
-			},
-			{
-				label: __('Frappe Cloud Marketplace'),
-				value: 'Frappe Cloud Marketplace',
-			},
 			{ label: __('Social media'), value: 'Social media' },
 			{ label: __('Friend or colleague'), value: 'Friend or colleague' },
 			{
@@ -77,7 +69,7 @@ const steps = computed(() => [
 	{
 		key: 'usage_context',
 		type: 'tags',
-		title: __('Where will you be using Frappe Learning?'),
+		title: __('Where will you be using Learno?'),
 		subtitle: PERSONALISE_HINT,
 		options: [
 			{ label: __('School'), value: 'School' },

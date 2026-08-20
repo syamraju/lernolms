@@ -5,6 +5,15 @@
 // memory history, rather than a copy that could drift from what router.js
 // actually registers.
 export const routes = [
+	// The only route a signed-out visitor may reach. `meta.isPublic` is what the
+	// guard in router.js keys off, so adding another public page is a one-line
+	// change here rather than a name check inside the guard.
+	{
+		path: '/login',
+		name: 'Login',
+		component: () => import('@/pages/Login.vue'),
+		meta: { isPublic: true, noLayout: true },
+	},
 	{
 		path: '/',
 		name: 'Home',
@@ -32,6 +41,28 @@ export const routes = [
 				component: () => import('@/pages/Forms/CourseImportForm.vue'),
 			},
 		],
+	},
+	// The guided creation wizard and the editing shell it hands off to both own
+	// their whole chrome (a dark command bar and a step rail), so they opt out
+	// of the app layout rather than nesting inside it. Registered ahead of
+	// '/courses/:courseName' — '/courses/create' would otherwise be read as a
+	// course named "create", the same trade already documented for
+	// '/courses/new'.
+	{
+		path: '/courses/create',
+		name: 'CourseCreate',
+		component: () =>
+			import('@/pages/Courses/Create/CourseCreateWizard.vue'),
+		meta: { noLayout: true },
+	},
+	{
+		// `:step?` keeps a bare /manage URL valid; the shell redirects it to the
+		// first step so a refresh always lands somewhere real.
+		path: '/courses/:courseName/manage/:step?',
+		name: 'CourseManage',
+		component: () => import('@/pages/Courses/Manage/CourseManage.vue'),
+		props: true,
+		meta: { noLayout: true },
 	},
 	{
 		path: '/courses/:courseName',
@@ -349,18 +380,14 @@ export const routes = [
 		path: '/programming-exercises/submissions',
 		name: 'ProgrammingExerciseSubmissions',
 		component: () =>
-			import(
-				'@/pages/ProgrammingExercises/ProgrammingExerciseSubmissions.vue'
-			),
+			import('@/pages/ProgrammingExercises/ProgrammingExerciseSubmissions.vue'),
 		props: true,
 	},
 	{
 		path: '/programming-exercises/:exerciseID/submission/:submissionID',
 		name: 'ProgrammingExerciseSubmission',
 		component: () =>
-			import(
-				'@/pages/ProgrammingExercises/ProgrammingExerciseSubmission.vue'
-			),
+			import('@/pages/ProgrammingExercises/ProgrammingExerciseSubmission.vue'),
 		props: true,
 	},
 	{
@@ -401,6 +428,69 @@ export const routes = [
 		name: 'MemberForm',
 		component: () => import('@/pages/Forms/MemberForm.vue'),
 		props: true,
+	},
+	// ------------------------------------------------------------------ /learn
+	// The student experience built from the Learno Figma. It is a sibling tree
+	// rather than a re-skin of the pages above: the two designs disagree about
+	// what the same semantic token means (see src/styles/learno.css), and the
+	// pages above are shared with the author/moderator app, which this design
+	// does not describe.
+	//
+	// `meta.layout: 'student'` is what App.vue keys the shell off, the same way
+	// `meta.noLayout` already selects NoSidebarLayout.
+	{
+		path: '/learn',
+		name: 'StudentDashboard',
+		component: () => import('@/pages/Student/StudentDashboard.vue'),
+		meta: { layout: 'student' },
+	},
+	{
+		path: '/learn/courses',
+		name: 'StudentCourses',
+		component: () => import('@/pages/Student/StudentCourses.vue'),
+		meta: { layout: 'student' },
+	},
+	{
+		path: '/learn/courses/:courseName',
+		name: 'StudentCourseDetail',
+		component: () => import('@/pages/Student/StudentCourseDetail.vue'),
+		meta: { layout: 'student' },
+	},
+	{
+		path: '/learn/courses/:courseName/session/:chapterNumber-:lessonNumber',
+		name: 'StudentSession',
+		component: () => import('@/pages/Student/StudentSession.vue'),
+		meta: { layout: 'student' },
+	},
+	{
+		path: '/learn/calendar',
+		name: 'StudentCalendar',
+		component: () => import('@/pages/Student/StudentCalendar.vue'),
+		meta: { layout: 'student' },
+	},
+	{
+		path: '/learn/materials',
+		name: 'StudentMaterials',
+		component: () => import('@/pages/Student/StudentMaterials.vue'),
+		meta: { layout: 'student' },
+	},
+	{
+		path: '/learn/chats',
+		name: 'StudentChats',
+		component: () => import('@/pages/Student/StudentChats.vue'),
+		meta: { layout: 'student' },
+	},
+	{
+		path: '/learn/support',
+		name: 'StudentSupport',
+		component: () => import('@/pages/Student/StudentSupport.vue'),
+		meta: { layout: 'student' },
+	},
+	{
+		path: '/learn/settings',
+		name: 'StudentSettings',
+		component: () => import('@/pages/Student/StudentSettings.vue'),
+		meta: { layout: 'student' },
 	},
 	{
 		path: '/:pathMatch(.*)*',
