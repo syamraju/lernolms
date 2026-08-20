@@ -217,7 +217,7 @@
 							role="tab"
 							class="learno-tab flex items-center gap-2"
 							:aria-selected="panel === item.value"
-							@click="panel = item.value"
+							@click="selectPanel(item.value)"
 						>
 							<span :class="[item.icon, 'size-4']" aria-hidden="true" />
 							{{ item.label }}
@@ -309,7 +309,12 @@ const chapterNumber = computed(() => String(route.params.chapterNumber))
 const lessonNumber = computed(() => String(route.params.lessonNumber))
 
 const railOpen = ref(true)
+// The design opens on Download (frame 122:81352). That only reads as the right
+// default when there is something to download — otherwise the first thing the
+// student sees is an empty box. `panelTouched` stops the automatic choice from
+// overriding a tab the student picked themselves.
 const panel = ref<'notes' | 'downloads'>('downloads')
+const panelTouched = ref(false)
 const completing = ref(false)
 
 const panels = computed(() => [
@@ -407,6 +412,18 @@ const lessonMaterials = computed(() => {
 			files: (chapter.files || []).filter((file: any) => file.lesson === name),
 		}))
 		.filter((chapter: any) => chapter.files.length)
+})
+
+function selectPanel(value: 'notes' | 'downloads') {
+	panel.value = value
+	panelTouched.value = true
+}
+
+// Re-evaluated per lesson: one lesson in a course can carry files and the next
+// none, so the default has to follow the lesson, not the course.
+watch([lessonMaterials, () => lesson.data?.name], () => {
+	if (panelTouched.value) return
+	panel.value = lessonMaterials.value.length ? 'downloads' : 'notes'
 })
 
 const progress = createResource({
