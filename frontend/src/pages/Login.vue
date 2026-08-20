@@ -34,7 +34,9 @@
 						<span class="text-[22px] font-semibold text-[#272727]">
 							{{ brandName }}
 						</span>
-						<span class="mt-0.5 text-[13px] text-[#272727]">{{ __('edu') }}</span>
+						<span class="mt-0.5 text-[13px] text-[#272727]">{{
+							__('edu')
+						}}</span>
 					</span>
 				</span>
 
@@ -46,7 +48,7 @@
 						<p class="mt-5 text-[16px] leading-[1.7] text-[#7a5b5b]">
 							{{
 								__(
-									'Your courses, sessions, materials and certificates — with your progress carried across all of them.'
+									'Your courses, sessions, materials and certificates — with your progress carried across all of them.',
 								)
 							}}
 						</p>
@@ -80,7 +82,9 @@
 					>
 						{{ __('Welcome to {0}').format(brandName) }}
 					</h1>
-					<p class="mt-2 text-center text-[14px] text-[var(--learno-ink-muted)]">
+					<p
+						class="mt-2 text-center text-[14px] text-[var(--learno-ink-muted)]"
+					>
 						{{ subtitle }}
 					</p>
 
@@ -94,17 +98,26 @@
 						     being swapped for a summary row: swapping it out loses the
 						     browser's password-manager association between the address
 						     and the password field that appears next to it. -->
-						<label class="sr-only" for="login-email">{{ __('Email') }}</label>
+						<label class="sr-only" for="login-email">
+							{{ __('Email or username') }}
+						</label>
+						<!-- `text`, NOT `email`. Frappe's login takes `usr`, which is an
+						     email OR a username — `Administrator`, the account every site
+						     ships with, is the latter. type="email" made the browser
+						     reject it before the request was ever sent, locking out the
+						     one account a fresh site definitely has. inputmode keeps the
+						     phone keyboard email-shaped for the common case. -->
 						<input
 							id="login-email"
 							ref="emailInput"
 							v-model.trim="email"
-							type="email"
+							type="text"
+							inputmode="email"
 							name="username"
 							autocomplete="username"
 							required
 							:readonly="step === 'password'"
-							:placeholder="__('Email address')"
+							:placeholder="__('Email or username')"
 							class="login-field"
 							:class="step === 'password' && 'text-[var(--learno-ink-muted)]'"
 						/>
@@ -218,67 +231,67 @@
 						{{ message }}
 					</p>
 
-					<div class="my-6 flex items-center gap-4">
-						<span class="h-px flex-1 bg-[var(--learno-line)]"></span>
-						<span class="text-[12px] text-[var(--learno-ink-subtle)]">
-							{{ __('or') }}
-						</span>
-						<span class="h-px flex-1 bg-[var(--learno-line)]"></span>
-					</div>
-
-					<button
-						v-if="!showOptions"
-						type="button"
-						class="learno-btn learno-btn-secondary w-full py-3 text-[14px]"
-						@click="showOptions = true"
-					>
-						{{ __('Show other options') }}
-					</button>
-
-					<div v-else class="space-y-3">
-						<a
-							v-for="provider in providers"
-							:key="provider.name"
-							:href="safeUrl(provider.auth_url)"
-							class="learno-btn learno-btn-secondary w-full py-3 text-[14px]"
-						>
-							<img
-								v-if="provider.icon"
-								:src="safeUrl(provider.icon)"
-								alt=""
-								class="size-4"
-							/>
-							{{ __('Continue with {0}').format(provider.label) }}
-						</a>
+					<!-- Only when there is something behind it. A site with no social
+				     login keys and sign-up switched off has exactly one way in, and
+				     a button that expands to nothing is worse than no button. -->
+					<template v-if="hasOtherOptions">
+						<div class="my-6 flex items-center gap-4">
+							<span class="h-px flex-1 bg-[var(--learno-line)]"></span>
+							<span class="text-[12px] text-[var(--learno-ink-subtle)]">
+								{{ __('or') }}
+							</span>
+							<span class="h-px flex-1 bg-[var(--learno-line)]"></span>
+						</div>
 
 						<button
-							v-if="mode === 'signin' && allowSignup"
+							v-if="!showOptions"
 							type="button"
 							class="learno-btn learno-btn-secondary w-full py-3 text-[14px]"
-							@click="switchMode('signup')"
+							@click="showOptions = true"
 						>
-							{{ __('Create an account') }}
-						</button>
-						<button
-							v-if="mode === 'signup'"
-							type="button"
-							class="learno-btn learno-btn-secondary w-full py-3 text-[14px]"
-							@click="switchMode('signin')"
-						>
-							{{ __('Sign in instead') }}
+							{{ __('Show other options') }}
 						</button>
 
-						<a
-							href="/app"
-							class="learno-btn learno-btn-secondary w-full py-3 text-[14px]"
-						>
-							{{ __('Go to the desk') }}
-						</a>
-					</div>
+						<div v-else class="space-y-3">
+							<a
+								v-for="provider in providers"
+								:key="provider.name"
+								:href="safeUrl(provider.auth_url)"
+								class="learno-btn learno-btn-secondary w-full py-3 text-[14px]"
+							>
+								<img
+									v-if="provider.icon"
+									:src="safeUrl(provider.icon)"
+									alt=""
+									class="size-4"
+								/>
+								{{ __('Continue with {0}').format(provider.label) }}
+							</a>
+
+							<button
+								v-if="mode === 'signin' && allowSignup"
+								type="button"
+								class="learno-btn learno-btn-secondary w-full py-3 text-[14px]"
+								@click="switchMode('signup')"
+							>
+								{{ __('Create an account') }}
+							</button>
+							<button
+								v-if="mode === 'signup'"
+								type="button"
+								class="learno-btn learno-btn-secondary w-full py-3 text-[14px]"
+								@click="switchMode('signin')"
+							>
+								{{ __('Sign in instead') }}
+							</button>
+						</div>
+					</template>
 				</div>
 			</div>
 
-			<footer class="pb-8 text-center text-[12px] text-[var(--learno-ink-subtle)]">
+			<footer
+				class="pb-8 text-center text-[12px] text-[var(--learno-ink-subtle)]"
+			>
 				{{ __('By signing in you agree to our') }}
 				<a
 					class="underline hover:text-[var(--learno-ink)]"
@@ -331,11 +344,14 @@ const loginOptions = createResource({
 
 const providers = computed(() => loginOptions.data?.providers ?? [])
 const allowSignup = computed(() => Boolean(loginOptions.data?.allow_signup))
+const hasOtherOptions = computed(
+	() => providers.value.length > 0 || allowSignup.value,
+)
 
 const subtitle = computed(() =>
 	mode.value === 'signup'
 		? __('Create an account to get started')
-		: __('Sign in to continue')
+		: __('Sign in to continue'),
 )
 
 usePageMeta(() => ({ title: __('Sign in') }))
