@@ -28,6 +28,13 @@ build_frontend() {
 if [ -d "${BENCH_DIR}/apps/frappe" ]; then
 	echo ">>> Bench already exists, reusing it"
 	cd "${BENCH_DIR}"
+	# node_modules lives in its own volume (see docker-compose.local.yml), so it
+	# is empty the first time a bench boots after the bind mount was added.
+	# Install before anything can try to build against nothing.
+	if [ ! -d "${BENCH_DIR}/apps/lms/frontend/node_modules/vite" ]; then
+		echo ">>> Installing frontend dependencies (container-side node_modules)"
+		(cd "${BENCH_DIR}/apps/lms/frontend" && yarn install)
+	fi
 	if [ ! -f "${BENCH_DIR}/apps/lms/lms/www/_lms.html" ]; then
 		echo ">>> Frontend assets missing, building them"
 		build_frontend
@@ -65,7 +72,18 @@ sed -i '/watch/d' ./Procfile
 
 echo ">>> Fetching apps"
 bench get-app --skip-assets --branch version-15 payments
-bench get-app --skip-assets lms "${SRC_STAGE}"
+
+# `bench get-app` clones into apps/lms, which fails when the repo is already
+# bind-mounted there (the dev-loop setup in docker-compose.local.yml). Detect
+# that and register the app in place instead: an editable pip install plus the
+# apps.txt entry is exactly what get-app leaves behind.
+if [ -f "${BENCH_DIR}/apps/lms/pyproject.toml" ]; then
+	echo ">>> apps/lms is bind-mounted; installing it in place"
+	"${BENCH_DIR}/env/bin/pip" install --quiet --editable "${BENCH_DIR}/apps/lms"
+	grep -qxF lms "${BENCH_DIR}/sites/apps.txt" 2>/dev/null || echo lms >> "${BENCH_DIR}/sites/apps.txt"
+else
+	bench get-app --skip-assets lms "${SRC_STAGE}"
+fi
 
 echo ">>> Creating site ${SITE}"
 bench new-site "${SITE}" \

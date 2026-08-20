@@ -102,15 +102,32 @@ pointed at somebody else's record.
 
 ## Local development
 
-The frontend build expects a bench layout — `src/socket.js` imports
-`../../../../sites/common_site_config.json`. Inside the Docker bench that path
-is real; on the host it is not, so `yarn build` needs a stub at
-`~/sites/common_site_config.json` (`{ "socketio_port": 9000 }`).
+The repo is bind-mounted into the Docker bench at `apps/lms`
+(`docker/docker-compose.local.yml`), so **nothing needs copying**:
 
-Backend changes do **not** reach the running container automatically:
-`docker/init-local.sh` takes a *snapshot* of the repo at bench init. To test a
-Python change against the live site:
+* **Python** — edit and the next request picks it up (`developer_mode` is on, so
+  the werkzeug reloader is running).
+* **Frontend** — `yarn --cwd frontend build` on the host writes into
+  `lms/public/frontend/`, which the container serves directly. No container
+  command, no restart.
 
-```bash
-docker cp lms/lms/student_api.py learno-lms-frappe-1:/home/frappe/frappe-bench/apps/lms/lms/lms/student_api.py
-```
+Two things that mount setup has to get right, and does:
+
+* `frontend/node_modules` is a **named volume**, not the host directory. The
+  host's are darwin-arm64 binaries (esbuild, rollup, lightningcss) and the
+  container is linux-arm64, so each side keeps its own tree. Building in the
+  container still works: `docker exec learno-lms-frappe-1 bash -lc 'cd
+  ~/frappe-bench/apps/lms/frontend && yarn build'`.
+* `bench get-app` clones into `apps/lms` and cannot, once the mount occupies it.
+  `docker/init-local.sh` detects a populated `apps/lms` and registers the app in
+  place (editable pip install + `sites/apps.txt`) instead, so a from-scratch
+  `docker compose up` still bootstraps.
+
+The host build needs a bench-layout stub at `~/sites/common_site_config.json`
+(`{ "socketio_port": 9000 }`) because `src/socket.js` imports
+`../../../../sites/common_site_config.json`. Inside the container that path is
+real.
+
+**Don't run a host build and a container build at once** — both write into
+`lms/public/frontend/assets/`, and you end up with two complete-but-different
+`index-*.js` bundles side by side. Clear the directory if that happens.

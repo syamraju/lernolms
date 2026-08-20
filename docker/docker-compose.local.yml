@@ -28,8 +28,23 @@ services:
     working_dir: /home/frappe
     volumes:
       - ./init-local.sh:/workspace/init-local.sh:ro
+      # Kept for the first-ever boot: init-local.sh stages a git snapshot from
+      # here when apps/lms is not already populated.
       - ..:/workspace/lms-src:ro
       - bench-data:/home/frappe
+      # The repo IS the app. Mounted over the bench's copy so an edit on the
+      # host is live in the container with no copying: Python reloads on the
+      # next request (developer_mode is on), and a `yarn build` on either side
+      # lands in lms/public/frontend, which is what the site serves.
+      #
+      # Mount order is by path depth, so this lands on top of bench-data and
+      # the node_modules volume below lands on top of this.
+      - ..:/home/frappe/frappe-bench/apps/lms
+      # node_modules must NOT come from the host: those are darwin-arm64
+      # binaries (esbuild, rollup, lightningcss) and the container is
+      # linux-arm64. A named volume shadows the host directory so each side
+      # keeps its own, natively-built tree.
+      - lms-node-modules:/home/frappe/frappe-bench/apps/lms/frontend/node_modules
     ports:
       - "8000:8000"
       - "9000:9000"
@@ -43,3 +58,4 @@ services:
 volumes:
   mariadb-data:
   bench-data:
+  lms-node-modules:
