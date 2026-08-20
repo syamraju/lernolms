@@ -15,7 +15,7 @@ const COMMON_SITE_CONFIG = /sites\/common_site_config\.json$/
 const forcePort = {
 	name: 'preview-force-port',
 	enforce: 'post',
-	config: () => ({ server: { port: 8085, strictPort: true } }),
+	config: () => ({ server: { port: 8090, strictPort: true } }),
 }
 
 const previewShims = {
