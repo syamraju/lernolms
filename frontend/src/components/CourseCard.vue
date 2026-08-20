@@ -162,19 +162,19 @@ const gradientColor = computed(() => {
 <style>
 /* Also worn by the server-rendered widget (lms/lms/widgets/CourseCard.html).
    The pill sits on the course image, so it stays light in both themes —
-   --white is a fixed palette value, not a themed token. On the Airtable scale this is
-   Heading/xsmall - caps: 11px, 700, uppercase — the kit's own eyebrow style,
-   which carries 5% tracking. */
+   --white is a fixed palette value, not a themed token. On the CDS scale 12px
+   is the smallest step and 700 the heading weight; Open Sans needs no
+   tracking. */
 .course-card-pills {
 	background: var(--white);
-	color: var(--at-text-default);
+	color: var(--cds-text-body-default);
 	margin-left: 0;
 	margin-right: 0.5rem;
 	padding: 3.5px 8px;
-	border-radius: var(--at-radius-badge);
-	font-size: 11px;
+	border-radius: var(--cds-radius-badge);
+	font-size: 12px;
 	text-align: center;
-	letter-spacing: 0.55px;
+	letter-spacing: normal;
 	text-transform: uppercase;
 	font-weight: 700;
 	width: fit-content;
