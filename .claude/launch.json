@@ -1,0 +1,17 @@
+{
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "lms-frontend",
+			"runtimeExecutable": "yarn",
+			"runtimeArgs": [
+				"--cwd",
+				"frontend",
+				"dev",
+				"--config",
+				"vite.preview.config.js"
+			],
+			"port": 8085
+		}
+	]
+}
