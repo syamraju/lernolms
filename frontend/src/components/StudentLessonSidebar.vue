@@ -17,8 +17,12 @@
 			<div
 				class="h-1 w-full rounded-full bg-surface-gray-2 overflow-hidden mt-2"
 			>
+				<!-- Cloudscape fills progress with the primary blue; green is
+				     reserved for status. `surface-blue-7` is the ramp position
+				     carrying CDS #006ce0 / #42b4ff, i.e.
+				     `background/progress/bar/content/default` in both modes. -->
 				<div
-					class="h-full bg-surface-green-3 transition-all"
+					class="h-full bg-surface-blue-7 transition-all"
 					:style="{ width: `${displayedProgress}%` }"
 				/>
 			</div>

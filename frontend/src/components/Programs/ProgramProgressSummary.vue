@@ -24,6 +24,7 @@
 				</div>
 				<DonutChart
 					:config="{
+						colors: chartColors,
 						data: progressDistribution || [],
 						title: __('Progress Distribution'),
 						categoryColumn: 'category',
@@ -68,6 +69,7 @@
 </template>
 <script setup lang="ts">
 import { Dialog, DonutChart, FormControl, NumberChart } from 'frappe-ui'
+import { chartColors } from '@/utils/chartPalette'
 import type { ListRow, ProgramMember } from '@/types'
 import { computed, ref, watch } from 'vue'
 import ResponsiveListView from '@/components/ResponsiveListView.vue'

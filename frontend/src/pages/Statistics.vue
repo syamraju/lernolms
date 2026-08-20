@@ -54,6 +54,7 @@
 					<AxisChart
 						v-if="signupsChart.data"
 						:config="{
+							colors: chartColors,
 							data: signupsChart.data,
 							title: 'Signups',
 							subtitle: 'Signups per day',
@@ -74,6 +75,7 @@
 					<AxisChart
 						v-if="enrollmentChart.data"
 						:config="{
+							colors: chartColors,
 							data: enrollmentChart.data,
 							title: 'Enrollments',
 							subtitle: 'Enrollments per day',
@@ -96,6 +98,7 @@
 					<AxisChart
 						v-if="certification.data"
 						:config="{
+							colors: chartColors,
 							data: certification.data,
 							title: 'Certifications',
 							subtitle: 'Certifications per day',
@@ -122,6 +125,7 @@
 					<DonutChart
 						v-if="courseCompletion.data"
 						:config="{
+							colors: chartColors,
 							data: courseCompletion.data,
 							title: 'Completions',
 							subtitle: 'Course Completion',
@@ -144,6 +148,7 @@ import {
 	Tooltip,
 	usePageMeta,
 } from 'frappe-ui'
+import { chartColors } from '@/utils/chartPalette'
 import { computed } from 'vue'
 import PageHeader from '@/components/Layouts/PageHeader.vue'
 import { sessionStore } from '../stores/session'

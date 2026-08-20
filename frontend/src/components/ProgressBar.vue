@@ -4,8 +4,14 @@
 			class="w-full bg-surface-gray-3 rounded-full h-1"
 			:class="$attrs.class"
 		>
+			<!-- Cloudscape fills a progress bar with the primary blue on a pale
+			     grey track, not near-black on grey. `surface-blue-7` is the ramp
+			     position that carries CDS's #006ce0 in light and #42b4ff in dark,
+			     which are exactly `background/progress/bar/content/default` in
+			     the two modes; the track's `surface-gray-3` is already CDS's
+			     `background/progress/bar/layout/default`. -->
 			<div
-				class="bg-surface-gray-10 rounded-full"
+				class="bg-surface-blue-7 rounded-full"
 				:class="progressBarHeight"
 				:style="{ width: progressBarWidth }"
 			></div>

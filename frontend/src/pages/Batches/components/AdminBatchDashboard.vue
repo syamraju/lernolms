@@ -116,6 +116,7 @@
 					v-if="showProgressChart"
 					class="border rounded-lg p-3 min-h-[300px]"
 					:config="{
+						colors: chartColors,
 						data: filteredChartData,
 						title: __('Batch Summary'),
 						subtitle: __('Progress of students in courses and assessments'),
@@ -161,6 +162,7 @@ import {
 	Avatar,
 	Button,
 } from 'frappe-ui'
+import { chartColors } from '@/utils/chartPalette'
 import { computed, inject, onMounted, ref, watch } from 'vue'
 import type dayjsType from 'dayjs'
 import { formatAmount } from '@/utils'
