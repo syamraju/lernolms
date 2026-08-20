@@ -1,12 +1,12 @@
-@import '@fontsource-variable/open-sans';
+@import '@fontsource-variable/inter';
 @import 'frappe-ui/style.css';
 @import 'frappe-ui/list-style.css';
-/* Cloudscape (CDS) layer. Must follow frappe-ui: both declare the same custom
+/* Airtable layer. Must follow frappe-ui: both declare the same custom
    properties at the same specificity, so source order decides. Generated from
-   the Figma library — see tailwind/cds/. */
-@import './styles/cds-tokens.css';
-@import './styles/cds-typography.css';
-@import './styles/cds-components.css';
+   the Figma library — see tailwind/airtable/. */
+@import './styles/airtable-tokens.css';
+@import './styles/airtable-typography.css';
+@import './styles/airtable-components.css';
 @import './styles/blockEditor.css';
 /* Learno student layer. Everything in it is scoped under `.learno`, which only
    the student shell carries, so it cannot reach the author/admin app — see the

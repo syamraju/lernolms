@@ -1,0 +1,273 @@
+{
+  "_source": {
+    "file": "Airtable Apps UI Kit (Community)",
+    "fileKey": "StoTaUKJ4FiEzEoOr4kW3N",
+    "system": "Airtable Apps UI Kit",
+    "extractedVia": "Figma MCP get_variable_defs on the Colors, Text, Headings, Buttons and Controls frames, plus rendered screenshots of Buttons / Controls / App frame for shape values",
+    "note": "The kit publishes real Figma variables for colour and type; every value under `palette` and `typography` is verbatim from them. `semantic`, `radius`, `borderWidth`, `shadow` and `spacing` are read off the rendered components and the kit's own Spacing/Tokens boards — see README.md for which is which. The kit ships LIGHT ONLY; the second entry of every `semantic` pair is a synthesised dark mode (see README)."
+  },
+
+  "palette": {
+    "_note": "Nine hues x five steps, verbatim from the kit's colour variables. Step names are Airtable's own: Bright is the saturated UI accent, base is the muted fill, Dark1 the pressed/heavy step, Light1/Light2 the tints.",
+    "grey": {
+      "0": "#FFFFFF",
+      "50": "#FAFAFA",
+      "100": "#F2F2F2",
+      "150": "#E8E8E8",
+      "200": "#E0E0E0",
+      "300": "#CFCFCF",
+      "400": "#A8A8A8",
+      "500": "#8C8C8C",
+      "600": "#757575",
+      "700": "#666666",
+      "800": "#4F4F4F",
+      "850": "#424242",
+      "900": "#3A3A3A",
+      "950": "#333333",
+      "1000": "#1F1F1F"
+    },
+    "yellow": {
+      "Bright": "#FCB400",
+      "base": "#E08D00",
+      "Dark1": "#B87503",
+      "Light1": "#FFD66E",
+      "Light2": "#FFEAB6"
+    },
+    "orange": {
+      "Bright": "#FF6F2C",
+      "base": "#F7653B",
+      "Dark1": "#D74D26",
+      "Light1": "#FFA981",
+      "Light2": "#FEE2D5"
+    },
+    "red": {
+      "Bright": "#F82B60",
+      "base": "#EF3061",
+      "Dark1": "#BA1E45",
+      "Light1": "#FF9EB7",
+      "Light2": "#FFDCE5"
+    },
+    "pink": {
+      "Bright": "#FF08C2",
+      "base": "#E929BA",
+      "Dark1": "#B2158B",
+      "Light1": "#F99DE2",
+      "Light2": "#FFDAF6"
+    },
+    "purple": {
+      "Bright": "#8B46FF",
+      "base": "#7C39ED",
+      "Dark1": "#6B1CB0",
+      "Light1": "#CDB0FF",
+      "Light2": "#EDE3FE"
+    },
+    "blue": {
+      "Bright": "#2D7FF9",
+      "base": "#1283DA",
+      "Dark1": "#2750AE",
+      "Light1": "#9CC7FF",
+      "Light2": "#CFDFFF"
+    },
+    "cyan": {
+      "Bright": "#18BFFF",
+      "base": "#01A9DB",
+      "Dark1": "#0B76B7",
+      "Light1": "#77D1F3",
+      "Light2": "#D0F0FD"
+    },
+    "teal": {
+      "Bright": "#20D9D2",
+      "base": "#02AAA4",
+      "Dark1": "#06A09B",
+      "Light1": "#72DDC3",
+      "Light2": "#C2F5E9"
+    },
+    "green": {
+      "Bright": "#20C933",
+      "base": "#11AF22",
+      "Dark1": "#338A17",
+      "Light1": "#93E088",
+      "Light2": "#D1F7C4"
+    }
+  },
+
+  "semantic": {
+    "_format": "[light, dark] — light is the kit; dark is synthesised, see README",
+
+    "background/app": ["#FFFFFF", "#181818"],
+    "background/subtle": ["#FAFAFA", "#1F1F1F"],
+    "background/sidebar": ["#FAFAFA", "#1F1F1F"],
+    "background/container": ["#FFFFFF", "#1F1F1F"],
+    "background/raised": ["#FFFFFF", "#2A2A2A"],
+    "background/overlay": ["#33333366", "#00000099"],
+    "background/hover": ["#F2F2F2", "#2A2A2A"],
+    "background/pressed": ["#E8E8E8", "#333333"],
+    "background/selected": ["#CFDFFF", "#2750AE"],
+    "background/cell/shaded": ["#FAFAFA", "#1F1F1F"],
+
+    "background/input/default": ["#F2F2F2", "#2A2A2A"],
+    "background/input/hover": ["#E8E8E8", "#333333"],
+    "background/input/focused": ["#FFFFFF", "#1F1F1F"],
+    "background/input/disabled": ["#FAFAFA", "#1F1F1F"],
+
+    "background/button/default": ["#F2F2F2", "#2A2A2A"],
+    "background/button/default-hover": ["#E8E8E8", "#333333"],
+    "background/button/default-active": ["#E0E0E0", "#3A3A3A"],
+    "background/button/primary": ["#2D7FF9", "#2D7FF9"],
+    "background/button/primary-hover": ["#1283DA", "#4A91FA"],
+    "background/button/primary-active": ["#2750AE", "#1283DA"],
+    "background/button/danger": ["#F82B60", "#F82B60"],
+    "background/button/danger-hover": ["#EF3061", "#FA4B77"],
+    "background/button/danger-active": ["#BA1E45", "#EF3061"],
+    "background/button/disabled": ["#F2F2F2", "#252525"],
+
+    "background/segment/track": ["#F2F2F2", "#2A2A2A"],
+    "background/segment/active": ["#666666", "#5C5C5C"],
+    "background/segment/hover": ["#E8E8E8", "#333333"],
+
+    "background/control/default": ["#E0E0E0", "#4F4F4F"],
+    "background/control/checked": ["#2D7FF9", "#2D7FF9"],
+    "background/control/disabled": ["#F2F2F2", "#2A2A2A"],
+
+    "background/status/error": ["#FFDCE5", "#3A1620"],
+    "background/status/warning": ["#FFEAB6", "#3A2E10"],
+    "background/status/success": ["#D1F7C4", "#16300F"],
+    "background/status/info": ["#CFDFFF", "#16233A"],
+
+    "background/token/grey": ["#E8E8E8", "#333333"],
+    "background/progress/track": ["#E0E0E0", "#333333"],
+    "background/progress/bar": ["#2D7FF9", "#2D7FF9"],
+
+    "border/default": ["#E0E0E0", "#3A3A3A"],
+    "border/subtle": ["#E8E8E8", "#2A2A2A"],
+    "border/strong": ["#CFCFCF", "#4F4F4F"],
+    "border/focus": ["#2D7FF9", "#2D7FF9"],
+    "border/input/default": ["#E0E0E0", "#3A3A3A"],
+    "border/input/focused": ["#2D7FF9", "#2D7FF9"],
+    "border/control/default": ["#CFCFCF", "#5C5C5C"],
+    "border/control/checked": ["#2D7FF9", "#2D7FF9"],
+    "border/container": ["#E0E0E0", "#3A3A3A"],
+    "border/divider": ["#E8E8E8", "#2A2A2A"],
+    "border/tabs/underline": ["#2D7FF9", "#2D7FF9"],
+    "border/status/error": ["#F82B60", "#F82B60"],
+    "border/status/warning": ["#FCB400", "#FCB400"],
+    "border/status/success": ["#20C933", "#20C933"],
+    "border/status/info": ["#2D7FF9", "#2D7FF9"],
+
+    "text/default": ["#333333", "#FAFAFA"],
+    "text/secondary": ["#757575", "#A8A8A8"],
+    "text/tertiary": ["#8C8C8C", "#8C8C8C"],
+    "text/heading": ["#333333", "#FFFFFF"],
+    "text/label": ["#333333", "#E0E0E0"],
+    "text/placeholder": ["#8C8C8C", "#757575"],
+    "text/disabled": ["#A8A8A8", "#5C5C5C"],
+    "text/inverted": ["#FFFFFF", "#FFFFFF"],
+    "text/link": ["#2D7FF9", "#4A91FA"],
+    "text/link/hover": ["#1283DA", "#77B0FC"],
+    "text/button/default": ["#333333", "#E0E0E0"],
+    "text/button/primary": ["#FFFFFF", "#FFFFFF"],
+    "text/button/danger": ["#FFFFFF", "#FFFFFF"],
+    "text/segment/active": ["#FFFFFF", "#FFFFFF"],
+    "text/segment/default": ["#333333", "#A8A8A8"],
+    "text/status/error": ["#BA1E45", "#FF9EB7"],
+    "text/status/warning": ["#B87503", "#FFD66E"],
+    "text/status/success": ["#338A17", "#93E088"],
+    "text/status/info": ["#2750AE", "#9CC7FF"],
+    "text/icon": ["#757575", "#A8A8A8"],
+    "text/icon/subtle": ["#8C8C8C", "#757575"],
+
+    "shadow/color": ["#3333331f", "#00000066"],
+    "shadow/color-strong": ["#33333333", "#00000099"]
+  },
+
+  "spacing": {
+    "_note": "8px major grid with a 4px minor fallback, per the kit's Spacing board.",
+    "0": 0,
+    "1": 4,
+    "2": 8,
+    "3": 16,
+    "4": 32,
+    "5": 64,
+    "6": 128,
+    "7": 256,
+    "8": 512
+  },
+
+  "radius": {
+    "_note": "Airtable is a small-radius system. Buttons, inputs, selects and tokens are 3px; cards, dialogs and popovers 6px; the app frame 8px. Nothing is a pill except switches and avatars.",
+    "button": 3,
+    "input": 3,
+    "select": 3,
+    "token": 3,
+    "badge": 3,
+    "swatch": 4,
+    "card": 6,
+    "dialog": 6,
+    "popover": 6,
+    "dropdown": 6,
+    "container": 6,
+    "app-frame": 8,
+    "switch": 999,
+    "avatar": 999
+  },
+
+  "borderWidth": {
+    "divider": 1,
+    "container": 1,
+    "input": 1,
+    "control": 1,
+    "focus-ring": 2,
+    "tabs-underline": 2,
+    "app-frame": 2
+  },
+
+  "shadow": {
+    "_note": "Airtable leans on flat fills and hairlines; shadow appears only on things that float (dropdowns, dialogs, popovers, drag states).",
+    "raised": { "x": 0, "y": 1, "blur": 3, "spread": 0 },
+    "dropdown": { "x": 0, "y": 4, "blur": 12, "spread": 0 },
+    "dialog": { "x": 0, "y": 8, "blur": 32, "spread": 0 }
+  },
+
+  "sizes": {
+    "icon/small": 12,
+    "icon/normal": 16,
+    "icon/medium": 20,
+    "icon/large": 24,
+    "control/small": 24,
+    "control/default": 32,
+    "control/large": 40
+  },
+
+  "typography": {
+    "_note": "Verbatim from the kit's type variables. The kit specifies SF Pro Text for UI/body and SF Pro Display for headings at 21px and above; both are Apple-licensed, so the theme ships Inter — see README for the substitution.",
+    "fontFamily": {
+      "text": "SF Pro Text",
+      "display": "SF Pro Display"
+    },
+    "text": {
+      "small": { "size": 11, "line": 14, "paragraph": 16, "weight": 400 },
+      "default": { "size": 13, "line": 16, "paragraph": 20, "weight": 400 },
+      "large": { "size": 15, "line": 20, "paragraph": 22, "weight": 400 },
+      "xlarge": { "size": 17, "line": 24, "paragraph": 26, "weight": 400 }
+    },
+    "heading": {
+      "xsmall": { "size": 15, "line": 22, "weight": 700, "family": "text" },
+      "small": { "size": 17, "line": 24, "weight": 600, "family": "text" },
+      "default": { "size": 21, "line": 26, "weight": 500, "family": "display" },
+      "large": { "size": 23, "line": 29, "weight": 500, "family": "display" },
+      "xlarge": { "size": 27, "line": 34, "weight": 500, "family": "display" },
+      "xxlarge": { "size": 35, "line": 44, "weight": 500, "family": "display" }
+    },
+    "caps": {
+      "xsmall": { "size": 11, "line": 16, "weight": 700, "tracking": 0.05 },
+      "small": { "size": 13, "line": 16, "weight": 600, "tracking": 0.05 },
+      "default": { "size": 15, "line": 20, "weight": 500, "tracking": 0.05 }
+    },
+    "fontWeight": {
+      "regular": 400,
+      "medium": 500,
+      "semibold": 600,
+      "bold": 700
+    }
+  }
+}

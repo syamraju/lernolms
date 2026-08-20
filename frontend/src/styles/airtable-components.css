@@ -1,0 +1,795 @@
+/*
+ * Airtable component layer — hand-written.
+ *
+ * The token layer (airtable-tokens.css) re-points every colour, radius and
+ * shadow, and the type layer (airtable-typography.css) moves the ramp onto
+ * Inter at Airtable's sizes. What neither can reach is component *shape* — the
+ * traits that make an Airtable control recognisable regardless of palette:
+ *
+ *   - buttons are 3px-radius rectangles, medium weight, with NO border
+ *   - the default button is a flat grey field; primary is blue; danger is red
+ *   - inputs are FILLED grey with no border — the single most recognisable
+ *     Airtable form detail, and the exact inverse of the outlined inputs of
+ *     the Cloudscape theme this replaces
+ *   - containers are 6px cards separated by hairlines, never by shadow
+ *   - the segmented control is a grey track with a dark grey active segment
+ *   - headings get *lighter* as they get larger, not heavier
+ *
+ * ── Why this file matches on utility classes ──────────────────────────────
+ * frappe-ui's Button renders Tailwind utilities straight onto the element and
+ * exposes no stable hook (no `.fui-button`, no data-attribute), so the only
+ * available selector is the class combination it always emits. Every rule here
+ * is therefore anchored on `.inline-flex.items-center.justify-center
+ * .transition-colors.shrink-0` — the invariant prefix in Button.vue's class
+ * list — and the variant is read off the background utility frappe-ui picked
+ * (`.bg-surface-gray-10` is solid/gray, `.bg-transparent` is ghost, and so on).
+ *
+ * That is a coupling to frappe-ui's internals, and it is deliberate: the
+ * alternative is forking Button.vue and the ~40 components that wrap it. The
+ * anchor is five classes, so specificity (0,5,0) clears Tailwind utilities
+ * (0,1,0) without `!important`, and hover/active states clear their
+ * pseudo-class utilities (0,2,0) the same way.
+ *
+ * If a frappe-ui upgrade changes Button.vue's base class list, buttons revert
+ * to frappe-ui's own styling rather than breaking — a visible regression, not a
+ * silent one. src/tests/airtableTheme.test.ts pins the signature so that shows
+ * up as a failing test.
+ */
+
+/* ---------------------------------------------------------------- buttons --
+ * Airtable's button is the flattest thing in the kit: a 3px rectangle, a solid
+ * fill, medium-weight label, and no border at all. Cloudscape's 20px pill with
+ * a 2px border was the loudest single element on screen; this is the quietest.
+ */
+.inline-flex.items-center.justify-center.transition-colors.shrink-0 {
+	border-radius: var(--at-radius-button);
+	border-width: 0;
+	border-style: solid;
+	border-color: transparent;
+	font-weight: 500;
+	letter-spacing: normal;
+}
+
+/* Airtable's buttons are tighter than frappe-ui's, and the padding scales with
+   the size or dense toolbars overflow: the courses header packs a title, a
+   four-way segmented control and a search field into one flex row.
+   Keyed on the height utility because that is what frappe-ui's size prop emits.
+   Icon buttons carry no `px-` utility and are excluded — they are fixed-square
+   and must not grow. */
+.inline-flex.items-center.justify-center.transition-colors.shrink-0[class*='px-'].h-6 {
+	padding-inline: 8px;
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0[class*='px-'].h-7 {
+	padding-inline: 10px;
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0[class*='px-'].h-8 {
+	padding-inline: 12px;
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0[class*='px-'].h-10 {
+	padding-inline: 16px;
+}
+
+/* Icon buttons take the same 3px rectangle as everything else. Airtable has no
+   circular icon button — the toolbar in the App frame board is a row of square
+   3px hit targets. */
+.inline-flex.items-center.justify-center.transition-colors.shrink-0:not([class*='px-']) {
+	border-radius: var(--at-radius-button);
+}
+
+/* ---------------------------------------------------------------- primary --
+ * frappe-ui's `solid` button is near-black; Airtable's primary action is
+ * blueBright. Both `gray-solid` (the app's default primary) and `blue-solid`
+ * map onto it, so the most prominent action on every screen reads as an
+ * Airtable primary.
+ */
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-gray-10,
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-blue-6 {
+	background-color: var(--at-background-button-primary);
+	color: var(--at-text-button-primary);
+	border-color: transparent;
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-gray-10:hover,
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-blue-6:hover {
+	background-color: var(--at-background-button-primary-hover);
+	color: var(--at-text-button-primary);
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-gray-10:active,
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-blue-6:active {
+	background-color: var(--at-background-button-primary-active);
+}
+
+/* ---------------------------------------------------------------- default --
+ * Airtable's secondary button is a flat light-grey field with dark text and no
+ * border — the same fill its inputs use. frappe-ui reaches this role through
+ * `blue-subtle` (a tinted fill) and `gray-outline` (a hairline box), so both
+ * are retargeted and the outline variant loses its border.
+ */
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-blue-2,
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.border-outline-gray-2 {
+	background-color: var(--at-background-button-default);
+	color: var(--at-text-button-default);
+	border-color: transparent;
+	border-width: 0;
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-blue-2:hover,
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.border-outline-gray-2:hover {
+	background-color: var(--at-background-button-default-hover);
+	color: var(--at-text-button-default);
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-blue-2:active,
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.border-outline-gray-2:active {
+	background-color: var(--at-background-button-default-active);
+}
+
+/* ------------------------------------------------------------------ ghost --
+ * Left neutral on purpose. Airtable's *text* button is blue, but frappe-ui uses
+ * `ghost` for toolbar and sidebar affordances too — recolouring all of them
+ * blue would turn every page chrome element into an accent. They keep their ink
+ * and take only the shared 3px/medium treatment above.
+ */
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-transparent {
+	border-color: transparent;
+	border-width: 0;
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-transparent:hover {
+	background-color: var(--at-background-hover);
+}
+
+/* ----------------------------------------------------------------- danger --
+ * Unlike Cloudscape, Airtable ships a real red button (redBright), so
+ * destructive actions get the kit's own treatment rather than an exception.
+ */
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-red-6,
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-red-5 {
+	background-color: var(--at-background-button-danger);
+	color: var(--at-text-button-danger);
+	border-color: transparent;
+}
+
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-red-6:hover,
+.inline-flex.items-center.justify-center.transition-colors.shrink-0.bg-surface-red-5:hover {
+	background-color: var(--at-background-button-danger-hover);
+	color: var(--at-text-button-danger);
+}
+
+/* Focus is a 2px blue ring offset off the control, the same cue everywhere. */
+.inline-flex.items-center.justify-center.transition-colors.shrink-0:focus-visible {
+	outline: var(--at-stroke-focus-ring) solid var(--at-border-focus);
+	outline-offset: 1px;
+}
+
+/* ----------------------------------------------------------------- inputs --
+ * The signature Airtable form detail: inputs are a FILLED grey field with no
+ * border, and they turn white with a blue border only on focus. frappe-ui
+ * already fills with `--surface-gray-2`, so the fill survives — what changes is
+ * removing the border at rest and inverting the focus treatment.
+ *
+ * Anchored on the fill utility plus the element type, so this only reaches real
+ * form controls.
+ */
+input.bg-surface-gray-2,
+textarea.bg-surface-gray-2,
+select.bg-surface-gray-2 {
+	background-color: var(--at-background-input-default);
+	border-color: transparent;
+	border-width: 0;
+	border-radius: var(--at-radius-input);
+	color: var(--at-text-default);
+}
+
+input.bg-surface-gray-2:hover,
+textarea.bg-surface-gray-2:hover,
+select.bg-surface-gray-2:hover {
+	background-color: var(--at-background-input-hover);
+}
+
+/* On focus the field lifts to the container background and takes a 2px blue
+   border — Airtable's way of saying "you are editing this". The border is drawn
+   as an inset box-shadow rather than a real border so the control does not
+   change size and the text does not shift by 2px on focus. */
+input.bg-surface-gray-2:focus,
+textarea.bg-surface-gray-2:focus,
+select.bg-surface-gray-2:focus {
+	background-color: var(--at-background-input-focused);
+	border-color: transparent;
+	box-shadow: inset 0 0 0 var(--at-stroke-focus-ring) var(--at-border-input-focused);
+	outline: none;
+}
+
+input.bg-surface-gray-2::placeholder,
+textarea.bg-surface-gray-2::placeholder {
+	color: var(--at-text-placeholder);
+	font-style: normal;
+}
+
+input.bg-surface-gray-2:disabled,
+textarea.bg-surface-gray-2:disabled,
+select.bg-surface-gray-2:disabled {
+	background-color: var(--at-background-input-disabled);
+	color: var(--at-text-disabled);
+}
+
+/* ------------------------------------------------- checkboxes and radios --
+ * Airtable's checked control is the primary blue with a white glyph on a 3px
+ * box. The `text-*` colour is what Tailwind's forms plugin uses to paint the
+ * checkmark background, hence setting colour rather than background here.
+ */
+input[type='checkbox'],
+input[type='radio'] {
+	color: var(--at-background-control-checked);
+	border-color: var(--at-border-control-default);
+	border-radius: var(--at-radius-badge);
+}
+
+input[type='radio'] {
+	border-radius: 999px;
+}
+
+input[type='checkbox']:checked,
+input[type='radio']:checked {
+	background-color: var(--at-background-control-checked);
+	border-color: var(--at-border-control-checked);
+}
+
+input[type='checkbox']:focus-visible,
+input[type='radio']:focus-visible {
+	outline: var(--at-stroke-focus-ring) solid var(--at-border-focus);
+	outline-offset: 1px;
+}
+
+/* -------------------------------------------------------------- containers --
+ * Airtable containers are 6px cards told apart from the page by a 1px #E0E0E0
+ * hairline and nothing else — no shadow, no tint. The app builds cards from
+ * frappe-ui's `rounded-*` + `border` utilities, so this normalises the radii
+ * the cards actually use down to the card radius when the element is a bordered
+ * surface.
+ */
+.bg-surface-base.rounded-lg.border,
+.bg-surface-base.rounded-xl.border,
+.bg-surface-elevation-1.rounded-lg.border,
+.bg-surface-elevation-1.rounded-xl.border {
+	border-radius: var(--at-radius-card);
+	border-color: var(--at-border-container);
+	box-shadow: none;
+}
+
+/* ------------------------------------------------------------------ tabs --
+ * Airtable marks the selected tab with a 2px blue underline and a medium-weight
+ * label. frappe-ui renders the indicator as a bottom border on the active
+ * trigger, so only the colour, width and weight move.
+ */
+[role='tab'][data-state='active'],
+[role='tab'][aria-selected='true'] {
+	border-bottom-color: var(--at-border-tabs-underline);
+	border-bottom-width: var(--at-stroke-tabs-underline);
+	color: var(--at-text-default);
+	font-weight: 500;
+}
+
+/* --------------------------------------------------------------- headings --
+ * Airtable's headings get *lighter* as they get larger — Bold at 15px, Semibold
+ * at 17px, Medium at 21px and up (see type-scale.mjs). The type layer already
+ * applies that to `text-<size>-<weight>` classes; bare <h1>–<h4> in prose carry
+ * no utility class, so the same ramp is spelled out here.
+ */
+.prose h1,
+.prose h2 {
+	font-weight: 500;
+	letter-spacing: normal;
+}
+
+.prose h3 {
+	font-weight: 600;
+	letter-spacing: normal;
+}
+
+.prose h4,
+.prose h5,
+.prose h6 {
+	font-weight: 700;
+	letter-spacing: normal;
+}
+
+/* ------------------------------------------------------------------ links --
+ * Airtable links are blue and *not* underlined at rest, anywhere — including in
+ * body copy. Underline appears on hover only. (Cloudscape underlined prose
+ * links at rest; this is the opposite.)
+ */
+.prose a,
+a[data-slot='link'] {
+	color: var(--at-text-link);
+	text-decoration: none;
+}
+
+.prose a:hover,
+a[data-slot='link']:hover {
+	color: var(--at-text-link-hover);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+a.text-ink-blue-link:not(.prose a),
+a.text-ink-blue-6:not(.prose a) {
+	color: var(--at-text-link);
+	text-decoration: none;
+}
+
+a.text-ink-blue-link:not(.prose a):hover,
+a.text-ink-blue-6:not(.prose a):hover {
+	color: var(--at-text-link-hover);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+/* ------------------------------------------------------------- form field --
+ * Airtable's field label is Text/default (13/16 **regular**) in the body ink,
+ * sitting directly above a filled control — not the 12px bold caption
+ * Cloudscape uses. Descriptions and constraints drop to Text/small (11/16) in
+ * the secondary grey. Placeholders are regular, never italic.
+ */
+[data-slot='label'],
+label.block:not([data-slot='label']) {
+	font-size: 13px;
+	line-height: 16px;
+	font-weight: 400;
+	letter-spacing: normal;
+	color: var(--at-text-label);
+}
+
+/* …and the same for a checkbox's inline label, which frappe-ui also marks
+   `data-slot="label"`. In Airtable both are Text/default, so unlike the
+   Cloudscape layer there is no second rule to tell them apart — the shared
+   declaration above already covers it. */
+
+[data-slot='description'] {
+	font-size: 11px;
+	line-height: 16px;
+	font-weight: 400;
+	color: var(--at-text-secondary);
+}
+
+input[data-slot='input']::placeholder {
+	font-style: normal;
+	color: var(--at-text-placeholder);
+}
+
+[data-slot='error'],
+.error-message {
+	font-size: 11px;
+	line-height: 16px;
+	color: var(--at-text-status-error);
+}
+
+/* ------------------------------------------------------------------ badge --
+ * Airtable's chips ("tokens" in the kit) are 3px rectangles with a soft tint
+ * and dark text — not pills, and not the solid saturated fills Cloudscape uses.
+ * Anchored on Badge.vue's base class list, which is disjoint from Button's (no
+ * justify-center / transition-colors / shrink-0), then keyed by the background
+ * utility for the hue.
+ */
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap {
+	border-radius: var(--at-radius-badge);
+	font-size: 11px;
+	line-height: 16px;
+	font-weight: 400;
+	letter-spacing: normal;
+	padding-inline: 6px;
+}
+
+/* grey */
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-gray-2,
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-gray-10 {
+	background-color: var(--at-background-token-grey);
+	color: var(--at-text-default);
+}
+
+/* blue */
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-blue-2,
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-blue-7 {
+	background-color: var(--at-background-status-info);
+	color: var(--at-text-status-info);
+}
+
+/* green */
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-green-2,
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-green-7 {
+	background-color: var(--at-background-status-success);
+	color: var(--at-text-status-success);
+}
+
+/* red */
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-red-2,
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-red-7 {
+	background-color: var(--at-background-status-error);
+	color: var(--at-text-status-error);
+}
+
+/* amber/orange */
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-amber-2,
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap.bg-surface-amber-7 {
+	background-color: var(--at-background-status-warning);
+	color: var(--at-text-status-warning);
+}
+
+/* Outline badges keep a border but take the same geometry. */
+.inline-flex.select-none.items-center.gap-1.overflow-clip.rounded-full.whitespace-nowrap[class*='border-outline-'] {
+	background-color: transparent;
+	color: var(--at-text-secondary);
+	border-color: var(--at-border-default);
+}
+
+/* ------------------------------------------------------------------ modal --
+ * Airtable dialogs are 6px cards with a hairline under the header and above the
+ * actions row, lifted with a soft wide shadow. `.dialog-content` and
+ * `.dialog-overlay` are real classes in Dialog.vue, so these are stable hooks.
+ *
+ * The header sits inside the body's horizontal padding, so its rule bleeds back
+ * out by that padding to make the divider span the modal. The padding differs
+ * at the `sm` breakpoint (px-4 -> sm:px-6), hence the custom property.
+ */
+.dialog-content {
+	--at-modal-pad: 1rem;
+	border-radius: var(--at-radius-dialog);
+	box-shadow: 0 8px 32px 0 var(--at-shadow-color-strong);
+}
+
+@media (min-width: 640px) {
+	.dialog-content {
+		--at-modal-pad: 1.5rem;
+	}
+}
+
+.dialog-overlay {
+	background-color: var(--at-background-overlay);
+}
+
+.dialog-content .mb-6.flex.items-center.justify-between {
+	margin-inline: calc(-1 * var(--at-modal-pad));
+	padding: 0 var(--at-modal-pad) 1rem;
+	margin-bottom: 1.25rem;
+	border-bottom: var(--at-stroke-divider) solid var(--at-border-divider);
+}
+
+/* The actions row is a full-width sibling of the body, so its border already
+   spans the modal. */
+.dialog-content .px-4.pb-7.pt-4 {
+	border-top: var(--at-stroke-divider) solid var(--at-border-divider);
+}
+
+/* ------------------------------------------------- dropdown / select menu --
+ * Airtable marks the selected option with a pale blue field and no border, and
+ * hovers to a neutral grey. frappe-ui portals its menus to <body>, so these are
+ * unscoped — keyed on reka's slot and state attributes, which are stable.
+ */
+[data-slot='content-body'],
+[data-slot='content'] {
+	border-radius: var(--at-radius-dropdown);
+	border-color: var(--at-border-default);
+	background-color: var(--at-background-raised);
+	box-shadow: 0 4px 12px 0 var(--at-shadow-color);
+}
+
+[data-slot='item-list-row'],
+[role='option'] {
+	border-radius: var(--at-radius-button);
+	color: var(--at-text-default);
+}
+
+[data-slot='item-list-row']:hover,
+[role='option']:hover,
+[role='option'][data-highlighted] {
+	background-color: var(--at-background-hover);
+	color: var(--at-text-default);
+}
+
+[role='option'][data-state='checked'],
+[role='option'][aria-selected='true'] {
+	background-color: var(--at-background-selected);
+	color: var(--at-text-default);
+	box-shadow: none;
+}
+
+/* Group headings inside a menu are Text/small in the secondary grey. */
+[data-slot='item-list-group-label'],
+[role='group'] > [role='presentation'] {
+	font-size: 11px;
+	line-height: 16px;
+	font-weight: 500;
+	color: var(--at-text-secondary);
+}
+
+/* ----------------------------------------------------- segmented control --
+ * The kit's "Select buttons": a flat light-grey track with square 3px corners,
+ * the selected segment a solid *dark grey* block with white text, and the rest
+ * transparent with dark labels. Note the active segment is grey, not blue —
+ * Airtable reserves blue for the primary action, and a blue segment would
+ * compete with it. frappe-ui renders a grey trough with a raised white "thumb",
+ * which reads as a control rather than a choice.
+ *
+ * `data-slot="tab-button"` and its `data-state` are set explicitly by
+ * TabButtons.vue; the visible block is the span it wraps.
+ */
+:has(> [data-slot='tab-button']) {
+	background-color: var(--at-background-segment-track);
+	border: 0;
+	border-radius: var(--at-radius-button);
+	padding: 0;
+	gap: 0;
+	overflow: hidden;
+}
+
+[data-slot='tab-button'],
+[data-slot='tab-button'] > * {
+	border-radius: 0;
+}
+
+[data-slot='tab-button'] > * {
+	font-weight: 400;
+	letter-spacing: normal;
+	padding-inline: 12px;
+}
+
+[data-slot='tab-button'][data-state='unchecked'] > * {
+	background-color: transparent;
+	color: var(--at-text-segment-default);
+	box-shadow: none;
+}
+
+[data-slot='tab-button'][data-state='unchecked']:hover > * {
+	background-color: var(--at-background-segment-hover);
+	color: var(--at-text-default);
+}
+
+[data-slot='tab-button'][data-state='checked'] > * {
+	background-color: var(--at-background-segment-active);
+	color: var(--at-text-segment-active);
+	box-shadow: none;
+}
+
+/* ----------------------------------------------------------------- toggle --
+ * Airtable switches are blue when on and *pale grey* when off, with a white
+ * knob — frappe-ui uses near-black on grey, so only the on-state colour really
+ * moves. This is one of the few things in the kit that stays a full pill.
+ * `data-slot="control"` is set by Switch.vue on reka's SwitchRoot, which also
+ * carries `data-state`.
+ */
+[data-slot='control'][data-state='unchecked'],
+[data-slot='control'].bg-surface-gray-4 {
+	background-color: var(--at-background-control-default);
+}
+
+[data-slot='control'][data-state='checked'],
+[data-slot='control'].bg-surface-gray-10 {
+	background-color: var(--at-background-control-checked);
+}
+
+[data-slot='control'][data-state='checked']:hover,
+[data-slot='control'].bg-surface-gray-10:hover {
+	background-color: var(--at-background-button-primary-hover);
+}
+
+[data-slot='control'][data-disabled] {
+	background-color: var(--at-background-control-disabled);
+}
+
+[data-slot='control'] > * {
+	background-color: var(--at-text-inverted);
+}
+
+/* ----------------------------------------------------------- progress bar --
+ * Airtable fills the bar with the primary blue on a pale grey track, and keeps
+ * it a full pill. frappe-ui uses near-black on grey. The fill is the inner
+ * element; the track is the rounded container Progress.vue marks with
+ * `transform-gpu`.
+ */
+.transform-gpu.overflow-hidden.rounded-xl {
+	background-color: var(--at-background-progress-track);
+	border-radius: 999px;
+}
+
+.transform-gpu.overflow-hidden.rounded-xl .bg-surface-gray-10 {
+	background-color: var(--at-background-progress-bar);
+}
+
+/* ---------------------------------------------------------------- popover --
+ * Same surface treatment as a dropdown: 6px radius, hairline border and the
+ * kit's soft dropdown shadow rather than frappe-ui's layered elevation.
+ */
+[data-slot='panel'],
+[data-radix-popper-content-wrapper] > * {
+	border-radius: var(--at-radius-popover);
+}
+
+[data-slot='panel'] {
+	border: var(--at-stroke-container) solid var(--at-border-default);
+	background-color: var(--at-background-raised);
+	box-shadow: 0 4px 12px 0 var(--at-shadow-color);
+}
+
+/* --------------------------------------------------------------- dropzone --
+ * A dashed 6px well that tints blue while a file is over it.
+ */
+[class*='border-dashed'] {
+	border-radius: var(--at-radius-card);
+	border-color: var(--at-border-strong);
+}
+
+[class*='border-dashed']:hover {
+	border-color: var(--at-border-focus);
+	background-color: var(--at-background-selected);
+}
+
+/* ------------------------------------------------------------------ alert --
+ * Airtable alerts are a 6px tinted block with a 1px border in the status
+ * colour — quieter than Cloudscape's 2px box, in keeping with a system that
+ * leans on fills rather than strokes.
+ *
+ * Alert.vue's root is the only element in the app with a
+ * `grid-cols-[auto_1fr_auto]` template, so that arbitrary-value class is a
+ * reliable anchor; matching it with `[class*=…]` avoids escaping the brackets.
+ */
+[class*='grid-cols-[auto_1fr_auto]'] {
+	border-radius: var(--at-radius-card);
+	border-width: var(--at-stroke-container);
+	border-style: solid;
+	border-color: var(--at-border-default);
+}
+
+[class*='grid-cols-[auto_1fr_auto]'].bg-surface-green-2 {
+	background-color: var(--at-background-status-success);
+	border-color: var(--at-border-status-success);
+}
+
+[class*='grid-cols-[auto_1fr_auto]'].bg-surface-red-2 {
+	background-color: var(--at-background-status-error);
+	border-color: var(--at-border-status-error);
+}
+
+[class*='grid-cols-[auto_1fr_auto]'].bg-surface-amber-2 {
+	background-color: var(--at-background-status-warning);
+	border-color: var(--at-border-status-warning);
+}
+
+[class*='grid-cols-[auto_1fr_auto]'].bg-surface-blue-2 {
+	background-color: var(--at-background-status-info);
+	border-color: var(--at-border-status-info);
+}
+
+/* The alert's title takes the heading weight for its size; the description
+   stays regular. */
+[class*='grid-cols-[auto_1fr_auto]'] > .grid > span:first-child {
+	font-weight: 700;
+	color: var(--at-text-default);
+}
+
+/* --------------------------------------------------------------- flashbar --
+ * Airtable's toast is the kit's dark tooltip surface — a near-black 3px block
+ * with white text, exactly as the "Edit content" tooltip is drawn on the
+ * Buttons board. `.toast-root-animatable` is a real class on Toast.vue's root.
+ */
+.toast-root-animatable {
+	background-color: var(--at-text-default);
+	color: var(--at-text-inverted);
+	border-radius: var(--at-radius-button);
+	box-shadow: 0 4px 12px 0 var(--at-shadow-color);
+}
+
+/* ------------------------------------------------------- status indicator --
+ * Status is an icon plus coloured text on no background — the colour is the
+ * whole signal. These are the four `text/status/*` roles.
+ */
+.text-ink-green-5,
+.text-ink-green-7 {
+	color: var(--at-text-status-success);
+}
+
+.text-ink-red-5,
+.text-ink-red-7 {
+	color: var(--at-text-status-error);
+}
+
+.text-ink-amber-5,
+.text-ink-amber-7 {
+	color: var(--at-text-status-warning);
+}
+
+/* ------------------------------------------------------------------ table --
+ * Airtable is a table product, and its grid is the most opinionated thing in
+ * the kit: an 11px secondary-grey column header over a hairline, 1px row
+ * dividers, and a very light shaded row on hover. Header text is NOT bold —
+ * the divider does the work.
+ */
+[data-slot='list-header'] {
+	background-color: var(--at-background-subtle);
+	border-bottom: var(--at-stroke-divider) solid var(--at-border-default);
+	font-size: 11px;
+	line-height: 16px;
+	font-weight: 500;
+	color: var(--at-text-secondary);
+}
+
+[data-slot='list-row'] {
+	border-bottom: var(--at-stroke-divider) solid var(--at-border-divider);
+}
+
+[data-slot='list-row']:hover {
+	background-color: var(--at-background-cell-shaded);
+}
+
+/* -------------------------------------------------------- side navigation --
+ * Airtable marks the selected nav item with a flat grey field and a
+ * medium-weight label — no shadow, no blue. frappe-ui uses a raised grey
+ * "selected surface" with a shadow, which reads as a button rather than a
+ * location.
+ */
+.flex.w-full.h-7.cursor-pointer.items-center.rounded {
+	border-radius: var(--at-radius-button);
+}
+
+.flex.w-full.h-7.cursor-pointer.items-center.rounded.bg-surface-elevation-3 {
+	background-color: var(--at-background-pressed);
+	color: var(--at-text-default);
+	font-weight: 500;
+	box-shadow: none;
+}
+
+.flex.w-full.h-7.cursor-pointer.items-center.rounded.bg-surface-elevation-3 .text-ink-gray-8 {
+	color: var(--at-text-default);
+}
+
+/* ------------------------------------------------------------- breadcrumb --
+ * Blue links, a secondary-grey current page, and a grey separator.
+ */
+.flex.min-w-0.items-center > .flex.min-w-0.items-center a {
+	color: var(--at-text-link);
+	font-weight: 400;
+}
+
+.flex.min-w-0.items-center > .flex.min-w-0.items-center a:hover {
+	color: var(--at-text-link-hover);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+.flex.min-w-0.items-center > .flex.min-w-0.items-center > :last-child {
+	color: var(--at-text-secondary);
+}
+
+/* ---------------------------------------------------- expandable section --
+ * A medium-weight header in the body ink, with the chevron leading. Airtable
+ * does not recolour these on hover — the chevron is the affordance.
+ */
+[data-state][aria-expanded] > .text-ink-gray-9,
+button[aria-expanded] > span:not([class*='lucide']) {
+	color: var(--at-text-default);
+	font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ token --
+ * The kit's choice / collaborator / linked-record tokens are 3px rectangles
+ * with a soft fill, not pills.
+ */
+[data-slot='token'],
+[class*='rounded'][class*='border'][class*='ps-2'][class*='pe-1'] {
+	border-radius: var(--at-radius-token);
+	border-color: var(--at-border-default);
+	background-color: var(--at-background-token-grey);
+}
+
+/* ------------------------------------------------------------------ tiles --
+ * Radio cards: bordered, and the selected one takes a blue border and a pale
+ * blue field.
+ */
+[role='radiogroup'] [role='radio'][aria-checked='true'],
+[role='radiogroup'] label:has(input[type='radio']:checked) {
+	border-color: var(--at-border-focus);
+	background-color: var(--at-background-selected);
+}

@@ -10,19 +10,23 @@ a dot — is drawn directly here and written out with a minimal PNG encoder.
 
 Keep the shapes in step with learning.svg if the mark changes.
 
-Usage: python3 tailwind/cds/render-logo.py
+Usage: python3 tailwind/airtable/render-logo.py
 """
 import struct
 import zlib
 from pathlib import Path
 
-# Cloudscape primary blue (color-variable: background/button/primary/default).
-BLUE = (0x00, 0x6C, 0xE0)
+# Airtable blueBright, the kit's primary action colour.
+BLUE = (0x2D, 0x7F, 0xF9)
 WHITE = (0xFF, 0xFF, 0xFF)
 
 # Source geometry, in the SVG's 80x79 user-space units.
 VB_W, VB_H = 80.0, 79.0
-TILE_RADIUS = 21.0
+# The tile radius follows the design system, not the old mark: Airtable is a
+# small-radius system (3px controls, 6px cards, 8px app frame), and the previous
+# 21-unit radius on an 80-unit tile read as a squircle. 10 units is ~8px at
+# favicon size — the app-frame radius, the largest the kit uses anywhere.
+TILE_RADIUS = 10.0
 L_X, L_Y, L_W, L_STEM_H = 26.5, 19.5, 11.2, 29.4
 L_FOOT_W, L_FOOT_H = 29.0, 10.6
 DOT_CX, DOT_CY, DOT_R, DOT_ALPHA = 53.5, 26.5, 6.6, 0.85
@@ -30,7 +34,7 @@ DOT_CX, DOT_CY, DOT_R, DOT_ALPHA = 53.5, 26.5, 6.6, 0.85
 SS = 4  # supersampling factor per axis; 16 samples per output pixel
 
 
-def inside_rounded_rect(x, y, w, h, r):
+def inside_rounded_rect(x: float, y: float, w: float, h: float, r: float) -> bool:
     if x < 0 or y < 0 or x > w or y > h:
         return False
     # Only the four corner boxes need the radius test.
@@ -41,17 +45,17 @@ def inside_rounded_rect(x, y, w, h, r):
     return (x - cx) ** 2 + (y - cy) ** 2 <= r * r
 
 
-def inside_l(x, y):
+def inside_l(x: float, y: float) -> bool:
     stem = L_X <= x <= L_X + L_W and L_Y <= y <= L_Y + L_STEM_H + L_FOOT_H
     foot = L_X <= x <= L_X + L_FOOT_W and L_Y + L_STEM_H <= y <= L_Y + L_STEM_H + L_FOOT_H
     return stem or foot
 
 
-def inside_dot(x, y):
+def inside_dot(x: float, y: float) -> bool:
     return (x - DOT_CX) ** 2 + (y - DOT_CY) ** 2 <= DOT_R * DOT_R
 
 
-def sample(x, y):
+def sample(x: float, y: float) -> tuple[int, int, int, int]:
     """Colour + coverage at one point in user space. Returns (r,g,b,a) 0-255."""
     if not inside_rounded_rect(x, y, VB_W, VB_H, TILE_RADIUS):
         return (0, 0, 0, 0)
@@ -64,7 +68,7 @@ def sample(x, y):
     return BLUE + (255,)
 
 
-def render(size):
+def render(size: int) -> list[bytes]:
     """Render `size`x`size` RGBA rows, supersampled for antialiasing."""
     rows = []
     # Preserve the source aspect by fitting the 80x79 box into a square.
@@ -102,12 +106,12 @@ def render(size):
     return rows
 
 
-def write_png(path, size):
+def write_png(path: Path, size: int) -> None:
     rows = render(size)
     # Filter type 0 (None) on every scanline.
     raw = b"".join(b"\x00" + r for r in rows)
 
-    def chunk(tag, data):
+    def chunk(tag: bytes, data: bytes) -> bytes:
         body = tag + data
         return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body))
 
@@ -122,7 +126,7 @@ def write_png(path, size):
 
 
 if __name__ == "__main__":
-    # .../frontend/tailwind/cds/render-logo.py -> repo root is three levels up.
+    # .../frontend/tailwind/airtable/render-logo.py -> repo root is three levels up.
     root = Path(__file__).resolve().parents[3]
     print("rendering Learno mark:")
     for rel, size in [
