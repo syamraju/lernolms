@@ -1,0 +1,257 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-08-21 04:40:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "course",
+  "column_break_head",
+  "event_type",
+  "meet_link",
+  "when_section",
+  "date",
+  "start_time",
+  "column_break_when",
+  "end_time",
+  "all_day",
+  "repeat_section",
+  "repeat_enabled",
+  "repeat_every",
+  "repeat_unit",
+  "column_break_repeat",
+  "repeat_on",
+  "repeat_ends",
+  "repeat_until",
+  "repeat_count",
+  "participants_section",
+  "participants",
+  "description_section",
+  "description",
+  "meta_section",
+  "course_title"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "description": "Optional. When set, only that course's students and instructors can be invited.",
+   "fieldname": "course",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Course",
+   "options": "LMS Course"
+  },
+  {
+   "fieldname": "column_break_head",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Discussion",
+   "fieldname": "event_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Discussion\nStudy Group\nOther"
+  },
+  {
+   "fieldname": "meet_link",
+   "fieldtype": "Data",
+   "label": "Meet Link"
+  },
+  {
+   "fieldname": "when_section",
+   "fieldtype": "Section Break",
+   "label": "When"
+  },
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Date",
+   "reqd": 1
+  },
+  {
+   "depends_on": "eval:!doc.all_day",
+   "fieldname": "start_time",
+   "fieldtype": "Time",
+   "label": "Start Time"
+  },
+  {
+   "fieldname": "column_break_when",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:!doc.all_day",
+   "fieldname": "end_time",
+   "fieldtype": "Time",
+   "label": "End Time"
+  },
+  {
+   "default": "0",
+   "fieldname": "all_day",
+   "fieldtype": "Check",
+   "label": "All Day Event"
+  },
+  {
+   "fieldname": "repeat_section",
+   "fieldtype": "Section Break",
+   "label": "Repeat"
+  },
+  {
+   "default": "0",
+   "fieldname": "repeat_enabled",
+   "fieldtype": "Check",
+   "label": "Repeats"
+  },
+  {
+   "default": "1",
+   "depends_on": "repeat_enabled",
+   "fieldname": "repeat_every",
+   "fieldtype": "Int",
+   "label": "Every"
+  },
+  {
+   "default": "Weeks",
+   "depends_on": "repeat_enabled",
+   "fieldname": "repeat_unit",
+   "fieldtype": "Select",
+   "label": "Unit",
+   "options": "Days\nWeeks\nMonths"
+  },
+  {
+   "fieldname": "column_break_repeat",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Comma-separated day names, for a weekly repeat. Empty means the event's own weekday.",
+   "depends_on": "repeat_enabled",
+   "fieldname": "repeat_on",
+   "fieldtype": "Data",
+   "label": "On"
+  },
+  {
+   "default": "Never",
+   "depends_on": "repeat_enabled",
+   "fieldname": "repeat_ends",
+   "fieldtype": "Select",
+   "label": "Ends",
+   "options": "Never\nOn Date\nAfter"
+  },
+  {
+   "depends_on": "eval:doc.repeat_enabled && doc.repeat_ends === 'On Date'",
+   "fieldname": "repeat_until",
+   "fieldtype": "Date",
+   "label": "Until"
+  },
+  {
+   "depends_on": "eval:doc.repeat_enabled && doc.repeat_ends === 'After'",
+   "fieldname": "repeat_count",
+   "fieldtype": "Int",
+   "label": "Occurrences"
+  },
+  {
+   "fieldname": "participants_section",
+   "fieldtype": "Section Break",
+   "label": "Participants"
+  },
+  {
+   "fieldname": "participants",
+   "fieldtype": "Table",
+   "label": "Participants",
+   "options": "LMS Event Participant"
+  },
+  {
+   "fieldname": "description_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "meta_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "course.title",
+   "fieldname": "course_title",
+   "fieldtype": "Data",
+   "label": "Course Title",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-21 04:40:00.000000",
+ "modified_by": "Administrator",
+ "module": "LMS",
+ "name": "LMS Student Event",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Moderator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "LMS Student",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Course Creator",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "date",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title"
+}

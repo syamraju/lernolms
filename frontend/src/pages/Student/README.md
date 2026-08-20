@@ -90,6 +90,59 @@ pointed at somebody else's record.
 | `get_my_batches` | strictly the caller's enrolments — unlike `lms.lms.api.get_my_batches`, which substitutes upcoming published batches when there are none |
 | `get_calendar_events` | live classes + evaluations + batch starts, flattened |
 
+## Calendar: events and appointments
+
+Two features, deliberately separate.
+
+**Create Event** — a student organises a discussion and invites people. The
+invite list is server-scoped: `calendar_api.get_event_invitees` only returns
+people the caller shares a course with, so it cannot be used to enumerate the
+user table. Recurrence is stored as a *rule*, not as N rows;
+`LMSStudentEvent.occurrences` expands it over whatever window the calendar is
+showing, capped at 200. That makes "edit the series" a one-row update, and it is
+also why deleting removes the whole series — there is nowhere to record "skip
+this one occurrence", and the button label says so.
+
+**Book Appointment** — four steps: course → instructor → free slot → what the
+doubt is. An instructor publishes weekly windows per course
+(`LMS Instructor Availability`, one row per instructor+course) and a
+`slot_duration` divides each window into bookable slots.
+
+The rule that matters is exclusivity, and it is enforced in exactly one place:
+`LMSAppointment.validate_slot_is_free`, under a row lock taken in
+`before_insert` on the availability row. `get_available_slots` also subtracts
+booked slots, but only so the UI does not offer them — it is a courtesy and it
+loses races. **Do not move that check into the API.** Cancelling sets status to
+`Cancelled` rather than deleting, which is what frees the slot again while
+keeping the history.
+
+Overlap, not exact-start, is what counts as a clash: changing `slot_duration`
+can leave an old appointment straddling two new slots, and double-booking a
+person is wrong either way.
+
+| Doctype | Role |
+|---|---|
+| `LMS Instructor Availability` | weekly windows + slot length, per instructor per course |
+| `LMS Availability Slot` | child: one weekly window |
+| `LMS Appointment` | one booked 1:1; owns the exclusivity rule |
+| `LMS Student Event` | a student-organised event + its repeat rule |
+| `LMS Event Participant` | child: one invitee, with the role resolved at invite time |
+
+Endpoints live in `lms/lms/calendar_api.py`. `student_api.get_calendar_events`
+folds both new kinds into the existing feed; every entry carries `kind`, which
+is what the grid colours on.
+
+### Activating it
+
+The five doctypes are new, so the tables do not exist until:
+
+```bash
+docker exec learno-lms-frappe-1 bash -lc 'cd ~/frappe-bench && bench --site lms.localhost migrate'
+```
+
+Until that runs, `/learn/calendar` will error on the new reads; the rest of
+`/learn` is unaffected.
+
 ## Crossing between the two apps
 
 * The router sends a signed-in user with **no** authoring rights to
