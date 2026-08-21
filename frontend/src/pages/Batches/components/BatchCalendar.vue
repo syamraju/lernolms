@@ -92,6 +92,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { Button, createResource } from 'frappe-ui'
+import { openExternal } from '@/utils/openExternal'
 
 const props = defineProps({
 	batch: {
@@ -187,18 +188,18 @@ const cells = computed(() => {
 })
 
 const legend = [
-	{ key: 'live_class', label: __('Live class'), dot: 'bg-blue-500' },
-	{ key: 'timetable', label: __('Timetable'), dot: 'bg-green-500' },
-	{ key: 'evaluation', label: __('Evaluation'), dot: 'bg-purple-500' },
-	{ key: 'appointment', label: __('Appointment'), dot: 'bg-amber-500' },
+	{ key: 'live_class', label: __('Live class'), dot: 'bg-surface-blue-7' },
+	{ key: 'timetable', label: __('Timetable'), dot: 'bg-surface-green-7' },
+	{ key: 'evaluation', label: __('Evaluation'), dot: 'bg-surface-purple-7' },
+	{ key: 'appointment', label: __('Appointment'), dot: 'bg-surface-amber-7' },
 	{ key: 'batch_start', label: __('Batch start / end'), dot: 'bg-gray-500' },
 ]
 
 const tones = {
-	live_class: 'bg-blue-100 text-blue-900',
-	timetable: 'bg-green-100 text-green-900',
-	evaluation: 'bg-purple-100 text-purple-900',
-	appointment: 'bg-amber-100 text-amber-900',
+	live_class: 'bg-surface-blue-2 text-ink-blue-8',
+	timetable: 'bg-surface-green-2 text-ink-green-8',
+	evaluation: 'bg-surface-purple-2 text-ink-purple-8',
+	appointment: 'bg-surface-amber-2 text-ink-amber-8',
 	batch_start: 'bg-gray-200 text-gray-900',
 	batch_end: 'bg-gray-200 text-gray-900',
 }
@@ -212,7 +213,10 @@ const eventTitle = (event) => {
 }
 
 const open = (event) => {
-	if (event.url) window.open(event.url, '_blank', 'noopener')
+	// Through the helper, not window.open directly: these URLs come from live
+	// class and evaluation records, so they are author-supplied, and the helper
+	// is where the scheme allowlist and the noopener guarantee live.
+	openExternal(event.url)
 }
 
 const shift = (months) => {
