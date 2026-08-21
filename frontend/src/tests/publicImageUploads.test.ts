@@ -103,6 +103,18 @@ describe('SettingFields leaves privacy to the field', () => {
 // tsconfig sets `types: []`, so node's globals aren't ambient here.
 declare const process: { cwd(): string }
 
+/** Same walk as vueFilesUnder, for the .ts modules that can upload from script. */
+const tsFilesUnder = (dir: string): string[] => {
+	const found: string[] = []
+	for (const entry of readdirSync(dir, { withFileTypes: true })) {
+		const full = join(dir, entry.name)
+		if (entry.isDirectory()) found.push(...tsFilesUnder(full))
+		else if (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts'))
+			found.push(full)
+	}
+	return found
+}
+
 const vueFilesUnder = (dir: string): string[] => {
 	const found: string[] = []
 	for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -281,5 +293,58 @@ describe('every uploader has the privacy the manifest states', () => {
 
 	it('matches the manifest exactly — no new, moved or flipped uploader', () => {
 		expect(found).toEqual(MANIFEST)
+	})
+})
+
+/**
+ * The scanner above only sees markup. An upload driven from script — `new
+ * FileUploadHandler().upload(file, opts)` — creates a File exactly the same
+ * way but has no tag to match, so it slipped past the manifest entirely. The
+ * bulk uploader added one; this closes the gap before there are three.
+ *
+ * Coarser than the tag scan by necessity: the options object is not adjacent
+ * to the constructor, so this asserts that a file constructing a handler
+ * declares privacy *somewhere* in that file, and pins which files those are.
+ * That is enough to force the decision to be written down and reviewed.
+ */
+const PROGRAMMATIC_UPLOADERS: Record<string, Privacy> = {
+	// Course ZIP awaiting import — never served to anyone, only unpacked.
+	'pages/Forms/CourseImportForm.vue': 'private',
+	// Bulk-uploaded lecture video. Private for the same reason as every other
+	// lecture video: it is paid course content, reachable only through the
+	// lesson it gets attached to.
+	'components/Curriculum/BulkUploader.vue': 'private',
+}
+
+describe('script-driven uploads declare their privacy too', () => {
+	const SRC = resolve(process.cwd(), 'src')
+	const sources = [
+		...vueFilesUnder(SRC),
+		...tsFilesUnder(SRC),
+	]
+
+	const found: Record<string, Privacy> = {}
+	for (const file of sources) {
+		const src = readFileSync(file, 'utf8')
+		if (!/new\s+FileUploadHandler\s*\(/.test(src)) continue
+		const key = relative(SRC, file).split(/[\\/]/).join('/')
+		if (/\b(private|is_private)\s*:\s*(false|0)\b/.test(src)) found[key] = 'public'
+		else if (/\b(private|is_private)\s*:\s*(true|1)\b/.test(src)) found[key] = 'private'
+		else found[key] = 'undeclared'
+	}
+
+	it('finds the handlers it is meant to scan', () => {
+		expect(Object.keys(found).length).toBeGreaterThan(0)
+	})
+
+	it('matches the manifest exactly — no new or flipped script uploader', () => {
+		expect(found).toEqual(PROGRAMMATIC_UPLOADERS)
+	})
+
+	it('never leaves a script upload undeclared', () => {
+		const undeclared = Object.entries(found)
+			.filter(([, p]) => p === 'undeclared')
+			.map(([f]) => f)
+		expect(undeclared, undeclared.join('\n')).toEqual([])
 	})
 })
