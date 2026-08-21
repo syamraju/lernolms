@@ -9,11 +9,29 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import cint, format_date, format_time, get_datetime, nowdate
 
-from lms.lms.doctype.lms_batch.lms_batch import authenticate
+from lms.lms.doctype.lms_batch.lms_batch import HUDDLE_PROVIDER, authenticate
+
+
+def huddle_join_url(name: str) -> str:
+	"""The in-app deep link for a huddle class.
+
+	Chats resolves any conversation id it is handed, so one route serves the
+	calendar entry, the reminder email and the batch page alike -- there is no
+	second "join a class" screen to keep in step with this one.
+	"""
+	from lms.lms.utils import get_lms_route
+
+	return get_lms_route(f"learn/chats?c=class:{name}&call=1")
 
 
 class LMSLiveClass(Document):
 	def after_insert(self):
+		if self.conferencing_provider == HUDDLE_PROVIDER and not self.join_url:
+			# Derived, not entered: the room is the class, so the link is a
+			# function of its name and cannot be set to point somewhere else.
+			self.db_set("join_url", huddle_join_url(self.name), update_modified=False)
+			self.reload()
+
 		self.create_calendar_event()
 
 	def on_update(self):
@@ -63,6 +81,17 @@ class LMSLiveClass(Document):
 		event.save(ignore_permissions=True)
 
 	def create_calendar_event(self):
+		if self.conferencing_provider == HUDDLE_PROVIDER:
+			# A local Event, deliberately unsynced: the class should appear in
+			# the LMS's own calendar, and there is no external calendar to keep
+			# in step. Requiring a configured Google Calendar here -- as the
+			# provider paths below do -- would make the one provider that needs
+			# no setup the one that refuses to be created without it.
+			event = self.create_event()
+			frappe.db.set_value(self.doctype, self.name, "event", event.name)
+			self.add_event_participants(event, None)
+			return
+
 		if self.conferencing_provider == "Google Meet":
 			calendar = frappe.db.get_value(
 				"LMS Google Meet Settings", self.google_meet_account, "google_calendar"

@@ -10,13 +10,19 @@
 		<InstallPrompt
 			v-if="!isPublicRoute && isMobile && !settings.data?.disable_pwa"
 		/>
+		<!-- Calls live at the app shell, not on the chat page: a call you have
+		     to stay on one screen to keep is a call you drop by navigating. -->
+		<template v-if="!isPublicRoute">
+			<HuddleDock :titles="huddleTitles" />
+			<IncomingCall />
+		</template>
 		<Dialogs />
 	</FrappeUIProvider>
 </template>
 <script setup>
 import { FrappeUIProvider } from 'frappe-ui'
 import { Dialogs } from '@/utils/dialogs'
-import { computed } from 'vue'
+import { computed, inject, provide, reactive } from 'vue'
 import { useScreenSize } from './utils/composables'
 import { useSettings } from '@/stores/settings'
 import { useRoute } from 'vue-router'
@@ -26,10 +32,29 @@ import NoSidebarLayout from './components/Layouts/NoSidebarLayout.vue'
 import StudentLayout from './components/Layouts/StudentLayout.vue'
 import InstallPrompt from './components/InstallPrompt.vue'
 import NotificationPanel from '@/components/Notifications/NotificationPanel.vue'
+import HuddleDock from '@/components/Huddle/HuddleDock.vue'
+import IncomingCall from '@/components/Huddle/IncomingCall.vue'
+import { useHuddle } from '@/composables/useHuddle'
+import { sessionStore } from '@/stores/session'
 
 const { isMobile } = useScreenSize()
 const route = useRoute()
 const { settings } = useSettings()
+const session = sessionStore()
+
+// One huddle for the whole app. Pages that can start a call inject it rather
+// than creating their own -- two instances would mean two mesh connections
+// fighting over the same microphone.
+const huddle = useHuddle({
+	socket: inject('$socket'),
+	currentUser: () => session.user || '',
+})
+provide('$huddle', huddle)
+
+// Whoever opens a thread knows its name; the dock, which outlives that page,
+// does not. This is the handoff.
+const huddleTitles = reactive({})
+provide('$huddleTitles', huddleTitles)
 
 // Derive the layout from the current route, not a navigation guard. Flipping it
 // in beforeEach swaps the layout the instant a navigation starts (before a lazy

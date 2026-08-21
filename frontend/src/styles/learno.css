@@ -322,3 +322,114 @@ html:has(.learno) {
 .learno-clamp-3 {
 	-webkit-line-clamp: 3;
 }
+
+/* Call controls — a small, self-contained set rather than Button variants: the
+   dock's buttons are icon-square, sit on both light and dark surfaces, and
+   carry a pressed state that reads as "this is OFF", which none of the shared
+   button variants mean. */
+.learno-huddle-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-width: 34px;
+	height: 34px;
+	padding: 0 9px;
+	border-radius: var(--learno-r-pill);
+	border: 1px solid var(--learno-line);
+	background: #ffffff;
+	color: var(--learno-ink-strong);
+	transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.learno-huddle-btn:hover {
+	background: var(--learno-canvas);
+}
+
+.learno-huddle-btn:focus-visible {
+	outline: 2px solid var(--learno-primary);
+	outline-offset: 2px;
+}
+
+/* Mic off / camera off. The state you most need to notice, so it is the one
+   that changes colour. */
+.learno-huddle-btn--danger {
+	background: var(--learno-primary-soft);
+	border-color: var(--learno-primary-soft);
+	color: var(--learno-primary);
+}
+
+.learno-huddle-btn--active {
+	background: var(--learno-ink);
+	border-color: var(--learno-ink);
+	color: #ffffff;
+}
+
+.learno-huddle-btn--leave {
+	background: var(--learno-primary);
+	border-color: var(--learno-primary);
+	color: #ffffff;
+}
+
+.learno-huddle-btn--leave:hover {
+	background: var(--learno-primary-hover);
+}
+
+.learno-huddle-btn--answer {
+	background: #0f9d58;
+	border-color: #0f9d58;
+	color: #ffffff;
+}
+
+.learno-huddle-btn--answer:hover {
+	background: #0c8a4c;
+}
+
+.learno-huddle-ghost {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: var(--learno-r-sm);
+	color: var(--learno-ink-muted);
+}
+
+.learno-huddle-ghost:hover {
+	background: var(--learno-canvas);
+	color: var(--learno-ink-strong);
+}
+
+.learno-huddle-link {
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+
+/* Chat sidebar rows — one shape for both DM and batch entries, so the two
+   sections read as one list rather than two widgets. */
+.learno-chat-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	margin-bottom: 2px;
+	padding: 8px 10px;
+	border-radius: var(--learno-r-md);
+	text-align: start;
+	transition: background 0.15s ease;
+}
+
+.learno-chat-unread {
+	display: inline-grid;
+	place-items: center;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 5px;
+	border-radius: var(--learno-r-pill);
+	background: var(--learno-badge);
+	color: #ffffff;
+	font-size: 10px;
+	font-weight: 600;
+}

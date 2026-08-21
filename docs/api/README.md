@@ -21,6 +21,7 @@ plus the generic Frappe REST layer they sit alongside.
 | [Payments & billing](./payments.md) | Order summary, billing access, payment links, gateways |
 | [Programs](./programs.md) | Program listing, details, enrollment |
 | [Discussions & notifications](./discussions.md) | Topics, replies, announcements, notification log |
+| [Calls & direct messages](./calls.md) | In-app audio/video huddles, signalling, 1:1 message threads |
 | [Platform & admin](./admin.md) | Settings, sidebar, branding, PWA, search, SEO meta, integrations |
 | [Generic REST resources](./rest.md) | `/api/resource/*` CRUD over LMS doctypes |
 

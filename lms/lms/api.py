@@ -2474,6 +2474,7 @@ def get_my_live_classes():
 			"start_url",
 			"join_url",
 			"owner",
+			"conferencing_provider",
 		],
 		limit=2,
 		order_by="date",

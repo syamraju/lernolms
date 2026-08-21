@@ -595,6 +595,16 @@
 			"export"
 		]
 	},
+	"LMS Direct Message": {
+		"LMS Student#0#if_owner": [
+			"read"
+		]
+	},
+	"LMS Direct Message Read State": {
+		"LMS Student#0#if_owner": [
+			"read"
+		]
+	},
 	"LMS Enrollment": {
 		"Course Creator#0": [
 			"read",

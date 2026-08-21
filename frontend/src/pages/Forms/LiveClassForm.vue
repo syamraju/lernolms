@@ -122,6 +122,9 @@ const readOnlyMode = window.read_only_mode
 // C2: close()'s pop branch restores the hash by itself; its deep-link branch
 // replaces to this literal location, so the tab hash has to be carried here or
 // a close lands on the bare path and silently resets the page to tab 0.
+// Kept in step with lms_batch.HUDDLE_PROVIDER.
+const HUDDLE_PROVIDER = 'Learno Huddle'
+
 const { close } = useFormRoute(
 	batchRouteLocation('BatchDetail', props.batchName, route.hash)
 )
@@ -148,6 +151,9 @@ const isAdmin = computed(() =>
 // lms_batch.create_live_class is.
 const hasProviderAccount = computed(() => {
 	const data = batch.data
+	// The in-app provider is the one that needs no account. Gating it behind
+	// one would make the zero-setup option the one that cannot be set up.
+	if (data?.conferencing_provider === HUDDLE_PROVIDER) return true
 	if (data?.conferencing_provider === 'Zoom' && data?.zoom_account) return true
 	if (
 		data?.conferencing_provider === 'Google Meet' &&
@@ -222,6 +228,16 @@ const createLiveClass = createResource({
 	},
 })
 
+const createHuddleLiveClass = createResource({
+	url: 'lms.lms.doctype.lms_batch.lms_batch.create_huddle_live_class',
+	makeParams(values) {
+		return {
+			batch_name: values.batch,
+			...values,
+		}
+	},
+})
+
 const createGoogleMeetLiveClass = createResource({
 	url: 'lms.lms.doctype.lms_batch.lms_batch.create_google_meet_live_class',
 	makeParams(values) {
@@ -246,9 +262,11 @@ const reloadLiveClassList = () => {
 const submitLiveClass = () => {
 	if (refusal.value) return
 	const resource =
-		conferencingProvider.value === 'Google Meet'
-			? createGoogleMeetLiveClass
-			: createLiveClass
+		conferencingProvider.value === HUDDLE_PROVIDER
+			? createHuddleLiveClass
+			: conferencingProvider.value === 'Google Meet'
+				? createGoogleMeetLiveClass
+				: createLiveClass
 	return submitResource(resource, liveClass, {
 		// NOTE: carried over verbatim — the return value is discarded, so
 		// validateFormFields() has never actually blocked a submit. Fixing it
