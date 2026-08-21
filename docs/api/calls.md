@@ -32,6 +32,7 @@ Everything here is addressed by a **conversation id**, `"<kind>:<key>"`:
 | Id | Who is in it |
 | --- | --- |
 | `batch:<LMS Batch>` | Batch members, instructors and moderators |
+| `channel:<LMS Chat Channel>` | The channel's audience, per `lms.lms.chat` |
 | `dm:<user-a>\|<user-b>` | Exactly the two people named — emails lowercased and sorted |
 | `class:<LMS Live Class>` | The live class's batch |
 

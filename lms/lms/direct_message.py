@@ -1,8 +1,10 @@
 """Direct messages: a thread between two people.
 
-Kept as its own store rather than folded into batch discussions: a discussion
-belongs to a cohort and a DM belongs to no cohort, so forcing one into the other
-would mean a nullable cohort link that half the access rules special-case.
+Deliberately separate from `lms.lms.chat`, which owns the batch channel tree.
+That store is channel-scoped -- every message links to an `LMS Chat Channel`
+that belongs to a cohort -- and a DM belongs to no cohort. Forcing one into the
+other would mean either a channel per pair of users or a nullable channel link
+that half the access rules have to special-case.
 
 This is what a 1:1 call hangs off: you ring a person, and the ring, the call,
 and the "call ended" line all need somewhere to land.

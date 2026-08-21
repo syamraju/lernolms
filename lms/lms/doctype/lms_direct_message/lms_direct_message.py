@@ -26,25 +26,15 @@ class LMSDirectMessage(Document):
 	pass
 
 
-def _is_super(user: str | None = None) -> bool:
-	"""Site administrators, who can already read the database directly.
-
-	Deliberately a local definition: `lms.lms.batch_access.is_super` is the same
-	rule and this should collapse into it the moment both live in the tree, but
-	a permission hook must not import a module this commit does not ship. The
-	literal "Administrator" check is not redundant with the role list -- it holds
-	even on a site where somebody has stripped System Manager from that user.
-	"""
-	user = user or frappe.session.user
-	if user == "Administrator":
-		return True
-	return "System Manager" in frappe.get_roles(user)
-
-
 def get_permission_query_conditions(user: str | None = None) -> str:
 	"""Restrict list/report queries to threads the caller is part of."""
+	# The shared definition, not a local one. Two notions of "super user" inside
+	# one permission layer is a drift waiting to happen, and this one also
+	# covers Administrator explicitly rather than relying on its role list.
+	from lms.lms.batch_access import is_super
+
 	user = user or frappe.session.user
-	if _is_super(user):
+	if is_super(user):
 		return ""
 
 	# Guest has no threads, and LIKE 'dm:guest|%' would be a lie rather than a
@@ -73,8 +63,10 @@ def get_permission_query_conditions(user: str | None = None) -> str:
 
 def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
 	"""Single-document access: you must be one of the two people in the id."""
+	from lms.lms.batch_access import is_super
+
 	user = user or frappe.session.user
-	if _is_super(user):
+	if is_super(user):
 		return True
 	if user == "Guest":
 		return False

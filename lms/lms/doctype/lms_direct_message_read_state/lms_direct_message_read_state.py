@@ -20,24 +20,12 @@ class LMSDirectMessageReadState(Document):
 	pass
 
 
-def _is_super(user: str | None = None) -> bool:
-	"""Site administrators, who can already read the database directly.
-
-	Deliberately a local definition: `lms.lms.batch_access.is_super` is the same
-	rule and this should collapse into it the moment both live in the tree, but
-	a permission hook must not import a module this commit does not ship. The
-	literal "Administrator" check is not redundant with the role list -- it holds
-	even on a site where somebody has stripped System Manager from that user.
-	"""
-	user = user or frappe.session.user
-	if user == "Administrator":
-		return True
-	return "System Manager" in frappe.get_roles(user)
-
-
 def get_permission_query_conditions(user: str | None = None) -> str:
+	# The shared definition, matching the message hook and the chat doctypes.
+	from lms.lms.batch_access import is_super
+
 	user = user or frappe.session.user
-	if _is_super(user):
+	if is_super(user):
 		return ""
 	if user == "Guest":
 		return "1 = 0"
@@ -46,8 +34,10 @@ def get_permission_query_conditions(user: str | None = None) -> str:
 
 
 def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
+	from lms.lms.batch_access import is_super
+
 	user = user or frappe.session.user
-	if _is_super(user):
+	if is_super(user):
 		return True
 	if user == "Guest":
 		return False

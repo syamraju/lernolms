@@ -210,9 +210,10 @@ def _announce(conversation: str, body: str) -> None:
 	"""Leave a trace of the call in the thread -- but only where the thread is
 	this app's message store.
 
-	Only a DM is backed by `lms.lms.direct_message`. A batch thread renders from
-	LMS Discussion, so a system message written here would land in a table
-	nobody reads. Those calls announce themselves live instead, through the
+	Only a DM is backed by `lms.lms.direct_message`. A batch channel's history
+	lives in `lms.lms.chat`'s own message store and a batch thread's in LMS
+	Discussion, so a system message written here would land in a table neither
+	of them reads. Those calls announce themselves live instead, through the
 	lifecycle badge, and leave no history behind.
 	"""
 	kind, _key = parse(conversation)

@@ -7,9 +7,10 @@ two modules is how the two drift apart and one of them becomes a hole.
 
 A conversation id is ``"<kind>:<key>"``:
 
-  * ``batch:<LMS Batch>``      -- the batch discussion thread
-  * ``dm:<user-a>|<user-b>``   -- a direct 1:1 thread, emails sorted
-  * ``class:<LMS Live Class>`` -- a scheduled live session
+  * ``batch:<LMS Batch>``        -- the batch discussion thread
+  * ``channel:<LMS Chat Channel>`` -- one channel of a batch's channel tree
+  * ``dm:<user-a>|<user-b>``     -- a direct 1:1 thread, emails sorted
+  * ``class:<LMS Live Class>``   -- a scheduled live session
 
 New kinds need a branch in `audience` and nothing else. Everything downstream --
 messages, rosters, signalling, badges -- is written against the id alone.
@@ -18,7 +19,7 @@ messages, rosters, signalling, badges -- is written against the id alone.
 import frappe
 from frappe import _
 
-KINDS = ("batch", "dm", "class")
+KINDS = ("batch", "channel", "dm", "class")
 
 
 def parse(conversation: str) -> tuple[str, str]:
@@ -152,6 +153,25 @@ def dm_allowed(pair: list) -> bool:
 	return bool(frappe.db.exists("LMS Direct Message", {"conversation": dm_id(a, b)}))
 
 
+def channel_audience(channel: str) -> list:
+	"""Who may read one channel of a batch's channel tree.
+
+	Delegates the rule to `lms.lms.chat` rather than restating it: a channel's
+	audience narrows its batch's membership, and a second copy of that rule here
+	would be the copy that goes stale when the first one changes. The cost is a
+	membership check per batch member, paid only when a call starts or ends.
+	"""
+	from lms.lms.chat import can_access_channel
+
+	row = frappe.db.get_value(
+		"LMS Chat Channel", channel, ["name", "batch", "audience"], as_dict=True
+	)
+	if not row:
+		frappe.throw(_("Channel not found."), frappe.DoesNotExistError)
+
+	return [u for u in batch_audience(row.batch) if can_access_channel(row, u)]
+
+
 def audience(conversation: str) -> list:
 	"""Everyone entitled to see this conversation.
 
@@ -164,6 +184,9 @@ def audience(conversation: str) -> list:
 
 	if kind == "batch":
 		return batch_audience(key)
+
+	if kind == "channel":
+		return channel_audience(key)
 
 	if kind == "class":
 		batch = frappe.db.get_value("LMS Live Class", key, "batch_name")
@@ -232,6 +255,9 @@ def title(conversation: str, viewer: str | None = None) -> str:
 
 	if kind == "batch":
 		return frappe.db.get_value("LMS Batch", key, "title") or key
+
+	if kind == "channel":
+		return frappe.db.get_value("LMS Chat Channel", key, "title") or key
 
 	if kind == "class":
 		return frappe.db.get_value("LMS Live Class", key, "title") or key
