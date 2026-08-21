@@ -107,7 +107,9 @@
 					<template #body>
 						<CurriculumItemBody
 							:item="element"
+							:courseName="courseName"
 							@update="$emit('update-item', $event)"
+							@set-quiz="$emit('set-quiz', $event)"
 							@edit-content="$emit('edit-content', $event)"
 							@refresh="$emit('refresh')"
 						/>
@@ -119,6 +121,7 @@
 		<div class="mt-3">
 			<AddItemForm
 				v-if="addingItem"
+				:courseName="courseName"
 				:loading="isBusy(`item:new:${section.name}`)"
 				@add="onAddItem"
 				@cancel="addingItem = false"
@@ -143,6 +146,7 @@ import type { CurriculumItem, CurriculumItemType, CurriculumSection } from '@/ty
 
 const props = defineProps<{
 	section: CurriculumSection
+	courseName: string
 	/** 1-based position among published sections, matching the learner's view. */
 	position: number
 	expandedItem: string
@@ -160,8 +164,10 @@ const emit = defineEmits<{
 			itemType: CurriculumItemType
 			title: string
 			description: string
+			quiz: string | null
 		},
 	]
+	'set-quiz': [{ lesson: string; quiz: string | null }]
 	'rename-item': [{ item: CurriculumItem; title: string }]
 	'toggle-item-published': [CurriculumItem]
 	'toggle-expanded': [CurriculumItem]
@@ -216,6 +222,7 @@ function onAddItem(payload: {
 	itemType: CurriculumItemType
 	title: string
 	description: string
+	quiz: string | null
 }) {
 	addingItem.value = false
 	emit('add-item', { section: props.section, ...payload })

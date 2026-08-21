@@ -38,6 +38,7 @@
   "duration_minutes",
   "description",
   "linked_section",
+  "is_shared_activity",
   "quiz",
   "assignment",
   "exercise",
@@ -134,6 +135,15 @@
    "fieldname": "linked_section",
    "fieldtype": "Section Break",
    "label": "Linked Activity"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.item_type != 'Lecture'",
+   "description": "The linked quiz, assignment or exercise comes from the library and is shared with other courses, so this item does not own it: renaming or deleting the item leaves it alone.",
+   "fieldname": "is_shared_activity",
+   "fieldtype": "Check",
+   "label": "Reused From The Library",
+   "read_only": 1
   },
   {
    "depends_on": "eval:doc.item_type == 'Quiz'",

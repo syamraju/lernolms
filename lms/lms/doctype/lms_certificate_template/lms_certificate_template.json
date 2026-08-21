@@ -1,0 +1,171 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-08-21 10:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "reference_doctype",
+  "reference_name",
+  "column_break_ref",
+  "title",
+  "is_complete",
+  "canvas_section",
+  "background_image",
+  "column_break_canvas",
+  "canvas_width",
+  "canvas_height",
+  "issue_section",
+  "issue_date_source",
+  "custom_issue_date",
+  "elements_section",
+  "elements"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Certificate For",
+   "options": "LMS Course\nLMS Program",
+   "reqd": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "in_standard_filter": 1,
+   "label": "Reference",
+   "options": "reference_doctype",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "column_break_ref",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "description": "Set by the server: a background is uploaded and every mandatory variable is on the canvas.",
+   "fieldname": "is_complete",
+   "fieldtype": "Check",
+   "label": "Complete",
+   "read_only": 1
+  },
+  {
+   "fieldname": "canvas_section",
+   "fieldtype": "Section Break",
+   "label": "Canvas"
+  },
+  {
+   "description": "The PNG or JPG the certificate is drawn on. Everything else is placed over it.",
+   "fieldname": "background_image",
+   "fieldtype": "Attach Image",
+   "label": "Background Image"
+  },
+  {
+   "fieldname": "column_break_canvas",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1754",
+   "fieldname": "canvas_width",
+   "fieldtype": "Int",
+   "label": "Canvas Width"
+  },
+  {
+   "default": "1240",
+   "fieldname": "canvas_height",
+   "fieldtype": "Int",
+   "label": "Canvas Height"
+  },
+  {
+   "fieldname": "issue_section",
+   "fieldtype": "Section Break",
+   "label": "Issue Date"
+  },
+  {
+   "default": "Completion Date",
+   "fieldname": "issue_date_source",
+   "fieldtype": "Select",
+   "label": "Issue Date",
+   "options": "Completion Date\nCustom Date"
+  },
+  {
+   "depends_on": "eval:doc.issue_date_source=='Custom Date'",
+   "fieldname": "custom_issue_date",
+   "fieldtype": "Date",
+   "label": "Custom Issue Date"
+  },
+  {
+   "fieldname": "elements_section",
+   "fieldtype": "Section Break",
+   "label": "Placed Elements"
+  },
+  {
+   "fieldname": "elements",
+   "fieldtype": "Table",
+   "label": "Elements",
+   "options": "LMS Certificate Element"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-21 10:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "LMS",
+ "name": "LMS Certificate Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Moderator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Course Creator",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

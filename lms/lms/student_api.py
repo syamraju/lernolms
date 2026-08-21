@@ -71,6 +71,35 @@ def _chapter_counts(course_names: list) -> dict:
 	return dict(Counter(rows))
 
 
+def _pacing_by_course(course_names: list) -> dict:
+	"""Deadline state for the signed-in student's enrollments in these courses.
+
+	One query for the whole page rather than one per card: deciding where an
+	enrollment stands is pure arithmetic, so the only cost worth avoiding is the
+	round trip.
+	"""
+	if not course_names or frappe.session.user == "Guest":
+		return {}
+
+	from lms.lms.pacing import compute_due_date, deadline_days, pacing_state
+
+	rows = frappe.get_all(
+		"LMS Enrollment",
+		filters={"member": frappe.session.user, "course": ("in", course_names)},
+		fields=["course", "due_date", "progress", "creation"],
+		limit_page_length=0,
+	)
+
+	pacing = {}
+	for row in rows:
+		# An enrollment made before the course had a deadline carries no stored
+		# date. Deriving one keeps the setting meaningful for a cohort already in
+		# flight instead of applying only to whoever enrolls next.
+		due_date = row.due_date or compute_due_date(row.creation, deadline_days(row.course))
+		pacing[row.course] = pacing_state(due_date, row.progress)
+	return pacing
+
+
 @frappe.whitelist(allow_guest=True)
 def get_student_courses(filters: dict | str = None, start: int = 0, limit_page_length=None) -> list:
 	"""`lms.lms.utils.get_courses` plus the two fields the student card needs.
@@ -86,12 +115,15 @@ def get_student_courses(filters: dict | str = None, start: int = 0, limit_page_l
 	if not courses:
 		return []
 
-	counts = _chapter_counts([course.name for course in courses])
+	course_names = [course.name for course in courses]
+	counts = _chapter_counts(course_names)
+	pacing = _pacing_by_course(course_names)
 	for course in courses:
 		course.chapters_count = counts.get(course.name, 0)
 		# `get_enrollment_details` attaches `membership` only when one exists, so
 		# a plain read of `.progress` would be a KeyError on an unenrolled row.
 		course.progress = cint((course.get("membership") or {}).get("progress"))
+		course.pacing = pacing.get(course.name)
 
 	return courses
 

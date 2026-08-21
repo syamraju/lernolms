@@ -45,6 +45,28 @@ class BaseTestUtils(UnitTestCase):
 		self.cleanup_items.append(("User", user.name))
 		return user
 
+	def _create_user_with_exact_roles(self, email, first_name, last_name, roles):
+		"""`_create_user`, but the account ends up holding exactly `roles`.
+
+		`_create_user` assigns roles only at insert and returns an existing
+		account untouched, so a leftover from an earlier run keeps whatever roles
+		it was born with. That is harmless for a fixture and poison for a
+		permission test: "this user may not approve a course" would pass or fail
+		on the history of the site rather than on the rule under test.
+		"""
+		user = self._create_user(email, first_name, last_name, roles)
+		wanted = set(roles)
+		held = {row.role for row in user.roles}
+		if held == wanted and user.enabled:
+			return user
+
+		user.set("roles", [])
+		for role in sorted(wanted):
+			user.append("roles", {"role": role})
+		user.enabled = 1
+		user.save(ignore_permissions=True)
+		return user
+
 	def _create_course(self, title="Utility Course", instructor="frappe@example.com"):
 		existing = frappe.db.exists("LMS Course", {"title": title})
 		if existing:

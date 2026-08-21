@@ -14,6 +14,13 @@ class LMSEnrollment(Document):
 		self.validate_duplicate_enrollment()
 		self.validate_course_enrollment_eligibility()
 		self.validate_owner()
+		self.set_due_date()
+
+	def set_due_date(self):
+		"""Stamp the course's completion deadline onto this learner's clock."""
+		from lms.lms.pacing import set_enrollment_due_date
+
+		set_enrollment_due_date(self)
 
 	def validate(self):
 		self.enforce_server_managed_fields()
@@ -29,6 +36,12 @@ class LMSEnrollment(Document):
 		defaults = {"progress": 0, "purchased_certificate": 0}
 		for field, default in defaults.items():
 			setattr(self, field, previous.get(field) if previous else default)
+
+		# due_date is the course's deadline, not the learner's preference: it is
+		# stamped by before_insert and rewritten only by pacing.refresh_due_dates.
+		# On a new row that stamp has already run, so only an update is reverted.
+		if previous:
+			self.due_date = previous.get("due_date")
 
 	def validate_owner(self):
 		"""Makes the member as the owner of the document so that users can update their progress"""

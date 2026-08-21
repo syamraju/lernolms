@@ -1,12 +1,24 @@
 <template>
 	<div class="space-y-6">
-		<p class="text-p-base text-ink-gray-7">
-			{{
-				__(
-					'Build your course out of sections holding lectures and practice — quizzes, coding exercises and assignments. Label everything clearly; this is the outline learners navigate by.'
-				)
-			}}
-		</p>
+		<div class="flex flex-wrap items-start justify-between gap-3">
+			<p class="max-w-2xl text-p-base text-ink-gray-7">
+				{{
+					__(
+						'Build your course out of sections holding lectures and practice — quizzes, coding exercises and assignments. Label everything clearly; this is the outline learners navigate by.'
+					)
+				}}
+			</p>
+			<Button
+				variant="outline"
+				class="shrink-0"
+				:label="__('Bulk uploader')"
+				@click="showBulkUploader = true"
+			>
+				<template #prefix>
+					<span class="lucide-upload size-4" />
+				</template>
+			</Button>
+		</div>
 
 		<div
 			class="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-md border bg-surface-gray-1 px-4 py-3 text-p-sm"
@@ -78,6 +90,7 @@
 			<template #item="{ element }">
 				<CurriculumSection
 					:section="element"
+					:courseName="courseName"
 					:position="publishedPosition(element)"
 					:expandedItem="expandedItem"
 					:isBusy="isBusy"
@@ -91,6 +104,7 @@
 					@toggle-expanded="onToggleExpanded"
 					@delete-item="onDeleteItem"
 					@update-item="onUpdateItem"
+					@set-quiz="onSetQuiz"
 					@edit-content="onEditContent"
 					@reorder-items="onReorderItems"
 					@refresh="refresh"
@@ -129,6 +143,13 @@
 				<span class="lucide-plus size-4" />
 			</template>
 		</Button>
+
+		<BulkUploader
+			v-model="showBulkUploader"
+			:courseName="courseName"
+			:sections="sections"
+			@uploaded="refresh"
+		/>
 	</div>
 </template>
 
@@ -148,6 +169,7 @@ import { Button, FormControl, createResource } from 'frappe-ui'
 import Draggable from 'vuedraggable'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import CurriculumSection from '@/components/Curriculum/CurriculumSection.vue'
+import BulkUploader from '@/components/Curriculum/BulkUploader.vue'
 import { useCurriculum } from '@/composables/useCurriculum'
 import { formatVideoLength } from '@/utils/courseCreation'
 import type {
@@ -155,6 +177,7 @@ import type {
 	CurriculumItem,
 	CurriculumItemType,
 	CurriculumSection as Section,
+	QuizType,
 	Resource,
 } from '@/types'
 
@@ -195,6 +218,7 @@ const status = createResource({
 	auto: true,
 }) as Resource<CourseCreationStatus | null>
 const expandedItem = ref('')
+const showBulkUploader = ref(false)
 const addingSection = ref(false)
 const sectionTitleInput = ref<{ $el?: HTMLElement } | null>(null)
 const newSection = reactive({ title: '', objective: '' })
@@ -302,13 +326,24 @@ async function onAddItem({
 	itemType,
 	title,
 	description,
+	quiz,
+	quizType,
 }: {
 	section: Section
 	itemType: CurriculumItemType
 	title: string
 	description: string
+	quiz: string | null
+	quizType: QuizType
 }) {
-	const result = await curriculum.addItem(section.name, itemType, title, description)
+	const result = await curriculum.addItem(
+		section.name,
+		itemType,
+		title,
+		description,
+		quiz,
+		quizType
+	)
 	// Open the new item straight away: adding one is always followed by filling
 	// it in, and a collapsed row would hide the work that comes next.
 	if (result?.lesson) expandedItem.value = result.lesson
@@ -326,6 +361,10 @@ function onUpdateItem({
 	values: Record<string, unknown>
 }) {
 	void curriculum.updateItem(lesson, values)
+}
+
+function onSetQuiz({ lesson, quiz }: { lesson: string; quiz: string | null }) {
+	void curriculum.setItemQuiz(lesson, quiz)
 }
 
 function onToggleItem(item: CurriculumItem) {

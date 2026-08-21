@@ -174,6 +174,14 @@ def get_membership(course: str, member: str = None):
 			],
 			as_dict=True,
 		)
+		# The public code, not the certificate's document name: it is what the
+		# learner's "view certificate" link has to carry, and the docname is an
+		# internal identifier that should not appear in a URL they can share.
+		membership.certificate_code = (
+			frappe.db.get_value("LMS Certificate", membership.certificate, "verification_code")
+			if membership.certificate
+			else None
+		)
 		return membership
 
 	return False
@@ -1263,11 +1271,13 @@ def get_course_outline(course: str, progress: bool = False) -> list:
 	files_by_name = get_scorm_files(chapters)
 	completed = get_completed_lessons(course, lesson_rows) if progress else set()
 
-	from lms.lms.permissions import enforces_lesson_completion
+	from lms.lms.permissions import enforces_lesson_completion, gates_by_section
 
 	enforce = enforces_lesson_completion(course) if progress else False
 
-	return build_outline(chapters, lesson_rows, files_by_name, completed, progress, enforce)
+	return build_outline(
+		chapters, lesson_rows, files_by_name, completed, progress, enforce, gates_by_section(course)
+	)
 
 
 def get_outline_chapter(course: str) -> list:
@@ -1380,6 +1390,66 @@ def compute_locked_lessons(ordered_lesson_names: list, completed: set) -> set:
 	return locked
 
 
+def compute_locked_sections(ordered_lesson_rows: list, completed: set) -> set:
+	"""Lesson names locked because their section has not been reached yet.
+
+	The section rule is coarser than the lesson rule on purpose: inside the
+	section a learner is working through, every item is open, so they can take
+	the lecture, the assignment and the end-of-section quiz in whatever order
+	suits them. What they cannot do is start the next portion. A section opens
+	once every item of every section before it is complete.
+
+	Sections are identified by the outline row that placed them, not by the
+	chapter name, so a chapter referenced twice in one course is two separate
+	portions and finishing the first does not open the second.
+
+	Lesson names are deduped on first sight, for the reason
+	`compute_locked_lessons` documents: the return value is a set of names, so a
+	lesson reachable from two sections would be locked by its later placement and
+	take its earlier one down with it — and with the opening lesson locked the
+	course is a dead end. The first placement is the one that counts, in its own
+	section and nowhere else.
+
+	Lessons already completed are never locked — the same courtesy
+	`compute_locked_lessons` extends, so switching the setting on mid-cohort
+	cannot take back work a learner has already done.
+	"""
+	sections: dict = {}
+	seen = set()
+	for row in ordered_lesson_rows:
+		name = row.get("name")
+		if name in seen:
+			continue
+		seen.add(name)
+		key = (row.get("chapter_idx"), row.get("chapter_name"))
+		sections.setdefault(key, []).append(name)
+
+	locked = set()
+	blocked = False
+	for _key, names in sorted(sections.items(), key=lambda item: item[0][0] or 0):
+		section_complete = all(name in completed for name in names)
+		if blocked:
+			locked.update(name for name in names if name not in completed)
+		elif not section_complete:
+			# The first unfinished section is the one in play; everything after
+			# it waits, however much of this one is already done.
+			blocked = True
+	return locked
+
+
+def compute_course_locks(ordered_lesson_rows: list, completed: set, by_section: bool = False) -> set:
+	"""The lock set for a course, under whichever progression rule it uses.
+
+	One entry point for both rules so the outline, the lesson gate and
+	`save_progress` can never disagree about what is open — they each derive
+	their own ordered rows, and picking the rule separately in three places is
+	how they would drift.
+	"""
+	if by_section:
+		return compute_locked_sections(ordered_lesson_rows, completed)
+	return compute_locked_lessons([row.get("name") for row in ordered_lesson_rows], completed)
+
+
 def get_ordered_lesson_rows(course: str) -> list:
 	"""Lesson identity rows for a course, in (chapter idx, lesson idx) order.
 
@@ -1422,6 +1492,7 @@ def build_outline(
 	completed: set,
 	progress: bool,
 	enforce_completion: bool = False,
+	by_section: bool = False,
 ) -> list:
 	chapter_idx_by_name = {c.name: c.idx for c in chapters}
 	lessons_by_chapter = {}
@@ -1450,8 +1521,12 @@ def build_outline(
 		lessons_by_chapter.setdefault(lr.chapter_name, []).append(lesson)
 
 	if progress and enforce_completion:
-		ordered_names = [lesson.name for c in chapters for lesson in lessons_by_chapter.get(c.name, [])]
-		locked = compute_locked_lessons(ordered_names, completed)
+		ordered_rows = [
+			frappe._dict(name=lesson.name, chapter_name=c.name, chapter_idx=c.idx)
+			for c in chapters
+			for lesson in lessons_by_chapter.get(c.name, [])
+		]
+		locked = compute_course_locks(ordered_rows, completed, by_section)
 		for lessons in lessons_by_chapter.values():
 			for lesson in lessons:
 				lesson.locked = 1 if lesson.name in locked else 0
@@ -1632,6 +1707,18 @@ def get_lesson(course: str, chapter: int, lesson: int) -> dict:
 	lesson_details.progress = progress
 	lesson_details.prev = neighbours["prev"]
 	lesson_details.membership = membership
+	# What still gates "Mark as Complete" for this student, from the same helpers
+	# save_progress checks. Only meaningful for a member — nobody else can record
+	# progress at all — so the cost is skipped for instructors and previews.
+	# Local import for the same reason as the two below: course_lesson imports
+	# from utils at module load.
+	from lms.lms.doctype.course_lesson.course_lesson import get_completion_requirements
+
+	requirements = get_completion_requirements(lesson_name) if membership else {}
+	lesson_details.completion_blockers = requirements.get("blockers", [])
+	# The pass mark and the learner's best attempt, so the page can name the bar
+	# instead of saying "pass the quiz" and leaving them to guess it.
+	lesson_details.pending_quizzes = requirements.get("pending_quizzes", [])
 	lesson_details.icon = get_lesson_icon(
 		lesson_details.body, lesson_details.content, lesson_details.get("item_type")
 	)

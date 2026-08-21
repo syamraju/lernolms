@@ -65,9 +65,20 @@
 		<div class="flex flex-1 flex-col gap-[19px] px-[9px]">
 			<div class="flex flex-col gap-[9px]">
 				<div class="flex flex-col items-start gap-1">
-					<span v-if="level" class="learno-tag bg-[#bedbff] text-[#11279a]">
-						{{ level }}
-					</span>
+					<div class="flex flex-wrap items-center gap-1">
+						<span v-if="level" class="learno-tag bg-[#bedbff] text-[#11279a]">
+							{{ level }}
+						</span>
+						<!-- The course's completion deadline, shown only while it is
+						     still something the student can act on. -->
+						<span
+							v-if="deadline"
+							class="learno-tag"
+							:class="PACING_TONE_CLASS[deadline.tone]"
+						>
+							{{ deadline.text }}
+						</span>
+					</div>
 
 					<span
 						v-if="organisation"
@@ -162,6 +173,7 @@
 import { computed } from 'vue'
 import LearnoMark from '@/components/Learno/LearnoMark.vue'
 import { safeUrl } from '@/utils/safeUrl'
+import { PACING_TONE_CLASS, pacingChip } from '@/utils/pacing'
 
 const props = defineProps<{
 	course: Record<string, any>
@@ -171,6 +183,8 @@ const props = defineProps<{
 defineEmits<{ (e: 'enroll', course: Record<string, any>): void }>()
 
 const NEW_FOR_DAYS = 30
+
+const deadline = computed(() => pacingChip(props.course.pacing))
 
 const isNew = computed(() => {
 	if (!props.course.published_on) return false

@@ -10,7 +10,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.query_builder.functions import Locate
 from frappe.rate_limiter import rate_limit
-from frappe.utils import add_to_date, now_datetime
+from frappe.utils import add_to_date, cint, now_datetime
 from frappe.utils.response import send_private_file
 from frappe.utils.telemetry import capture
 
@@ -308,6 +308,66 @@ def apply_enforcement_flags(quiz_done: bool, assignment_done: bool, settings: di
 	)
 
 
+def get_completion_settings() -> dict:
+	"""The two enforcement toggles, or {} on a site that has not migrated yet.
+
+	Pre-migrate sites lack these columns; {} makes apply_enforcement_flags treat
+	both as enforced, which is the legacy behaviour.
+	"""
+	try:
+		return (
+			frappe.get_cached_value(
+				"LMS Settings",
+				None,
+				["enforce_quiz_completion", "enforce_assignment_completion"],
+				as_dict=True,
+			)
+			or {}
+		)
+	except Exception:
+		return {}
+
+
+def get_completion_blockers(lesson: str) -> list[str]:
+	"""Which of a lesson's activities still stand between a student and completion.
+
+	A subset of ``["quiz", "assignment"]``, derived from the same helpers
+	:func:`_save_progress` gates the write on. Shipped to the client by
+	``get_lesson`` so the button a student sees and the write the server will
+	accept cannot disagree — before this existed, save_progress returned
+	normally without recording anything and the page reported success.
+	"""
+	quiz_completed, assignment_completed = apply_enforcement_flags(
+		quiz_done=get_quiz_progress(lesson),
+		assignment_done=get_assignment_progress(lesson),
+		settings=get_completion_settings(),
+	)
+	blockers = []
+	if not quiz_completed:
+		blockers.append("quiz")
+	if not assignment_completed:
+		blockers.append("assignment")
+	return blockers
+
+
+def get_completion_requirements(lesson: str) -> dict:
+	"""``get_completion_blockers`` plus the pass marks behind the quiz blocker.
+
+	The blocker list says *that* a quiz is in the way; this says which quiz, what
+	the author set as the pass mark, and how the learner has done so far. The
+	page needs both — the list drives whether the button is disabled, the detail
+	drives the sentence under it.
+
+	`pending_quizzes` is empty when quiz enforcement is switched off site-wide,
+	so the detail can never contradict the button.
+	"""
+	blockers = get_completion_blockers(lesson)
+	return {
+		"blockers": blockers,
+		"pending_quizzes": get_pending_quizzes(lesson) if "quiz" in blockers else [],
+	}
+
+
 @frappe.whitelist()
 def save_progress(lesson: str, course: str, scorm_details: dict = None):
 	"""
@@ -343,24 +403,10 @@ def _save_progress(lesson: str, course: str, scorm_details: dict = None):
 		{"lesson": lesson, "member": frappe.session.user, "status": "Complete"},
 	)
 
-	try:
-		settings = (
-			frappe.get_cached_value(
-				"LMS Settings",
-				None,
-				["enforce_quiz_completion", "enforce_assignment_completion"],
-				as_dict=True,
-			)
-			or {}
-		)
-	except Exception:
-		# Pre-migrate sites won't have these columns yet. Fall back to {} so
-		# apply_enforcement_flags treats both as enforced (legacy behavior).
-		settings = {}
 	quiz_completed, assignment_completed = apply_enforcement_flags(
 		quiz_done=get_quiz_progress(lesson),
 		assignment_done=get_assignment_progress(lesson),
-		settings=settings,
+		settings=get_completion_settings(),
 	)
 
 	if scorm_details:
@@ -462,10 +508,26 @@ def get_next_lesson(course: str, lesson: str):
 	return frappe.db.get_value("Lesson Reference", {"parent": next_chapter, "idx": 1}, "lesson")
 
 
-def get_quiz_progress(lesson):
-	lesson_details = frappe.db.get_value("Course Lesson", lesson, ["body", "content"], as_dict=1)
-	quizzes = []
+def get_lesson_quizzes(lesson) -> list[str]:
+	"""Every quiz standing between a learner and the end of this lesson.
 
+	Three placements, and one lesson can hold more than one kind:
+
+	- EditorJS `quiz` blocks and quizzes attached to a video, in `content`
+	- the legacy `{{ Quiz(...) }}` macro, in `body`
+	- the quiz a curriculum Quiz item delegates to, in `Course Lesson.quiz`
+
+	The third was missing here, so an end-of-section quiz added through the
+	curriculum builder gated nothing: a learner could mark the item complete
+	without opening it, and the pass mark the author set was decoration. It is
+	read whether or not the lesson also has body content, because a Quiz item
+	has no body of its own to fall through to.
+	"""
+	lesson_details = frappe.db.get_value("Course Lesson", lesson, ["body", "content", "quiz"], as_dict=1)
+	if not lesson_details:
+		return []
+
+	quizzes = []
 	if lesson_details.content:
 		for block in get_editorjs_blocks(lesson_details.content):
 			data = block.get("data") or {}
@@ -482,18 +544,114 @@ def get_quiz_progress(lesson):
 		macros = find_macros(lesson_details.body)
 		quizzes = [value for name, value in macros if name == "Quiz"]
 
+	if lesson_details.quiz:
+		quizzes.append(lesson_details.quiz)
+
+	# Dedupe on first sight: the same quiz placed twice is one requirement, and
+	# reporting it twice would put it in the learner's blocker list twice.
+	seen = set()
+	ordered = []
 	for quiz in quizzes:
-		passing_percentage = frappe.db.get_value("LMS Quiz", quiz, "passing_percentage")
-		if not frappe.db.exists(
+		if not quiz or quiz in seen:
+			continue
+		seen.add(quiz)
+		ordered.append(quiz)
+	return ordered
+
+
+def get_pending_quizzes(lesson) -> list[dict]:
+	"""The lesson's quizzes this learner has not yet passed, and the bar for each.
+
+	Returns the pass mark alongside the learner's best attempt so the page can
+	say *why* the lesson will not close — "you scored 40%, you need 60%" — which
+	a bare "pass the quiz" cannot.
+	"""
+	pending = []
+	for quiz in get_lesson_quizzes(lesson):
+		quiz_details = frappe.db.get_value(
+			"LMS Quiz",
+			quiz,
+			[
+				"title",
+				"passing_percentage",
+				"max_attempts",
+				"quiz_type",
+				"block_progress_until_evaluated",
+			],
+			as_dict=True,
+		)
+		if not quiz_details:
+			continue
+		passing_percentage = cint(quiz_details.passing_percentage)
+
+		submissions = frappe.get_all(
 			"LMS Quiz Submission",
+			filters={"quiz": quiz, "member": frappe.session.user},
+			fields=["percentage", "evaluation_status"],
+		)
+
+		if quiz_details.quiz_type == "Subjective":
+			row = subjective_blocker(quiz, quiz_details, submissions, passing_percentage)
+			if row:
+				pending.append(row)
+			continue
+
+		best = max((cint(row.percentage) for row in submissions), default=None)
+		if best is not None and best >= passing_percentage:
+			continue
+
+		pending.append(
 			{
 				"quiz": quiz,
-				"member": frappe.session.user,
-				"percentage": [">=", passing_percentage],
-			},
-		):
-			return False
-	return True
+				"title": quiz_details.title,
+				"passing_percentage": passing_percentage,
+				"best_percentage": best,
+				"attempts": len(submissions),
+				"max_attempts": cint(quiz_details.max_attempts),
+				"awaiting_evaluation": False,
+			}
+		)
+	return pending
+
+
+def subjective_blocker(quiz, quiz_details, submissions, passing_percentage) -> dict | None:
+	"""Whether an evaluator-marked quiz still holds the lesson open, and why.
+
+	A subjective quiz has no answer key, so an unmarked submission has no percentage
+	to test against the pass mark. Handing the work in is therefore what satisfies
+	the lesson — unless the author asked for it to wait, in which case only a mark
+	that clears the pass mark will do.
+	"""
+
+	def blocker(best, awaiting):
+		return {
+			"quiz": quiz,
+			"title": quiz_details.title,
+			"passing_percentage": passing_percentage,
+			"best_percentage": best,
+			"attempts": len(submissions),
+			"max_attempts": cint(quiz_details.max_attempts),
+			"awaiting_evaluation": awaiting,
+		}
+
+	if not submissions:
+		return blocker(None, False)
+
+	if not cint(quiz_details.block_progress_until_evaluated):
+		return None
+
+	evaluated = [row for row in submissions if row.evaluation_status == "Evaluated"]
+	best = max((cint(row.percentage) for row in evaluated), default=None)
+	if best is not None and best >= passing_percentage:
+		return None
+
+	# Awaiting only while nothing has come back yet. Once a mark exists and falls
+	# short, the learner has a result to act on, not a wait.
+	return blocker(best, not evaluated)
+
+
+def get_quiz_progress(lesson):
+	return not get_pending_quizzes(lesson)
 
 
 UNTITLED_LESSON_TITLE = "Untitled lesson"

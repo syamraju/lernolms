@@ -82,11 +82,66 @@
 		</section>
 
 		<!-- Quiz -->
-		<QuizBuilder
-			v-else-if="item.item_type === 'Quiz' && item.quiz"
-			:quizName="item.quiz"
-			@changed="$emit('refresh')"
-		/>
+		<section v-else-if="item.item_type === 'Quiz'" class="space-y-4">
+			<div class="flex flex-wrap items-center justify-between gap-3">
+				<div class="min-w-0">
+					<h4 class="text-p-base-medium text-ink-gray-9">
+						{{ isSharedQuiz ? __('Linked quiz') : __('Quiz') }}
+					</h4>
+					<p class="text-p-sm text-ink-gray-6">
+						{{
+							isSharedQuiz
+								? __(
+										'This quiz comes from your library and may be used by other courses, so it is edited in the Quizzes section.'
+								  )
+								: __('Written here and used only by this course.')
+						}}
+					</p>
+				</div>
+				<Button
+					variant="outline"
+					:label="isSharedQuiz ? __('Replace quiz') : __('Use an existing quiz')"
+					@click="openPicker"
+				>
+					<template #prefix>
+						<span class="lucide-library size-4" />
+					</template>
+				</Button>
+			</div>
+
+			<!-- A shared quiz is described, not edited: its questions belong to
+			     every course using it, so changing them here would be an edit the
+			     author cannot see the reach of. -->
+			<div
+				v-if="isSharedQuiz"
+				class="flex flex-wrap items-center justify-between gap-3 rounded-md border bg-surface-gray-1 px-4 py-3"
+			>
+				<div class="min-w-0">
+					<p class="truncate text-p-base-medium text-ink-gray-9">
+						{{ item.quiz_summary?.title || item.quiz }}
+					</p>
+					<p class="text-p-sm text-ink-gray-6">{{ sharedQuizSummary }}</p>
+				</div>
+				<div class="flex items-center gap-2">
+					<Button
+						variant="subtle"
+						:label="__('Edit in Quizzes')"
+						@click="openQuizEditor"
+					/>
+					<Button
+						variant="ghost"
+						:label="__('Write a new quiz instead')"
+						@click="detachQuiz"
+					/>
+				</div>
+			</div>
+
+			<QuizBuilder
+				v-else-if="item.quiz"
+				:quizName="item.quiz"
+				@changed="$emit('refresh')"
+			/>
+		</section>
 
 		<!-- Assignment / Coding Exercise: their own full-page editors -->
 		<section v-else class="space-y-3">
@@ -126,6 +181,37 @@
 			</div>
 		</section>
 
+		<Dialog
+			v-model="showPicker"
+			:options="{
+				title: __('Use an existing quiz'),
+				actions: [
+					{
+						label: __('Use this quiz'),
+						variant: 'solid',
+						disabled: !picked,
+						onClick: applyPickedQuiz,
+					},
+				],
+			}"
+		>
+			<template #body-content>
+				<p class="mb-3 text-p-sm text-ink-gray-6">
+					{{
+						__(
+							'The quiz stays in your library. Editing it later updates every course that uses it.'
+						)
+					}}
+				</p>
+				<QuizPicker
+					v-model="picked"
+					:courseName="courseName"
+					:excludeQuiz="item.quiz"
+					:autofocus="true"
+				/>
+			</template>
+		</Dialog>
+
 		<div class="border-t pt-5">
 			<ResourceList
 				:lesson="item.name"
@@ -138,30 +224,91 @@
 </template>
 
 <script setup lang="ts">
-import { ref, useId } from 'vue'
-import { Button, FileUploader, FormControl, call, toast } from 'frappe-ui'
+import { computed, ref, useId } from 'vue'
+import { useRouter } from 'vue-router'
+import { Button, Dialog, FileUploader, FormControl, call, toast } from 'frappe-ui'
 import RichTextEditor from '@/components/RichTextEditor.vue'
 import { InputLabel } from '@/components/Form/labeling'
 import QuizBuilder from './QuizBuilder.vue'
+import QuizPicker from './QuizPicker.vue'
 import ResourceList from './ResourceList.vue'
 import {
 	errorMessage,
 	formatVideoLength,
 	readVideoDuration,
 } from '@/utils/courseCreation'
+import { openExternal } from '@/utils/openExternal'
 import { safeUrl } from '@/utils/safeUrl'
 import type { CurriculumItem, LessonResourceRow } from '@/types'
 
-const props = defineProps<{ item: CurriculumItem }>()
+const props = defineProps<{ item: CurriculumItem; courseName: string }>()
 
 const emit = defineEmits<{
 	update: [{ lesson: string; values: Record<string, unknown> }]
+	'set-quiz': [{ lesson: string; quiz: string | null }]
 	'edit-content': [CurriculumItem]
 	refresh: []
 }>()
 
+const router = useRouter()
 const descriptionLabelId = useId()
 const attaching = ref(false)
+const showPicker = ref(false)
+const picked = ref<string | null>(null)
+
+const isSharedQuiz = computed(
+	() => props.item.item_type === 'Quiz' && Boolean(props.item.is_shared_activity)
+)
+
+/** The one line describing a shared quiz: its size and the bar it sets. */
+const sharedQuizSummary = computed(() => {
+	const summary = props.item.quiz_summary
+	if (!summary) return __('This quiz is no longer in your library.')
+	const count =
+		summary.question_count === 1
+			? __('1 question')
+			: __('{0} questions').format(summary.question_count)
+	return `${count} · ${__('{0}% to pass').format(summary.passing_percentage ?? 0)}`
+})
+
+function openPicker() {
+	picked.value = null
+	showPicker.value = true
+}
+
+function applyPickedQuiz(options?: { close?: () => void }) {
+	if (!picked.value) return
+	emit('set-quiz', { lesson: props.item.name, quiz: picked.value })
+	showPicker.value = false
+	options?.close?.()
+}
+
+/**
+ * Swap a library quiz back for one this item owns.
+ *
+ * The library quiz is left where it is — this only stops the item pointing at
+ * it — so the author gets an empty quiz to write in without losing the shared
+ * one they were using.
+ */
+function detachQuiz() {
+	emit('set-quiz', { lesson: props.item.name, quiz: null })
+}
+
+/**
+ * Open the shared quiz in the Quizzes section, in a new tab.
+ *
+ * A new tab rather than a navigation: the author is mid-way through building a
+ * curriculum, and sending them away from a page of unsaved expansion state to
+ * change a pass mark loses their place in the outline.
+ */
+function openQuizEditor() {
+	if (!props.item.quiz) return
+	const target = router.resolve({
+		name: 'QuizForm',
+		params: { quizID: props.item.quiz },
+	})
+	openExternal(target.href)
+}
 
 // Debounced so a burst of typing in the rich-text editor collapses into one
 // write rather than a request per keystroke.

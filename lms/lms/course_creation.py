@@ -13,7 +13,13 @@ import frappe
 from frappe import _
 from frappe.utils import cint, flt, now
 
-from lms.lms.utils import can_modify_course, has_moderator_role
+from lms.lms.certificates import (
+	certificate_readiness,
+	enforce_certificate_payload,
+	enforce_certificate_ready,
+	write_template,
+)
+from lms.lms.utils import can_modify_course
 
 # Submission thresholds. Mirrored in the "why can't I submit" dialog, so they
 # live in one place rather than being re-typed into the copy on the client.
@@ -59,6 +65,8 @@ def create_course_draft(
 	course_type: str = "Course",
 	category: str | None = None,
 	time_commitment: str | None = None,
+	instructors: list | str | None = None,
+	certificate=None,
 ) -> str:
 	"""Create the skeleton course the wizard hands off to the editing shell.
 
@@ -67,6 +75,11 @@ def create_course_draft(
 	`description` and `short_introduction` are mandatory only once the course
 	is published (`mandatory_depends_on` on LMS Course) — a draft is allowed to
 	be incomplete, and every save between steps would fail otherwise.
+
+	The certificate is the exception to "fill it in later". It is designed in
+	the wizard, written here, and checked before anyone is invited: a course
+	handed to instructors without one never gets a certificate, because by then
+	the moderator has moved on and nobody who is left owns the decision.
 	"""
 	frappe.only_for(["Moderator", "Course Creator"])
 
@@ -84,8 +97,62 @@ def create_course_draft(
 	if time_commitment:
 		course.time_commitment = time_commitment
 	course.append("instructors", {"instructor": frappe.session.user, "is_visible": 1, "can_manage_course": 1})
+
+	# The moderator who names a course is rarely the person who will build it.
+	# Naming the instructors here — rather than leaving it to a settings page
+	# they may never open — is what starts the handoff: each one is notified and
+	# the course appears in their own "created" list straight away.
+	invited = resolve_instructor_invites(instructors, exclude=frappe.session.user)
+
+	# Refused before the insert, not after: an invitation the gate is going to
+	# reject must never leave a Course Instructor row behind that nobody was
+	# told about.
+	if invited:
+		enforce_certificate_payload("LMS Course", certificate)
+
+	for email in invited:
+		course.append(
+			"instructors",
+			{
+				"instructor": email,
+				"invitation_status": "Pending",
+				"is_visible": 1,
+				"can_manage_course": 1,
+			},
+		)
+
 	course.insert()
+
+	if certificate:
+		write_template("LMS Course", course.name, certificate)
+
+	from lms.lms.course_review import notify_instructor_added
+
+	for email in invited:
+		notify_instructor_added(course.name, email)
+
 	return course.name
+
+
+def resolve_instructor_invites(instructors: list | str | None, exclude: str | None = None) -> list[str]:
+	"""Validate a list of instructor emails, dropping duplicates and the creator.
+
+	An unknown address is refused rather than skipped: silently dropping one
+	would leave the moderator believing they had handed the course over when
+	nobody had been told about it.
+	"""
+	if isinstance(instructors, str):
+		instructors = frappe.parse_json(instructors)
+
+	resolved = []
+	for raw in instructors or []:
+		email = (raw or "").strip().lower()
+		if not email or email == (exclude or "").lower() or email in resolved:
+			continue
+		if not frappe.db.exists("User", email):
+			frappe.throw(_("No user found with the email {0}.").format(email))
+		resolved.append(email)
+	return resolved
 
 
 def get_video_stats(course: str) -> dict:
@@ -153,6 +220,10 @@ def get_course_creation_status(course: str) -> dict:
 	requirements = count_rows(doc, "requirements")
 	learners = count_rows(doc, "intended_learners")
 	description_words = len(strip_html_to_words(doc.description))
+	# Reported, never a blocker: the certificate gates the instructor handoff
+	# (`add_course_instructor`), which happens before any of this. By the time a
+	# course is being submitted for review it has already had to clear it.
+	certificate = certificate_readiness("LMS Course", course)
 
 	steps = {
 		"intended-learners": objectives >= MIN_OBJECTIVES and requirements > 0 and learners > 0,
@@ -167,6 +238,7 @@ def get_course_creation_status(course: str) -> dict:
 		"pricing": bool(doc.paid_course) is False or flt(doc.course_price) > 0,
 		"promotions": True,
 		"messages": bool(doc.welcome_message or doc.congratulations_message),
+		"certificate": certificate["is_complete"],
 	}
 
 	blockers = []
@@ -214,6 +286,11 @@ def get_course_creation_status(course: str) -> dict:
 		"title": doc.title,
 		"status": doc.status,
 		"published": cint(doc.published),
+		# What the reviewer asked for when they sent it back. The status alone
+		# tells an instructor their course is in their court again but not why,
+		# which is the one thing they need in order to act on it.
+		"review_feedback": doc.review_feedback,
+		"submitted_on": doc.submitted_on,
 		"steps": steps,
 		"blockers": blockers,
 		"can_submit": not blockers and doc.status == "In Progress",
@@ -224,6 +301,7 @@ def get_course_creation_status(course: str) -> dict:
 		"requirements": requirements,
 		"intended_learners": learners,
 		"description_words": description_words,
+		"certificate": certificate,
 	}
 
 
@@ -241,8 +319,22 @@ def submit_course_for_review(course: str) -> dict:
 		frappe.throw(_("This course has already been submitted."))
 
 	frappe.db.set_value(
-		"LMS Course", course, {"status": "Under Review", "submitted_on": now()}, update_modified=False
+		"LMS Course",
+		course,
+		{
+			"status": "Under Review",
+			"submitted_on": now(),
+			# The previous round's notes described a version that no longer
+			# exists; leaving them up would have the course show as rejected
+			# while it sits in the queue.
+			"review_feedback": None,
+		},
+		update_modified=False,
 	)
+
+	from lms.lms.course_review import notify_submitted_for_review
+
+	notify_submitted_for_review(course)
 	return get_course_creation_status(course)
 
 
@@ -303,8 +395,14 @@ def get_course_instructors(course: str) -> list[dict]:
 
 @frappe.whitelist()
 def add_course_instructor(course: str, email: str, permissions=None) -> list[dict]:
-	"""Invite a user as a co-instructor with an explicit permission set."""
+	"""Invite a user as a co-instructor with an explicit permission set.
+
+	The certificate gate applies here too. Inviting from the wizard and inviting
+	from the settings tab are the same act — handing the course to someone else
+	— so one of them being ungated would be the way round the other.
+	"""
 	enforce_course_access(course)
+	enforce_certificate_ready("LMS Course", course)
 	email = (email or "").strip().lower()
 	if not email:
 		frappe.throw(_("An email address is required."))
@@ -466,15 +564,23 @@ def get_caption_status(course: str) -> dict:
 
 
 @frappe.whitelist()
-def moderate_course(course: str, action: str) -> dict:
-	"""Approve or send back a course awaiting review. Moderators only."""
-	if not has_moderator_role():
-		frappe.throw(_("Only a moderator can review courses."), frappe.PermissionError)
-	if action not in ("approve", "reject"):
-		frappe.throw(_("Unknown review action {0}.").format(action))
+def moderate_course(course: str, action: str, feedback: str | None = None) -> dict:
+	"""Approve or send back a course awaiting review.
 
-	if action == "approve":
-		frappe.db.set_value("LMS Course", course, {"status": "Approved", "published": 1})
-	else:
-		frappe.db.set_value("LMS Course", course, {"status": "In Progress", "submitted_on": None})
-	return get_course_creation_status(course)
+	Kept as the name the existing client calls; the decision itself, the
+	notifications and who may take it now live in `lms.lms.course_review`, so
+	the moderator's button and the evaluator's queue cannot diverge.
+	"""
+	from lms.lms.course_review import review_course
+
+	review_course(course, action, feedback)
+	# Answering with the author's checklist, as this endpoint always has. A
+	# reviewer with no edit rights on the course cannot read that, so they get
+	# the workflow state instead of a permission error on a decision that
+	# already went through.
+	if can_modify_course(course):
+		return get_course_creation_status(course)
+
+	from lms.lms.course_review import get_review_state
+
+	return get_review_state(course)

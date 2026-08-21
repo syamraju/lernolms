@@ -5,14 +5,26 @@
 // memory history, rather than a copy that could drift from what router.js
 // actually registers.
 export const routes = [
-	// The only route a signed-out visitor may reach. `meta.isPublic` is what the
-	// guard in router.js keys off, so adding another public page is a one-line
-	// change here rather than a name check inside the guard.
+	// `meta.isPublic` is what the guard in router.js keys off, so adding another
+	// public page is a one-line change here rather than a name check inside the
+	// guard.
 	{
 		path: '/login',
 		name: 'Login',
 		component: () => import('@/pages/Login.vue'),
 		meta: { isPublic: true, noLayout: true },
+	},
+	// A certificate's proof of authenticity. Public because that is the whole
+	// point — an employer checking a link does not have an account here — and
+	// `allowLoggedIn` because, unlike the login page, it is also the page a
+	// signed-in learner follows from their own certificate. Without it the guard
+	// would bounce them to Home.
+	{
+		path: '/verify/:code',
+		name: 'CertificateVerification',
+		component: () => import('@/pages/CertificateVerification.vue'),
+		props: true,
+		meta: { isPublic: true, allowLoggedIn: true, noLayout: true },
 	},
 	{
 		path: '/',
@@ -83,7 +95,8 @@ export const routes = [
 			name: 'CourseDetail',
 			params: { courseName: to.params.courseName },
 			hash: to.params.step === 'curriculum' ? '#editor' : '#settings',
-			query: to.params.step === 'curriculum' ? { view: 'curriculum' } : {},
+			query:
+				to.params.step === 'curriculum' ? { view: 'curriculum' } : {},
 		}),
 	},
 	{
@@ -106,6 +119,17 @@ export const routes = [
 				props: true,
 			},
 		],
+	},
+	// The certificate designer owns its own chrome — a canvas beside a
+	// properties rail — so it opts out of the app layout, like the assignment
+	// and exercise editors above.
+	{
+		path: '/courses/:courseName/certificate',
+		name: 'CourseCertificateDesigner',
+		component: () =>
+			import('@/pages/Certificates/CertificateDesignerPage.vue'),
+		props: true,
+		meta: { noLayout: true },
 	},
 	{
 		path: '/courses/:courseName/learn/:chapterNumber-:lessonNumber',
@@ -253,9 +277,29 @@ export const routes = [
 		component: () => import('@/pages/CertifiedParticipants.vue'),
 	},
 	{
+		// The reviewer's worklist: courses instructors have submitted, waiting to
+		// be published or sent back. Gated server-side by get_review_queue.
+		path: '/course-reviews',
+		name: 'CourseReviewQueue',
+		component: () => import('@/pages/Courses/CourseReviewQueue.vue'),
+	},
+	{
 		path: '/quizzes',
 		name: 'Quizzes',
 		component: () => import('@/pages/Quizzes.vue'),
+	},
+	{
+		// An evaluator's own queue: the subjective quiz submissions from the courses
+		// and programs a moderator has assigned them.
+		path: '/evaluations',
+		name: 'Evaluations',
+		component: () => import('@/pages/Evaluations.vue'),
+	},
+	{
+		path: '/evaluations/:submission',
+		name: 'EvaluationReview',
+		component: () => import('@/pages/EvaluationReview.vue'),
+		props: true,
 	},
 	{
 		path: '/quizzes/:quizID',
@@ -325,6 +369,17 @@ export const routes = [
 		name: 'ProgramDetail',
 		component: () => import('@/pages/Programs/ProgramDetail.vue'),
 		props: true,
+	},
+	// The same designer as the course one. A program certificate carries a
+	// different set of mandatory fields — the server decides which from the
+	// reference doctype — so one screen serves both.
+	{
+		path: '/programs/:programName/certificate',
+		name: 'ProgramCertificateDesigner',
+		component: () =>
+			import('@/pages/Certificates/CertificateDesignerPage.vue'),
+		props: true,
+		meta: { noLayout: true },
 	},
 	{
 		path: '/assignments',

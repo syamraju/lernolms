@@ -25,6 +25,8 @@
   "featured",
   "disable_self_learning",
   "enforce_lesson_completion",
+  "enforce_section_completion",
+  "completion_deadline_days",
   "section_break_18",
   "short_introduction",
   "column_break_viqw",
@@ -65,6 +67,9 @@
   "lecture_ready_emails",
   "column_break_notify",
   "submitted_on",
+  "review_feedback",
+  "reviewed_by",
+  "reviewed_on",
   "pricing_tab",
   "pricing_section",
   "paid_course",
@@ -135,6 +140,22 @@
    "fieldname": "enforce_lesson_completion",
    "fieldtype": "Check",
    "label": "Enforce Lesson Completion"
+  },
+  {
+   "default": "0",
+   "depends_on": "enforce_lesson_completion",
+   "description": "A section stays locked until every item in the section before it is complete, so learners finish one portion before starting the next.",
+   "fieldname": "enforce_section_completion",
+   "fieldtype": "Check",
+   "label": "Unlock Sections One At A Time"
+  },
+  {
+   "default": "0",
+   "description": "How long a learner has from enrolling to finish the course. Their enrollment is marked overdue after that. Leave at 0 for no deadline.",
+   "fieldname": "completion_deadline_days",
+   "fieldtype": "Int",
+   "label": "Days To Complete",
+   "non_negative": 1
   },
   {
    "fieldname": "image",
@@ -433,6 +454,26 @@
    "fieldname": "submitted_on",
    "fieldtype": "Datetime",
    "label": "Submitted for Review On",
+   "read_only": 1
+  },
+  {
+   "description": "Why the reviewer sent this course back. Cleared when it is submitted again.",
+   "fieldname": "review_feedback",
+   "fieldtype": "Small Text",
+   "label": "Review Feedback",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reviewed_by",
+   "fieldtype": "Link",
+   "label": "Reviewed By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reviewed_on",
+   "fieldtype": "Datetime",
+   "label": "Reviewed On",
    "read_only": 1
   },
   {

@@ -202,6 +202,18 @@ def enforces_lesson_completion(course: str) -> bool:
 	return bool(get_membership(course))
 
 
+def gates_by_section(course: str) -> bool:
+	"""Whether this course unlocks a whole section at a time rather than a lesson.
+
+	A sub-setting of the sequential gate, not an alternative to it: with
+	`enforce_lesson_completion` off there is nothing to unlock in the first
+	place, and reading the flag alone would gate a course the author left open.
+	"""
+	if not isinstance(course, str) or not course:
+		return False
+	return bool(frappe.db.get_value("LMS Course", course, "enforce_section_completion"))
+
+
 def _lock_state(course: str) -> tuple[set, list, set]:
 	"""``(locked names, every name in course order, completed names)``.
 
@@ -213,12 +225,12 @@ def _lock_state(course: str) -> tuple[set, list, set]:
 
 	# Local import: utils imports from permissions at call time, so importing utils at
 	# module load would create a cycle (same reason get_lesson imports this lazily).
-	from lms.lms.utils import compute_locked_lessons, get_completed_lessons, get_ordered_lesson_rows
+	from lms.lms.utils import compute_course_locks, get_completed_lessons, get_ordered_lesson_rows
 
 	rows = get_ordered_lesson_rows(course)
 	completed = get_completed_lessons(course, rows)
 	names = [row.name for row in rows]
-	return compute_locked_lessons(names, completed), names, completed
+	return compute_course_locks(rows, completed, gates_by_section(course)), names, completed
 
 
 def get_lesson_gate(course: str) -> tuple[set, str | None]:

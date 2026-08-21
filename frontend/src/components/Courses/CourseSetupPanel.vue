@@ -43,6 +43,24 @@
 				<SkeletonLoader v-if="!status.data" variant="form" />
 
 				<template v-else>
+					<!--
+						A course sent back arrives with the reviewer's reason, and
+						it goes above the checklist: it is the thing that has to be
+						answered before any of the ticks matter again.
+					-->
+					<div
+						v-if="status.data.review_feedback"
+						class="rounded-md border border-outline-red-2 bg-surface-red-1 p-4"
+					>
+						<div class="flex items-center gap-2 text-p-base-medium text-ink-gray-9">
+							<span class="lucide-undo-2 size-4" aria-hidden="true" />
+							{{ __('Sent back by the reviewer') }}
+						</div>
+						<p class="mt-2 whitespace-pre-line text-p-base text-ink-gray-8">
+							{{ status.data.review_feedback }}
+						</p>
+					</div>
+
 					<div
 						v-if="status.data.blockers.length"
 						class="rounded-md border border-outline-amber-2 bg-surface-amber-1 p-4"
@@ -258,10 +276,13 @@ const statusTheme = computed(() => {
 const submitHint = computed(() => {
 	switch (status.data?.status) {
 		case 'Under Review':
-			return __('A moderator is reviewing this course.')
+			return __('A reviewer has this course in their queue.')
 		case 'Approved':
-			return __('Approved. Publish it from Settings when you are ready.')
+			return __('Approved and published.')
 		default:
+			if (status.data?.review_feedback) {
+				return __('Address the reviewer’s notes, then submit it again.')
+			}
 			return status.data?.can_submit
 				? __('Everything required is done.')
 				: __('Clear the items above to submit.')
@@ -275,6 +296,15 @@ function toggle(key: string) {
 function go(item: SetupItem) {
 	if (!item.target) return
 	show.value = false
+	// An item whose editor is a screen of its own rather than a tab of this
+	// page says so with `route`. Everything else still hands off to a tab.
+	if (item.target.route) {
+		router.push({
+			name: item.target.route,
+			params: { courseName: props.courseName },
+		})
+		return
+	}
 	router.push({
 		name: 'CourseDetail',
 		params: { courseName: props.courseName },
