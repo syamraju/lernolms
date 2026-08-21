@@ -233,6 +233,48 @@ class TestCourseChannels(ChatTestCase):
 		self.assertEqual(channel.channel_type, "Course")
 		self.assertEqual(channel.parent_channel, general_channel(self.batch))
 
+	def test_deleting_the_course_itself_takes_the_channel_with_it(self):
+		"""Dropping a course from a batch archives its channel; deleting the
+		course removes it. Without this the delete is refused outright — the
+		channel holds a Link to the course, so a moderator deleting a course that
+		had ever been in a batch got a raw LinkExistsError naming a channel id.
+		"""
+		from lms.lms.api import delete_course
+
+		course = self._course("Chat Delete Course")
+		doc = frappe.get_doc("LMS Batch", self.batch)
+		doc.append("courses", {"course": course})
+		doc.save(ignore_permissions=True)
+
+		channel = frappe.db.get_value("LMS Chat Channel", {"batch": self.batch, "course": course}, "name")
+		self.assertTrue(channel)
+		posted = frappe.get_doc(
+			{"doctype": "LMS Chat Message", "channel": channel, "content": "hello"}
+		).insert(ignore_permissions=True)
+
+		frappe.set_user("Administrator")
+		delete_course(course)
+
+		self.assertFalse(frappe.db.exists("LMS Chat Channel", channel))
+		# The channel's on_trash is what clears these; a bare row delete on the
+		# channel would leave both orphaned.
+		self.assertFalse(frappe.db.exists("LMS Chat Message", posted.name))
+		self.assertFalse(frappe.db.exists("LMS Chat Read State", {"channel": channel}))
+
+	def test_deleting_the_batch_takes_its_channels_with_it(self):
+		"""Seeding a channel per batch made every batch undeletable: the channel
+		Links to the batch, so frappe refused the delete outright."""
+		batch = _batch("Chat Deletable Cohort", self.moderator)
+		seed_default_channels(batch)
+		channels = frappe.get_all("LMS Chat Channel", {"batch": batch}, pluck="name")
+		self.assertTrue(channels)
+
+		frappe.set_user("Administrator")
+		frappe.delete_doc("LMS Batch", batch, ignore_permissions=True, force=True)
+
+		for channel in channels:
+			self.assertFalse(frappe.db.exists("LMS Chat Channel", channel))
+
 	def test_removing_a_course_archives_rather_than_deletes(self):
 		"""Dropping a course must not destroy the discussion that happened in it."""
 		course = self._course("Chat Archive Course")

@@ -14,12 +14,20 @@ class TestGetMembers(BaseTestUtils):
 
 	def setUp(self):
 		super().setUp()
-		self.moderator = self._create_user("moderator@example.com", "Mod", "Erator", ["Moderator"])
+		# System Manager, not Moderator. `get_members` is the site-wide user list
+		# and was narrowed to System Manager when batch scoping landed: a
+		# moderator locked out of a batch could otherwise still enumerate its
+		# students here. These cases are about paging and search, so they need an
+		# actor the endpoint accepts; that the endpoint now refuses a moderator is
+		# covered in lms.lms.test_batch_people.
+		self.operator = self._create_user(
+			"members-operator@example.com", "Ops", "Erator", ["System Manager"]
+		)
 		self.members = [
 			self._create_user(f"member{index}@example.com", "Member", str(index), ["LMS Student"])
 			for index in range(MEMBERS_PAGE_LENGTH + 3)
 		]
-		frappe.set_user(self.moderator.name)
+		frappe.set_user(self.operator.name)
 
 	def _users_in_one_query(self, limit):
 		"""What get_members would return if it never paged, read straight from
@@ -97,12 +105,20 @@ class TestGetMember(BaseTestUtils):
 
 	def setUp(self):
 		super().setUp()
-		self.moderator = self._create_user("moderator@example.com", "Mod", "Erator", ["Moderator"])
+		# System Manager, not Moderator. `get_members` is the site-wide user list
+		# and was narrowed to System Manager when batch scoping landed: a
+		# moderator locked out of a batch could otherwise still enumerate its
+		# students here. These cases are about paging and search, so they need an
+		# actor the endpoint accepts; that the endpoint now refuses a moderator is
+		# covered in lms.lms.test_batch_people.
+		self.operator = self._create_user(
+			"members-operator@example.com", "Ops", "Erator", ["System Manager"]
+		)
 		self.members = [
 			self._create_user(f"member{index}@example.com", "Member", str(index), ["LMS Student"])
 			for index in range(MEMBERS_PAGE_LENGTH + 3)
 		]
-		frappe.set_user(self.moderator.name)
+		frappe.set_user(self.operator.name)
 
 	def tearDown(self):
 		frappe.set_user("Administrator")

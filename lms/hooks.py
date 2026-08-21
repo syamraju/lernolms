@@ -158,7 +158,11 @@ doc_events = {
 	"LMS Batch": {
 		"after_insert": "lms.lms.chat.sync_course_channels",
 		"on_update": "lms.lms.chat.sync_course_channels",
+		"on_trash": "lms.lms.chat.remove_channels_for",
 	},
+	# Channels Link to the course too, so the same sweep has to run when a course
+	# is deleted — otherwise the delete is refused. See remove_channels_for.
+	"LMS Course": {"on_trash": "lms.lms.chat.remove_channels_for"},
 	"User": {
 		"validate": "lms.lms.user.validate_username_duplicates",
 		"before_insert": "lms.lms.user.add_lms_student_role",
