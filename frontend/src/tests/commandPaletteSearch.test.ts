@@ -48,7 +48,6 @@ vi.mock('@/utils', () => ({
 				{ to: 'Courses' },
 				{ to: 'Batches' },
 				{ to: 'Programs' },
-				{ to: 'Jobs' },
 				{ to: 'Quizzes' },
 				{ to: 'Assignments' },
 			],
@@ -91,11 +90,6 @@ const COURSE = {
 	name: 'kubernetes-in-practice',
 	title: 'Kubernetes in Practice',
 }
-const JOB = {
-	doctype: 'Job Opportunity',
-	name: 'JOB-0001',
-	title: 'Backend Engineer',
-}
 const BATCH = {
 	doctype: 'LMS Batch',
 	name: 'batch-01',
@@ -105,7 +99,6 @@ const BATCH = {
 const RESULTS = [
 	{ title: 'Courses', items: [COURSE] },
 	{ title: 'Batches', items: [BATCH] },
-	{ title: 'Job Opportunities', items: [JOB] },
 ]
 
 function build() {
@@ -198,7 +191,7 @@ describe('command palette search', () => {
 	})
 
 	// Every doctype but LMS Course used to fall through to the batch route, so a
-	// job hit navigated to /batches/JOB-0001.
+	// quiz hit navigated to /batches/quiz-1.
 	it.each([
 		{
 			item: COURSE,
@@ -206,7 +199,6 @@ describe('command palette search', () => {
 			params: { courseName: COURSE.name },
 		},
 		{ item: BATCH, route: 'BatchDetail', params: { batchName: BATCH.name } },
-		{ item: JOB, route: 'JobDetail', params: { job: JOB.name } },
 		{
 			item: { doctype: 'LMS Quiz', name: 'quiz-1', title: 'Week 1 Quiz' },
 			route: 'QuizForm',

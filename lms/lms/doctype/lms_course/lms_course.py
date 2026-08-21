@@ -112,6 +112,13 @@ class LMSCourse(Document):
 		if not self.upcoming and self.has_value_changed("upcoming"):
 			self.send_email_to_interested_users()
 
+		if self.has_value_changed("completion_deadline_days"):
+			# Changing the allowance has to reach the cohort already enrolled,
+			# or the setting only applies to learners who join afterwards.
+			from lms.lms.pacing import refresh_due_dates
+
+			refresh_due_dates(self.name)
+
 	def on_payment_authorized(self, payment_status):
 		if payment_status in ["Authorized", "Completed"]:
 			update_payment_record("LMS Course", self.name)

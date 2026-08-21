@@ -30,6 +30,21 @@ services:
       - ./init-local.sh:/workspace/init-local.sh:ro
       # Kept for the first-ever boot: init-local.sh stages a git snapshot from
       # here when apps/lms is not already populated.
+      #
+      # ⚠ SAME DIRECTORY AS apps/lms BELOW. Both mounts point at this repo, so
+      # inside the container /workspace/lms-src and
+      # /home/frappe/frappe-bench/apps/lms are one directory (verified: same
+      # dev+inode). NEVER copy between them. `tar -C one … | tar -C other -x`
+      # is a self-overwriting tar: it reads each file while writing it, reads
+      # short, and pads to the size in the header it already wrote — leaving the
+      # tail as NUL bytes with the file's size unchanged. That corrupts silently;
+      # Python imports the intact prefix and the missing half looks like a
+      # feature that was never written. It destroyed four source files and a
+      # built CSS bundle on 2026-08-21.
+      #
+      # This became a hazard when the apps/lms mount was added. Before that the
+      # container held a snapshot copy and the two paths were genuinely
+      # different, which is why the old sync recipe was safe and is not any more.
       - ..:/workspace/lms-src:ro
       - bench-data:/home/frappe
       # The repo IS the app. Mounted over the bench's copy so an edit on the

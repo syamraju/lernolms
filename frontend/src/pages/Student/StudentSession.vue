@@ -47,10 +47,7 @@
 					:aria-expanded="railOpen"
 					@click="railOpen = !railOpen"
 				>
-					<span
-						class="lucide-panel-left size-4 shrink-0"
-						aria-hidden="true"
-					/>
+					<span class="lucide-panel-left size-4 shrink-0" aria-hidden="true" />
 					<span v-if="railOpen">{{ __('Hide Sessions') }}</span>
 				</button>
 
@@ -90,7 +87,7 @@
 														chapterNumber: String(item.number).split('-')[0],
 														lessonNumber: String(item.number).split('-')[1],
 													},
-												}
+											  }
 									"
 									class="flex flex-col gap-1 rounded-e-[6px] border-s-2 px-3 py-2 transition"
 									:class="rowClass(item)"
@@ -101,8 +98,8 @@
 												item.locked
 													? 'lucide-lock'
 													: item.is_complete
-														? 'lucide-circle-check-big'
-														: 'lucide-circle',
+													? 'lucide-circle-check-big'
+													: 'lucide-circle',
 												'size-3 shrink-0',
 											]"
 											aria-hidden="true"
@@ -126,7 +123,9 @@
 				class="learno-scroll min-w-0 flex-1 overflow-y-auto bg-[var(--learno-canvas)]"
 			>
 				<div v-if="lesson.loading && !lesson.data" class="p-8">
-					<div class="h-[420px] animate-pulse rounded-[var(--learno-r-lg)] bg-black/5" />
+					<div
+						class="h-[420px] animate-pulse rounded-[var(--learno-r-lg)] bg-black/5"
+					/>
 				</div>
 
 				<div
@@ -182,30 +181,38 @@
 					</div>
 
 					<div class="mb-5 flex flex-wrap items-center justify-between gap-4">
-						<h1
-							class="text-[24px] font-semibold text-[var(--learno-primary)]"
-						>
+						<h1 class="text-[24px] font-semibold text-[var(--learno-primary)]">
 							{{ lesson.data.title }}
 						</h1>
 
-						<button
-							v-if="canComplete"
-							type="button"
-							class="learno-btn learno-btn-primary px-5 py-2.5 text-[13px]"
-							:disabled="completing || isComplete"
-							@click="markComplete"
-						>
-							<span
-								:class="[
-									completing
-										? 'lucide-loader-circle animate-spin'
-										: 'lucide-check',
-									'size-4',
-								]"
-								aria-hidden="true"
-							/>
-							{{ isComplete ? __('Completed') : __('Mark as Complete') }}
-						</button>
+						<div v-if="canComplete" class="flex flex-col items-end gap-1">
+							<button
+								type="button"
+								class="learno-btn learno-btn-primary px-5 py-2.5 text-[13px]"
+								:disabled="completing || isComplete || isBlocked"
+								:title="blockerMessage"
+								@click="markComplete"
+							>
+								<span
+									:class="[
+										completing
+											? 'lucide-loader-circle animate-spin'
+											: isBlocked
+											? 'lucide-lock'
+											: 'lucide-check',
+										'size-4',
+									]"
+									aria-hidden="true"
+								/>
+								{{ isComplete ? __('Completed') : __('Mark as Complete') }}
+							</button>
+							<p
+								v-if="isBlocked"
+								class="text-[12px] text-[var(--learno-ink-muted)]"
+							>
+								{{ blockerMessage }}
+							</p>
+						</div>
 					</div>
 
 					<!-- Notes / Download -->
@@ -295,8 +302,14 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { createListResource, createResource, toast, usePageMeta } from 'frappe-ui'
+import {
+	createListResource,
+	createResource,
+	toast,
+	usePageMeta,
+} from 'frappe-ui'
 import { extractYoutubeID } from '@/utils/lessonMacros'
+import { completionBlockerMessage } from '@/utils/lessonProgress'
 import LessonBody from '@/pages/Student/components/LessonBody.vue'
 import CourseMaterials from '@/pages/Student/components/CourseMaterials.vue'
 
@@ -401,6 +414,18 @@ const isComplete = computed(() => Boolean(lesson.data?.progress))
 // so save_progress would no-op server-side while the button showed success.
 const canComplete = computed(() => Boolean(lesson.data?.membership))
 
+// save_progress refuses to record completion while the lesson's quiz or
+// assignment is outstanding, and it refuses *quietly* — it returns the course
+// percentage either way. The server now reports what it is waiting on, so the
+// button says so instead of firing a request that does nothing.
+const blockerMessage = computed(() =>
+	completionBlockerMessage(
+		lesson.data?.completion_blockers,
+		lesson.data?.pending_quizzes
+	)
+)
+const isBlocked = computed(() => Boolean(blockerMessage.value))
+
 // The Download tab shows this lesson's files, not the whole course's, so the
 // course-wide payload is narrowed here rather than fetched twice.
 const lessonMaterials = computed(() => {
@@ -429,20 +454,33 @@ watch([lessonMaterials, () => lesson.data?.name], () => {
 const progress = createResource({
 	url: 'lms.lms.doctype.course_lesson.course_lesson.save_progress',
 	onSuccess() {
-		lesson.reload()
+		// The lesson itself is refetched by markComplete, which has to await it
+		// before it can tell whether the write actually landed. The rail only
+		// needs to catch up, so it stays fire-and-forget here.
 		outline.reload()
 	},
 })
 
 async function markComplete() {
 	if (completing.value || isComplete.value) return
+	if (isBlocked.value) {
+		toast.error(blockerMessage.value)
+		return
+	}
 	completing.value = true
 	try {
 		await progress.submit({
 			lesson: lesson.data.name,
 			course: courseName.value,
 		})
-		toast.success(__('Marked as complete'))
+		// The endpoint returns the course percentage whether or not it recorded
+		// anything, so success is claimed only once the refetched lesson agrees.
+		await lesson.reload()
+		if (isComplete.value) {
+			toast.success(__('Marked as complete'))
+		} else {
+			toast.error(blockerMessage.value || __('Could not save your progress'))
+		}
 	} catch (error: any) {
 		toast.error(error?.messages?.[0] || __('Could not save your progress'))
 	} finally {

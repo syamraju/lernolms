@@ -1,5 +1,18 @@
 <template>
-	<div class="grid grid-cols-1 md:grid-cols-[70%,30%] flex-1 min-h-0">
+	<!-- Structure view: the whole width, because the builder is a list of
+	     sections with drag handles and inline forms — it does not fit the
+	     30% column the lesson view puts the outline in. -->
+	<div v-if="isCurriculumView" class="flex-1 min-h-0 overflow-y-auto">
+		<div class="mx-auto max-w-4xl p-5">
+			<CurriculumBuilder
+				v-if="props.course?.data?.name"
+				:courseName="props.course.data.name"
+				@changed="outline.reload()"
+			/>
+		</div>
+	</div>
+
+	<div v-else class="grid grid-cols-1 md:grid-cols-[70%,30%] flex-1 min-h-0">
 		<div class="flex flex-col overflow-hidden">
 			<div class="overflow-y-auto h-full">
 				<SkeletonLoader
@@ -8,12 +21,17 @@
 				/>
 				<div
 					v-else-if="!selected"
-					class="flex flex-col items-center justify-center h-full text-ink-gray-5"
+					class="flex flex-col items-center justify-center gap-2 h-full text-ink-gray-5"
 				>
 					<span class="lucide-book-open size-8" />
 					<div>
 						{{ __('Select a lesson on the right to start editing.') }}
 					</div>
+					<Button
+						variant="subtle"
+						:label="__('Or arrange the curriculum')"
+						@click="setView('curriculum')"
+					/>
 				</div>
 				<LessonForm
 					v-else
@@ -88,6 +106,7 @@ import { Button, createResource } from 'frappe-ui'
 import { useSidebar } from '@/stores/sidebar'
 import { useScreenSize } from '@/utils/composables'
 import CourseOutline from '@/components/CourseOutline.vue'
+import CurriculumBuilder from '@/components/Curriculum/CurriculumBuilder.vue'
 import BottomSheet from '@/components/BottomSheet.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import LessonForm from '@/pages/LessonForm.vue'
@@ -108,6 +127,22 @@ const route = useRoute()
 const router = useRouter()
 const { isMobile } = useScreenSize()
 const showChapters = ref(false)
+
+// Two views of the same tab: `curriculum` arranges the sections, `lesson`
+// writes one lecture's body. Curriculum is the default — the structure is what
+// an author wants to see on arrival, and it is the way in to every lecture.
+//
+// Written explicitly rather than by absence, because the lesson view restores
+// the last-edited lecture into `?editLesson` on load: inferring the view from
+// the query would flip the tab back to the lesson editor a beat after landing.
+const isCurriculumView = computed(() => route.query.view !== 'lesson')
+
+function setView(view) {
+	router.replace({
+		query: { ...route.query, view },
+		hash: route.hash || '#editor',
+	})
+}
 
 // Collapse the app sidebar while the lesson editor is open to give the
 // editing surface room, then restore it on leaving the tab. Mirrors the
@@ -405,6 +440,8 @@ function openAddChapter() {
 }
 
 defineExpose({
+	isCurriculumView,
+	setView,
 	saveSelectedLesson,
 	isDirty,
 	lessonHasVideo,

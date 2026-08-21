@@ -91,7 +91,6 @@ PERMISSION_DOCTYPES = (
 	"LMS Quiz",
 	"LMS Assignment",
 	"LMS Program",
-	"Job Opportunity",
 )
 
 
@@ -290,37 +289,6 @@ def verify_billing_access(doctype, name, billing_type):
 
 
 @frappe.whitelist(allow_guest=True)
-def get_job_details(job: str):
-	if not isinstance(job, str):
-		frappe.throw(_("Job must be a string."))
-
-	job_details = frappe.db.get_value(
-		"Job Opportunity",
-		job,
-		[
-			"job_title",
-			"location",
-			"country",
-			"type",
-			"work_mode",
-			"company_name",
-			"company_logo",
-			"company_website",
-			"name",
-			"creation",
-			"description",
-			"owner",
-		],
-		as_dict=1,
-	)
-
-	if job_details:
-		job_details.applicants = frappe.db.count("LMS Job Application", {"job": job})
-
-	return job_details
-
-
-@frappe.whitelist(allow_guest=True)
 def get_own_assignment_submission(assignment: str):
 	"""Name of the current user's submission for an assignment, if any.
 
@@ -340,92 +308,6 @@ def get_own_assignment_submission(assignment: str):
 		{"assignment": assignment, "member": frappe.session.user},
 		"name",
 	)
-
-
-@frappe.whitelist()
-def get_application_users(user_names: list | str):
-	# temp function workaround:reverting once upstream restores dotted-field JOINs in `frappe.client.get_list`
-	if isinstance(user_names, str):
-		user_names = json.loads(user_names)
-	if not user_names:
-		return []
-
-	visible = frappe.get_list(
-		"LMS Job Application",
-		filters={"user": ["in", user_names]},
-		fields=["user"],
-		pluck="user",
-	)
-	visible_user_names = list(set(visible))
-	if not visible_user_names:
-		return []
-
-	return frappe.get_all(
-		"User",
-		filters={"name": ["in", visible_user_names]},
-		fields=["name", "user_image", "full_name", "email"],
-	)
-
-
-def sanitize_job_filters(filters, or_filters):
-	ALLOWED_FILTERS = ("status", "type", "work_mode", "country")
-	ALLOWED_OR_FILTERS = ("job_title", "company_name", "location")
-
-	filters = {f: v for f, v in (filters or {}).items() if f in ALLOWED_FILTERS}
-	or_filters = {f: v for f, v in (or_filters or {}).items() if f in ALLOWED_OR_FILTERS}
-
-	if filters.get("status") == "Closed" and "Moderator" not in frappe.get_roles():
-		filters["owner"] = frappe.session.user
-
-	return filters, or_filters
-
-
-@frappe.whitelist(allow_guest=True)
-def get_job_opportunities(
-	filters: dict = None,
-	or_filters: dict = None,
-	start: int = 0,
-	page_length: int = 40,
-	limit_start: int = None,
-	limit_page_length: int = None,
-):
-	if limit_page_length is not None:
-		page_length = cint(limit_page_length)
-	if limit_start is not None:
-		start = cint(limit_start)
-	filters, or_filters = sanitize_job_filters(filters, or_filters)
-
-	jobs = frappe.get_all(
-		"Job Opportunity",
-		filters=filters,
-		or_filters=or_filters,
-		fields=[
-			"job_title",
-			"location",
-			"country",
-			"type",
-			"work_mode",
-			"company_name",
-			"company_logo",
-			"name",
-			"creation",
-			"description",
-		],
-		start=start,
-		page_length=page_length,
-		order_by="creation desc",
-	)
-
-	for job in jobs:
-		job.description = frappe.utils.strip_html_tags(job.description)
-		job.applicants = frappe.db.count("LMS Job Application", {"job": job.name})
-	return jobs
-
-
-@frappe.whitelist(allow_guest=True)
-def get_job_opportunities_count(filters: dict = None, or_filters: dict = None):
-	filters, or_filters = sanitize_job_filters(filters, or_filters)
-	return frappe.db.count("Job Opportunity", filters, or_filters)
 
 
 @frappe.whitelist(allow_guest=True)
@@ -905,7 +787,6 @@ def get_sidebar_settings():
 		"courses",
 		"batches",
 		"certifications",
-		"jobs",
 		"statistics",
 		"notifications",
 		"programming_exercises",
@@ -1135,7 +1016,15 @@ def get_member(member: str):
 
 @frappe.whitelist()
 def get_members(start: int = 0, search: str = None, role: str = "All"):
-	frappe.only_for(["Moderator"])
+	"""The site-wide user list. System Manager only.
+
+	This used to be `frappe.only_for(["Moderator"])` and unfiltered, which made
+	batch scoping meaningless: a moderator locked out of a batch could still
+	enumerate its students — and everybody else's — from Settings > Members.
+	Moderators get `lms.lms.batch_people.get_batch_people` instead, which answers
+	the same question inside the batches they actually run.
+	"""
+	frappe.only_for(["System Manager"])
 
 	lms_roles = LMS_ROLES
 	if not isinstance(role, str) or role not in (["All"] + lms_roles):
@@ -1957,7 +1846,6 @@ def get_lms_settings():
 		"contact_us_url",
 		"livecode_url",
 		"disable_pwa",
-		"allow_job_posting",
 		"demo_data_present",
 		"lesson_dwell_time",
 		"enforce_video_completion",
@@ -2586,6 +2474,7 @@ def get_my_live_classes():
 			"start_url",
 			"join_url",
 			"owner",
+			"conferencing_provider",
 		],
 		limit=2,
 		order_by="date",
@@ -3001,9 +2890,7 @@ def clear_demo_data():
 	quiz_titles = ["Do you know Learno?", "Do you know Frappe Learning?"]
 	frappe.db.delete("LMS Quiz", {"title": ["in", quiz_titles]})
 
-	demo_courses = frappe.get_all(
-		"LMS Course", {"title": ["in", list(DEMO_COURSE_TITLES)]}, pluck="name"
-	)
+	demo_courses = frappe.get_all("LMS Course", {"title": ["in", list(DEMO_COURSE_TITLES)]}, pluck="name")
 
 	for demo_course in demo_courses:
 		delete_course(demo_course)

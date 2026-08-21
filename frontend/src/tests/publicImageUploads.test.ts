@@ -103,6 +103,18 @@ describe('SettingFields leaves privacy to the field', () => {
 // tsconfig sets `types: []`, so node's globals aren't ambient here.
 declare const process: { cwd(): string }
 
+/** Same walk as vueFilesUnder, for the .ts modules that can upload from script. */
+const tsFilesUnder = (dir: string): string[] => {
+	const found: string[] = []
+	for (const entry of readdirSync(dir, { withFileTypes: true })) {
+		const full = join(dir, entry.name)
+		if (entry.isDirectory()) found.push(...tsFilesUnder(full))
+		else if (entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts'))
+			found.push(full)
+	}
+	return found
+}
+
 const vueFilesUnder = (dir: string): string[] => {
 	const found: string[] = []
 	for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -193,17 +205,23 @@ const MANIFEST: Record<string, Privacy[]> = {
 	// A caption track is fetched by the video player alongside the lecture, on
 	// the same terms as the poster image — it has to be readable without the
 	// player holding a session for the File itself.
-	'pages/Courses/Manage/StepCaptions.vue': ['public'],
+	'components/Courses/CourseCaptionsSection.vue': ['public'],
 	// Deliberately not readable by other users.
 	'components/Assignment.vue': ['private', 'private', 'private'],
-	'components/Modals/JobApplicationModal.vue': ['private'],
 	'pages/Forms/ChapterForm.vue': ['private'],
 	'components/Notes/Notes.vue': ['private'],
 	// Lecture video, uploaded from the curriculum editor. Private and attached
 	// to its Course Lesson, so access follows the lesson's own permission —
 	// the same shape UploadPlugin uses for video dropped into a lesson body,
 	// and what keeps paid course content out of reach of a bare URL.
-	'pages/Courses/Manage/StepCurriculum.vue': ['private'],
+	// Two uploaders. The scanner groups by tag, not document position, so the
+	// FileUploader (the lecture video) is listed before the RichTextEditor (the
+	// item's description, `undeclared` like every other one).
+	'components/Curriculum/CurriculumItemBody.vue': ['private', 'undeclared'],
+	// Course materials a learner downloads: worksheets, source bundles. Private
+	// and attached to the lesson for the same reason as the video — they are
+	// part of the paid content, not public collateral.
+	'components/Curriculum/ResourceList.vue': ['private'],
 	// Neither literal. `per-field` reads the field's own `public` flag and
 	// `computed` is any other expression. `undeclared` passes no uploadArgs at
 	// all — for a RichTextEditor that means private, because its uploadFile
@@ -226,14 +244,20 @@ const MANIFEST: Record<string, Privacy[]> = {
 	'pages/Forms/EmailTemplateForm.vue': ['undeclared'],
 	'pages/Forms/NewBatchForm.vue': ['undeclared'],
 	'components/Courses/CourseOverviewSection.vue': ['undeclared'],
-	// RichTextEditor bodies in the guided creation flow: the course description
-	// and the two automated course messages. Same standing caveat as the other
+	// RichTextEditor bodies across the guided creation and curriculum flows:
+	// the course description, the two automated course messages, a quiz
+	// question, the assignment's instructions/questions/solution, and the
+	// exercise's problem statement and hints. Same standing caveat as the other
 	// `undeclared` rows — a pasted image lands private.
-	'pages/Courses/Manage/StepLandingPage.vue': ['undeclared'],
-	'pages/Courses/Manage/StepMessages.vue': ['undeclared', 'undeclared'],
+	'components/Courses/CourseMessagesSection.vue': ['undeclared', 'undeclared'],
+	'components/Curriculum/QuizBuilder.vue': ['undeclared'],
+	'pages/Courses/Manage/AssignmentEditor.vue': [
+		'undeclared',
+		'undeclared',
+		'undeclared',
+	],
+	'pages/Courses/Manage/ExerciseEditor.vue': ['undeclared', 'undeclared'],
 	'pages/Forms/NewCourseForm.vue': ['undeclared'],
-	'pages/JobApplications.vue': ['undeclared'],
-	'pages/Forms/JobForm.vue': ['undeclared'],
 	'pages/Forms/ProfileEditForm.vue': ['undeclared'],
 	'pages/Forms/ProgrammingExerciseForm.vue': ['undeclared'],
 	'pages/Forms/QuizQuestionForm.vue': ['undeclared'],
@@ -269,5 +293,58 @@ describe('every uploader has the privacy the manifest states', () => {
 
 	it('matches the manifest exactly — no new, moved or flipped uploader', () => {
 		expect(found).toEqual(MANIFEST)
+	})
+})
+
+/**
+ * The scanner above only sees markup. An upload driven from script — `new
+ * FileUploadHandler().upload(file, opts)` — creates a File exactly the same
+ * way but has no tag to match, so it slipped past the manifest entirely. The
+ * bulk uploader added one; this closes the gap before there are three.
+ *
+ * Coarser than the tag scan by necessity: the options object is not adjacent
+ * to the constructor, so this asserts that a file constructing a handler
+ * declares privacy *somewhere* in that file, and pins which files those are.
+ * That is enough to force the decision to be written down and reviewed.
+ */
+const PROGRAMMATIC_UPLOADERS: Record<string, Privacy> = {
+	// Course ZIP awaiting import — never served to anyone, only unpacked.
+	'pages/Forms/CourseImportForm.vue': 'private',
+	// Bulk-uploaded lecture video. Private for the same reason as every other
+	// lecture video: it is paid course content, reachable only through the
+	// lesson it gets attached to.
+	'components/Curriculum/BulkUploader.vue': 'private',
+}
+
+describe('script-driven uploads declare their privacy too', () => {
+	const SRC = resolve(process.cwd(), 'src')
+	const sources = [
+		...vueFilesUnder(SRC),
+		...tsFilesUnder(SRC),
+	]
+
+	const found: Record<string, Privacy> = {}
+	for (const file of sources) {
+		const src = readFileSync(file, 'utf8')
+		if (!/new\s+FileUploadHandler\s*\(/.test(src)) continue
+		const key = relative(SRC, file).split(/[\\/]/).join('/')
+		if (/\b(private|is_private)\s*:\s*(false|0)\b/.test(src)) found[key] = 'public'
+		else if (/\b(private|is_private)\s*:\s*(true|1)\b/.test(src)) found[key] = 'private'
+		else found[key] = 'undeclared'
+	}
+
+	it('finds the handlers it is meant to scan', () => {
+		expect(Object.keys(found).length).toBeGreaterThan(0)
+	})
+
+	it('matches the manifest exactly — no new or flipped script uploader', () => {
+		expect(found).toEqual(PROGRAMMATIC_UPLOADERS)
+	})
+
+	it('never leaves a script upload undeclared', () => {
+		const undeclared = Object.entries(found)
+			.filter(([, p]) => p === 'undeclared')
+			.map(([f]) => f)
+		expect(undeclared, undeclared.join('\n')).toEqual([])
 	})
 })

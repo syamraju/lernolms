@@ -9,11 +9,17 @@
 		<header
 			class="shrink-0 border-b border-[var(--learno-line-soft)] bg-white px-6 py-[22px] lg:px-10"
 		>
-			<h1 class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12">
+			<h1
+				class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12"
+			>
 				{{ __('Materials') }}
 			</h1>
 			<p class="mt-1 text-[13px] text-[var(--learno-ink-muted)]">
-				{{ __('Everything you can download from the courses you are enrolled in.') }}
+				{{
+					__(
+						'Everything you can download from the courses you are enrolled in.'
+					)
+				}}
 			</p>
 		</header>
 
@@ -53,7 +59,11 @@
 					</router-link>
 					<span class="learno-rule" aria-hidden="true" />
 					<span class="text-[13px] text-[var(--learno-ink-muted)]">
-						{{ course.count === 1 ? __('1 file') : `${course.count} ${__('files')}` }}
+						{{
+							course.count === 1
+								? __('1 file')
+								: `${course.count} ${__('files')}`
+						}}
 					</span>
 				</div>
 

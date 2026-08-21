@@ -9,14 +9,15 @@
 		doc-prop="course"
 	>
 		<template #actions="{ tab }">
-			<!-- The guided setup is the front door for finishing a course, so it
-			     stays reachable from every tab rather than living inside one. -->
-			<Tooltip v-if="isAdmin" :text="__('Guided course setup')">
+			<!-- The setup checklist reports on what is left to do and links into
+			     the tab that owns each field, so it stays reachable from every
+			     tab rather than living inside one. -->
+			<Tooltip v-if="isAdmin" :text="__('Course setup checklist')">
 				<Button
 					variant="ghost"
 					:class="isMobile ? '!size-9' : ''"
 					:label="__('Course setup')"
-					@click="openCourseSetup()"
+					@click="showSetup = true"
 				>
 					<template #icon v-if="isMobile">
 						<span class="lucide-list-checks size-4" />
@@ -55,7 +56,44 @@
 					/>
 				</ShortcutTooltip>
 			</template>
-			<template v-if="tab?.key === 'editor' && editorSelected">
+			<template v-if="tab?.key === 'editor'">
+				<Tooltip
+					:text="
+						courseEditorRef?.isCurriculumView
+							? __('Edit the open lecture')
+							: __('Arrange sections and lectures')
+					"
+				>
+					<Button
+						variant="ghost"
+						:class="isMobile ? '!size-9' : ''"
+						:label="
+							courseEditorRef?.isCurriculumView
+								? __('Lesson')
+								: __('Curriculum')
+						"
+						@click="
+							courseEditorRef?.setView(
+								courseEditorRef?.isCurriculumView ? 'lesson' : 'curriculum'
+							)
+						"
+					>
+						<template #icon v-if="isMobile">
+							<span :class="[editorViewIcon, 'size-4']" />
+						</template>
+						<template #prefix v-else>
+							<span :class="[editorViewIcon, 'size-4']" />
+						</template>
+					</Button>
+				</Tooltip>
+			</template>
+			<template
+				v-if="
+					tab?.key === 'editor' &&
+					editorSelected &&
+					!courseEditorRef?.isCurriculumView
+				"
+			>
 				<Tooltip
 					v-if="courseEditorRef?.lessonHasVideo"
 					:text="__('Video Statistics')"
@@ -191,7 +229,11 @@
 
 		<template #overlay="{ tab }">
 			<Button
-				v-if="isMobile && tab?.key === 'editor'"
+				v-if="
+					isMobile &&
+					tab?.key === 'editor' &&
+					!courseEditorRef?.isCurriculumView
+				"
 				variant="outline"
 				size="md"
 				class="absolute bottom-4 end-4 z-10 !h-11 !rounded-full !px-4 !shadow-lg"
@@ -204,7 +246,11 @@
 			</Button>
 
 			<div
-				v-if="tab?.key === 'editor' && course.data"
+				v-if="
+					tab?.key === 'editor' &&
+					course.data &&
+					!courseEditorRef?.isCurriculumView
+				"
 				class="pointer-events-none absolute inset-x-0 top-0 z-10 hidden md:flex"
 			>
 				<div class="w-[70%]" />
@@ -225,6 +271,14 @@
 		</template>
 	</TabbedDetailPage>
 	<LessonHelp v-model="showLessonHelp" />
+
+	<CourseSetupPanel
+		v-if="isAdmin"
+		v-model="showSetup"
+		:courseName="props.courseName"
+		:published="Boolean(course.data?.published)"
+		@changed="course.reload()"
+	/>
 
 	<router-view />
 </template>
@@ -248,6 +302,7 @@ import TabbedDetailPage from '@/components/Layouts/TabbedDetailPage.vue'
 import type { DetailTab } from '@/components/Layouts/TabbedDetailPage.vue'
 import CourseOverview from '@/pages/Courses/CourseOverview.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
+import CourseSetupPanel from '@/components/Courses/CourseSetupPanel.vue'
 import CourseDashboard from '@/pages/Courses/CourseDashboard.vue'
 import CourseEditor from '@/pages/Courses/CourseEditor.vue'
 import CourseForm from '@/pages/Courses/CourseForm.vue'
@@ -279,6 +334,13 @@ interface EditorSelection {
 
 const editorSelected = ref<EditorSelection | null>(null)
 const showLessonHelp = ref(false)
+const showSetup = ref(false)
+
+// The editor tab's view switch names where it goes, not where it is, so the
+// icon has to follow the destination too.
+const editorViewIcon = computed<string>(() =>
+	courseEditorRef.value?.isCurriculumView ? 'lucide-book-open' : 'lucide-layers'
+)
 
 type CourseMenuItem = {
 	label: string
@@ -298,6 +360,8 @@ const courseFormRef = computed<CourseFormApi | null>(
 )
 
 type CourseEditorApi = {
+	isCurriculumView: ComputedRef<boolean>
+	setView: (view: 'curriculum' | 'lesson') => void
 	saveSelectedLesson: () => void
 	isDirty: ComputedRef<boolean>
 	lessonHasVideo: ComputedRef<boolean>
@@ -363,13 +427,6 @@ function togglePublishCourse() {
 // so the button navigates instead of reaching into the tab instance. Hash and
 // query both travel: the hash names the tab this page returns to, and the query
 // holds CourseEditor's open lesson.
-function openCourseSetup() {
-	router.push({
-		name: 'CourseManage',
-		params: { courseName: props.courseName, step: 'intended-learners' },
-	})
-}
-
 function openEnrollForm() {
 	openFormRoute(router, {
 		name: 'NewCourseEnrollment',

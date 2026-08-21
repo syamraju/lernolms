@@ -20,47 +20,47 @@ import { writeFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import {
-  SCALE,
-  WEIGHTS,
-  UPPERCASE,
-  FONT_SANS,
-  FONT_MONO,
-  trackingOf,
-  headingLeadingOf,
+	SCALE,
+	WEIGHTS,
+	UPPERCASE,
+	FONT_SANS,
+	FONT_MONO,
+	trackingOf,
+	headingLeadingOf,
 } from './type-scale.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 
 const rules = []
 const rule = (sel, decls) =>
-  rules.push(`\t${sel} {\n${decls.map((d) => `\t\t${d};`).join('\n')}\n\t}`)
+	rules.push(`\t${sel} {\n${decls.map((d) => `\t\t${d};`).join('\n')}\n\t}`)
 
 for (const [size, [px, , para]] of Object.entries(SCALE)) {
-  const upper = UPPERCASE.includes(size) ? ['text-transform: uppercase'] : []
-  const tracking = trackingOf(size)
-  // Weight variants are how every heading in this codebase is written, so they
-  // take the CDS heading leading rather than the compact UI one.
-  const heading = headingLeadingOf(size)
-  for (const [name, weight] of Object.entries(WEIGHTS)) {
-    rule(`.text-${size}-${name}`, [
-      `font-size: ${px}px`,
-      `line-height: ${heading}px`,
-      `letter-spacing: ${tracking}`,
-      `font-weight: ${weight}`,
-      ...upper,
-    ])
-    rule(`.text-p-${size}-${name}`, [
-      `font-size: ${px}px`,
-      `line-height: ${para}px`,
-      `letter-spacing: ${tracking}`,
-      `font-weight: ${weight}`,
-      ...upper,
-    ])
-  }
+	const upper = UPPERCASE.includes(size) ? ['text-transform: uppercase'] : []
+	const tracking = trackingOf(size)
+	// Weight variants are how every heading in this codebase is written, so they
+	// take the CDS heading leading rather than the compact UI one.
+	const heading = headingLeadingOf(size)
+	for (const [name, weight] of Object.entries(WEIGHTS)) {
+		rule(`.text-${size}-${name}`, [
+			`font-size: ${px}px`,
+			`line-height: ${heading}px`,
+			`letter-spacing: ${tracking}`,
+			`font-weight: ${weight}`,
+			...upper,
+		])
+		rule(`.text-p-${size}-${name}`, [
+			`font-size: ${px}px`,
+			`line-height: ${para}px`,
+			`letter-spacing: ${tracking}`,
+			`font-weight: ${weight}`,
+			...upper,
+		])
+	}
 }
 
 const quote = (list) =>
-  list.map((f) => (/[^a-zA-Z-]/.test(f) ? `'${f}'` : f)).join(', ')
+	list.map((f) => (/[^a-zA-Z-]/.test(f) ? `'${f}'` : f)).join(', ')
 
 const css = `/*
  * Cloudscape (CDS) typography — GENERATED, do not edit by hand.

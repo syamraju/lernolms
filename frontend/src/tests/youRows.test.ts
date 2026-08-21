@@ -42,7 +42,6 @@ const SIDEBAR = [
 	link('Courses', 'BookOpen', 'Courses'),
 	link('Batches', 'Users', 'Batches'),
 	link('Certifications', 'GraduationCap', 'Certifications'),
-	link('Jobs', 'Briefcase', 'Jobs'),
 	link('Statistics', 'TrendingUp', 'Statistics'),
 ]
 const OTHER = [
@@ -93,7 +92,7 @@ describe('destinations', () => {
 
 	it('keeps the section order inside the one group', () => {
 		// The heading is gone, the clustering is not: LEARN, then DISCOVER, then
-		// MORE. Arrival order would read Programs, Batches, Jobs, Statistics,
+		// MORE. Arrival order would read Programs, Batches, Statistics,
 		// Quizzes — course content split around the discovery links.
 		expect(
 			labelsIn(
@@ -108,7 +107,6 @@ describe('destinations', () => {
 			'Quizzes',
 			'Assignments',
 			'Programming Exercises',
-			'Jobs',
 			'Statistics',
 			'Contact Us',
 		])
@@ -259,7 +257,6 @@ describe('every icon the page can draw', () => {
 			'lucide-circle-help',
 			'lucide-pencil',
 			'lucide-code',
-			'lucide-briefcase',
 			'lucide-trending-up',
 			'lucide-mail',
 			'lucide-bell',

@@ -30,7 +30,20 @@
   "file_type",
   "column_break_syza",
   "help",
-  "video_duration"
+  "video_duration",
+  "curriculum_section",
+  "item_type",
+  "is_published",
+  "column_break_curr",
+  "duration_minutes",
+  "description",
+  "linked_section",
+  "is_shared_activity",
+  "quiz",
+  "assignment",
+  "exercise",
+  "resources_section",
+  "resources"
  ],
  "fields": [
   {
@@ -80,6 +93,89 @@
    "fieldtype": "Float",
    "label": "Video Duration (seconds)",
    "precision": "2"
+  },
+  {
+   "fieldname": "curriculum_section",
+   "fieldtype": "Section Break",
+   "label": "Curriculum Item"
+  },
+  {
+   "default": "Lecture",
+   "description": "What kind of curriculum item this is. A Lecture carries the body content; the other three delegate to their own document.",
+   "fieldname": "item_type",
+   "fieldtype": "Select",
+   "label": "Item Type",
+   "options": "Lecture\nQuiz\nAssignment\nCoding Exercise"
+  },
+  {
+   "default": "1",
+   "description": "An unpublished item stays hidden from learners while it is being written.",
+   "fieldname": "is_published",
+   "fieldtype": "Check",
+   "label": "Published"
+  },
+  {
+   "fieldname": "column_break_curr",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "How long this item should take a learner. Used for items with no video of their own.",
+   "fieldname": "duration_minutes",
+   "fieldtype": "Int",
+   "label": "Estimated Duration (minutes)",
+   "non_negative": 1
+  },
+  {
+   "description": "Shown to learners under the item title, before the content itself.",
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "fieldname": "linked_section",
+   "fieldtype": "Section Break",
+   "label": "Linked Activity"
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.item_type != 'Lecture'",
+   "description": "The linked quiz, assignment or exercise comes from the library and is shared with other courses, so this item does not own it: renaming or deleting the item leaves it alone.",
+   "fieldname": "is_shared_activity",
+   "fieldtype": "Check",
+   "label": "Reused From The Library",
+   "read_only": 1
+  },
+  {
+   "depends_on": "eval:doc.item_type == 'Quiz'",
+   "fieldname": "quiz",
+   "fieldtype": "Link",
+   "label": "Quiz",
+   "options": "LMS Quiz"
+  },
+  {
+   "depends_on": "eval:doc.item_type == 'Assignment'",
+   "fieldname": "assignment",
+   "fieldtype": "Link",
+   "label": "Assignment",
+   "options": "LMS Assignment"
+  },
+  {
+   "depends_on": "eval:doc.item_type == 'Coding Exercise'",
+   "fieldname": "exercise",
+   "fieldtype": "Link",
+   "label": "Coding Exercise",
+   "options": "LMS Programming Exercise"
+  },
+  {
+   "fieldname": "resources_section",
+   "fieldtype": "Section Break",
+   "label": "Resources"
+  },
+  {
+   "fieldname": "resources",
+   "fieldtype": "Table",
+   "label": "Resources",
+   "options": "Lesson Resource"
   },
   {
    "fetch_from": "chapter.course",

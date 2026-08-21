@@ -72,27 +72,14 @@ const links = (...routes: string[]) => [{ items: routes.map((to) => ({ to })) }]
 // What getSidebarLinks() actually returns for each kind of visitor. Programs is
 // absent for a guest (`if (!userResource.data) return false`) and for a student
 // with no programs; Quizzes and Assignments are instructor/moderator/evaluator only.
-const GUEST = links('Courses', 'Batches', 'Jobs', 'Statistics')
+const GUEST = links('Courses', 'Batches', 'Statistics')
 // Certifications' `to` is the route name, not the label.
-const STUDENT = links(
-	'Courses',
-	'Batches',
-	'Jobs',
-	'CertifiedParticipants',
-	'Statistics'
-)
-const STUDENT_WITH_PROGRAMS = links(
-	'Courses',
-	'Batches',
-	'Programs',
-	'Jobs',
-	'Statistics'
-)
+const STUDENT = links('Courses', 'Batches', 'CertifiedParticipants', 'Statistics')
+const STUDENT_WITH_PROGRAMS = links('Courses', 'Batches', 'Programs', 'Statistics')
 const ADMIN = links(
 	'Courses',
 	'Batches',
 	'Programs',
-	'Jobs',
 	'Quizzes',
 	'Assignments',
 	'CertifiedParticipants',
@@ -153,7 +140,7 @@ describe('command palette categories', () => {
 	it('offers a browse row for each category the user may see', () => {
 		const wrapper = build()
 		expect(titles(wrapper)).toEqual(
-			expect.arrayContaining(['Courses', 'Batches', 'Jobs', 'Programs'])
+			expect.arrayContaining(['Courses', 'Batches', 'Programs'])
 		)
 	})
 
@@ -359,14 +346,14 @@ describe('command palette settings row', () => {
 /**
  * `getSidebarLinks()` is only half the sidebar's rule. AppSidebar filters its
  * result a second time against `get_sidebar_settings` — the per-site on/off
- * flags — and the palette read only the first half, so a site with Jobs
- * switched off was still offered a Jobs row.
+ * flags — and the palette read only the first half, so a site with Batches
+ * switched off was still offered a Batches row.
  */
 describe('command palette site visibility flags', () => {
 	it('withholds a category the site has switched off', () => {
-		settings.sidebarSettings.data = { jobs: 0 }
+		settings.sidebarSettings.data = { batches: 0 }
 		const offered = titles(build())
-		expect(offered).not.toContain('Jobs')
+		expect(offered).not.toContain('Batches')
 		expect(offered).toContain('Courses')
 	})
 
@@ -383,19 +370,19 @@ describe('command palette site visibility flags', () => {
 	})
 
 	it('keeps a row the flags say nothing about', () => {
-		settings.sidebarSettings.data = { jobs: 0 }
+		settings.sidebarSettings.data = { batches: 0 }
 		expect(titles(build())).toContain('Quizzes')
 	})
 
 	it('offers everything while the flags are still unresolved', () => {
 		settings.sidebarSettings.data = null
-		expect(titles(build())).toContain('Jobs')
+		expect(titles(build())).toContain('Batches')
 	})
 
 	it('withholds a switched-off category from a search too', async () => {
-		settings.sidebarSettings.data = { jobs: 0 }
+		settings.sidebarSettings.data = { batches: 0 }
 		const wrapper = build()
-		await type(wrapper, 'job')
-		expect(titles(wrapper)).not.toContain('Jobs')
+		await type(wrapper, 'batch')
+		expect(titles(wrapper)).not.toContain('Batches')
 	})
 })

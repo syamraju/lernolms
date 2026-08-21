@@ -79,19 +79,6 @@
 			<BatchOverview v-if="batch.data" :batch="batch" />
 			<SkeletonLoader v-else variant="course-page" />
 		</template>
-
-		<template #tab-body-discussions>
-			<div class="w-[90%] lg:w-[75%] mx-auto mt-5">
-				<Discussions
-					doctype="LMS Batch"
-					:docname="batch.data.name"
-					:title="__('Discussions')"
-					:key="batch.data.name"
-					:singleThread="true"
-					:scrollToBottom="false"
-				/>
-			</div>
-		</template>
 	</TabbedDetailPage>
 
 	<router-view />
@@ -115,8 +102,10 @@ import StudentBatchDashboard from '@/pages/Batches/components/BatchDashboard.vue
 import BatchOverview from '@/pages/Batches/BatchOverview.vue'
 import LiveClass from '@/pages/Batches/components/LiveClass.vue'
 import Announcements from '@/pages/Batches/components/Announcements.vue'
+import BatchCalendar from '@/pages/Batches/components/BatchCalendar.vue'
+import BatchChats from '@/pages/Batches/components/BatchChats.vue'
+import BatchPeople from '@/pages/Batches/components/BatchPeople.vue'
 import BatchForm from '@/pages/Batches/BatchForm.vue'
-import Discussions from '@/components/Discussions.vue'
 import HeaderButton from '@/components/HeaderButton.vue'
 import ShortcutTooltip from '@/components/ShortcutTooltip.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
@@ -170,8 +159,18 @@ watch(
 // what makes them unable to reach it themselves, so it is handed down.
 provide('reloadBatchDetails', () => batch.reload())
 
+// Scoped to this batch, not to the role. `is_moderator` on the session only says
+// the user holds Moderator somewhere; `get_batch_details` reports whether they
+// moderate *this* cohort, which is what every administrative control below gates
+// on. A System Manager is a moderator everywhere.
 const isAdmin = computed(() => {
-	return Boolean(user.data?.is_moderator || user.data?.is_evaluator)
+	return Boolean(batch.data?.is_moderator || user.data?.is_system_manager)
+})
+
+// Instructors and evaluators derived onto this batch from its curriculum. They
+// read the inside of the cohort but administer nothing.
+const isStaff = computed(() => {
+	return Boolean(isAdmin.value || batch.data?.is_staff)
 })
 
 const isStudent = computed(() => {
@@ -179,7 +178,7 @@ const isStudent = computed(() => {
 })
 
 const tabs = computed(() => {
-	const enrolled = isAdmin.value || isStudent.value
+	const enrolled = isStaff.value || isStudent.value
 	return [
 		{
 			key: 'overview',
@@ -204,6 +203,13 @@ const tabs = computed(() => {
 			when: !isAdmin.value && isStudent.value,
 		},
 		{
+			key: 'calendar',
+			label: __('Calendar'),
+			component: markRaw(BatchCalendar),
+			icon: 'lucide-calendar-days',
+			when: enrolled,
+		},
+		{
 			key: 'classes',
 			label: __('Classes'),
 			component: markRaw(LiveClass),
@@ -211,17 +217,24 @@ const tabs = computed(() => {
 			when: enrolled,
 		},
 		{
+			key: 'chats',
+			label: __('Chats'),
+			component: markRaw(BatchChats),
+			icon: 'lucide-messages-square',
+			when: enrolled,
+		},
+		{
+			key: 'people',
+			label: __('People'),
+			component: markRaw(BatchPeople),
+			icon: 'lucide-users',
+			when: isAdmin.value,
+		},
+		{
 			key: 'announcements',
 			label: __('Announcements'),
 			component: markRaw(Announcements),
 			icon: 'lucide-mail',
-			when: enrolled,
-		},
-		{
-			key: 'discussions',
-			label: __('Discussions'),
-			component: markRaw(Discussions),
-			icon: 'lucide-message-circle',
 			when: enrolled,
 		},
 		{

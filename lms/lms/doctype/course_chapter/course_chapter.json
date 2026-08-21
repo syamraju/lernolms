@@ -9,6 +9,8 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
+  "learning_objective",
+  "is_published",
   "column_break_3",
   "course",
   "course_title",
@@ -101,6 +103,19 @@
    "fieldtype": "Data",
    "label": "Course Title",
    "read_only": 1
+  },
+  {
+   "default": "1",
+   "description": "An unpublished section and everything in it stays hidden from learners.",
+   "fieldname": "is_published",
+   "fieldtype": "Check",
+   "label": "Published"
+  },
+  {
+   "description": "What learners will be able to do by the end of this section.",
+   "fieldname": "learning_objective",
+   "fieldtype": "Small Text",
+   "label": "Learning Objective"
   }
  ],
  "grid_page_length": 50,

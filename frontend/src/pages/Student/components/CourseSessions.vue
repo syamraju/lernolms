@@ -86,7 +86,7 @@
 											chapterNumber: String(lesson.number).split('-')[0],
 											lessonNumber: String(lesson.number).split('-')[1],
 										},
-									}
+								  }
 						"
 						class="flex items-center gap-3 rounded-[var(--learno-r-sm)] px-3 py-2.5 text-[13px] transition"
 						:class="
@@ -100,8 +100,8 @@
 								lesson.locked
 									? 'lucide-lock'
 									: lesson.is_complete
-										? 'lucide-circle-check-big'
-										: 'lucide-circle-play',
+									? 'lucide-circle-check-big'
+									: 'lucide-circle-play',
 								'size-4 shrink-0',
 								lesson.is_complete && 'text-[var(--learno-primary)]',
 							]"

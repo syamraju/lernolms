@@ -1,10 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
 	resolveDwellSeconds,
 	isVideoComplete,
 	shouldStartDwellTimer,
 	shouldAttachVideoFallback,
+	completionBlockerMessage,
+	quizRequirementSentence,
 } from '@/utils/lessonProgress'
+import { installTranslate, translate } from './translateStub'
 
 describe('resolveDwellSeconds', () => {
 	it('returns the parsed number for a positive integer', () => {
@@ -125,5 +128,118 @@ describe('shouldAttachVideoFallback', () => {
 		expect(shouldAttachVideoFallback({ hasVideo: true, enforceVideo: 1 })).toBe(
 			true
 		)
+	})
+})
+
+// The message goes through the app's translation global, which only exists at
+// runtime. The faithful stub rather than identity: the specific wording formats
+// a placeholder, and identity would fail on a difference the app does not have.
+vi.stubGlobal('__', translate)
+
+describe('completionBlockerMessage', () => {
+	beforeEach(installTranslate)
+	// save_progress records nothing while a lesson's quiz is unpassed or its
+	// assignment unsubmitted, but it returns the course percentage either way —
+	// so the page used to toast "Marked as complete" over a write that never
+	// happened. get_lesson now ships the reason and this turns it into a
+	// sentence; '' doubles as the "nothing outstanding" signal.
+	it('is empty when nothing is outstanding', () => {
+		expect(completionBlockerMessage([])).toBe('')
+		expect(completionBlockerMessage(undefined)).toBe('')
+		expect(completionBlockerMessage(null)).toBe('')
+	})
+
+	it('names the quiz on its own', () => {
+		expect(completionBlockerMessage(['quiz'])).toBe(
+			'Pass the quiz to complete this session.'
+		)
+	})
+
+	it('names the assignment on its own', () => {
+		expect(completionBlockerMessage(['assignment'])).toBe(
+			'Submit the assignment to complete this session.'
+		)
+	})
+
+	it('names both when both are outstanding, in one sentence', () => {
+		expect(completionBlockerMessage(['quiz', 'assignment'])).toBe(
+			'Pass the quiz and submit the assignment to complete this session.'
+		)
+		// Order comes from the server; the sentence must not depend on it.
+		expect(completionBlockerMessage(['assignment', 'quiz'])).toBe(
+			'Pass the quiz and submit the assignment to complete this session.'
+		)
+	})
+
+	it('ignores a blocker key it does not know', () => {
+		expect(completionBlockerMessage(['scorm'])).toBe('')
+	})
+
+	// The pass mark is what makes a section-ending quiz a gate. A student told
+	// only to "pass the quiz" cannot tell whether their 55% was close or hopeless.
+	it('names the pass mark when the server sends the requirement', () => {
+		expect(
+			completionBlockerMessage(['quiz'], [
+				{ passing_percentage: 60, best_percentage: null, attempts: 0 },
+			])
+		).toBe('Score at least 60% on the quiz to complete this session.')
+	})
+
+	it('names the best score once the student has attempted it', () => {
+		expect(
+			completionBlockerMessage(['quiz'], [
+				{ passing_percentage: 60, best_percentage: 40, attempts: 2 },
+			])
+		).toBe('Your best score is 40%. You need 60% to complete this session.')
+	})
+
+	it('keeps the specific wording when the assignment is outstanding too', () => {
+		expect(
+			completionBlockerMessage(['quiz', 'assignment'], [
+				{ passing_percentage: 60, best_percentage: 40, attempts: 1 },
+			])
+		).toBe(
+			'Your best score is 40%. You need 60% to complete this session. You also need to submit the assignment.'
+		)
+	})
+
+	// An older backend sends no detail, and the generic sentences still have to
+	// be what the student reads.
+	it('falls back to the generic wording with no requirement detail', () => {
+		expect(completionBlockerMessage(['quiz'], [])).toBe(
+			'Pass the quiz to complete this session.'
+		)
+		expect(completionBlockerMessage(['quiz', 'assignment'], null)).toBe(
+			'Pass the quiz and submit the assignment to complete this session.'
+		)
+	})
+})
+
+describe('quizRequirementSentence', () => {
+	beforeEach(installTranslate)
+
+	it('is empty with nothing to be specific about', () => {
+		expect(quizRequirementSentence(undefined)).toBe('')
+		expect(quizRequirementSentence([])).toBe('')
+	})
+
+	// A pass mark of 0 is an author saying "attempt it", not "score on it", so
+	// quoting a bar of 0% would misdescribe what the quiz asks.
+	it('asks only for a submission when the pass mark is zero', () => {
+		expect(
+			quizRequirementSentence([
+				{ passing_percentage: 0, best_percentage: null, attempts: 0 },
+			])
+		).toBe('Submit the quiz to complete this session.')
+	})
+
+	// A learner who scored 0 has attempted it; best_percentage 0 must not read
+	// as "no attempt yet".
+	it('reports a zero score as a score, not as an untried quiz', () => {
+		expect(
+			quizRequirementSentence([
+				{ passing_percentage: 50, best_percentage: 0, attempts: 1 },
+			])
+		).toBe('Your best score is 0%. You need 50% to complete this session.')
 	})
 })

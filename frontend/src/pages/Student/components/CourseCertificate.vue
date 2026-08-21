@@ -14,7 +14,9 @@
 				{{ __('Learning Path and Course Inclusions') }}
 			</h2>
 
-			<p class="max-w-[52ch] text-[13px] leading-[1.7] text-[var(--learno-ink-muted)]">
+			<p
+				class="max-w-[52ch] text-[13px] leading-[1.7] text-[var(--learno-ink-muted)]"
+			>
 				<template v-if="!offered">
 					{{ __('This course does not issue a certificate.') }}
 				</template>
@@ -47,8 +49,24 @@
 					</span>
 				</div>
 
+				<!--
+					A designed certificate has a page of its own on this platform
+					— the same one anybody with the link can open — so it is an
+					SPA route rather than a redirect to a rendered PDF.
+				-->
+				<router-link
+					v-if="certificateCode"
+					:to="{
+						name: 'CertificateVerification',
+						params: { code: certificateCode },
+					}"
+					class="learno-btn learno-btn-primary w-fit px-5 py-2.5 text-[13px]"
+				>
+					<span class="lucide-award size-4" aria-hidden="true" />
+					{{ __('View certificate') }}
+				</router-link>
 				<a
-					v-if="certificate"
+					v-else-if="certificate"
 					:href="safeUrl(certificateHref)"
 					class="learno-btn learno-btn-primary w-fit px-5 py-2.5 text-[13px]"
 					v-external
@@ -89,8 +107,8 @@
 						certificate
 							? __('Certificate of Achievement')
 							: offered
-								? __('Not earned yet')
-								: __('No certificate for this course')
+							? __('Not earned yet')
+							: __('No certificate for this course')
 					}}
 				</p>
 				<p
@@ -117,6 +135,13 @@ const offered = computed(() =>
 )
 
 const certificate = computed(() => props.course.membership?.certificate || '')
+
+// Present only on certificates issued since verification links existed. Older
+// ones keep the print-format link below rather than pointing at a page that
+// cannot resolve them.
+const certificateCode = computed(
+	() => props.course.membership?.certificate_code || ''
+)
 
 const progress = computed(() =>
 	Math.min(100, Math.round(Number(props.course.membership?.progress || 0)))

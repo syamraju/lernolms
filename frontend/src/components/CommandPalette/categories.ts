@@ -38,7 +38,6 @@ export const CATEGORIES: Category[] = [
 		icon: 'lucide-route',
 		listRoute: 'Programs',
 	},
-	{ id: 'jobs', label: 'Jobs', icon: 'lucide-briefcase', listRoute: 'Jobs' },
 	{
 		id: 'quizzes',
 		label: 'Quizzes',
@@ -74,9 +73,9 @@ function offeredRoutes(sidebarLinks: SidebarGroup[]): Set<string | undefined> {
  *
  * `getSidebarLinks()` is only half of what the sidebar draws: AppSidebar filters
  * its result again against `get_sidebar_settings`, the per-site on/off flags, so
- * reading the first half alone offered a Jobs row on a site with Jobs switched
- * off. `isLinkEnabled` is the phone bar's reading of those same flags, and the
- * same label-to-key convention AppSidebar filters by.
+ * reading the first half alone offered a Statistics row on a site with
+ * Statistics switched off. `isLinkEnabled` is the phone bar's reading of those
+ * same flags, and the same label-to-key convention AppSidebar filters by.
  */
 export function visibleCategories(
 	sidebarLinks: SidebarGroup[],

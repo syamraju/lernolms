@@ -10,7 +10,11 @@ from frappe.utils import cint
 
 class LMSQuizSubmission(Document):
 	def validate(self):
-		self.validate_if_max_attempts_exceeded()
+		# Only a new attempt can exceed the attempt limit. Re-checking on update
+		# counted the row being saved, so an evaluator marking the only submission
+		# of a one-attempt quiz was refused with the learner's own error.
+		if self.is_new():
+			self.validate_if_max_attempts_exceeded()
 		self.validate_marks()
 		self.set_percentage()
 
@@ -46,10 +50,15 @@ class LMSQuizSubmission(Document):
 				self.score += cint(row.marks)
 
 	def set_percentage(self):
-		if self.score and self.score_out_of:
-			self.percentage = (self.score / self.score_out_of) * 100
+		# Written unconditionally: an evaluator awarding zero has to move a stale
+		# percentage back down to 0, not leave the previous one standing.
+		self.percentage = (cint(self.score) / cint(self.score_out_of)) * 100 if self.score_out_of else 0
 
 	def notify_member(self):
+		if self.evaluation_status == "Evaluated" and self.has_value_changed("evaluation_status"):
+			self.notify_evaluation_complete()
+			return
+
 		if self.score != 0 and self.has_value_changed("score"):
 			notification = frappe._dict(
 				{
@@ -69,6 +78,32 @@ class LMSQuizSubmission(Document):
 			)
 
 			make_notification_logs(notification, [self.member])
+
+	def notify_evaluation_complete(self):
+		"""Tell the learner their subjective submission has been marked.
+
+		notify_member's own guard skips a score of zero, which is a legitimate
+		result here — and the learner has been waiting on this one, so silence is
+		the wrong answer.
+		"""
+		subject = _("Your submission for {0} has been evaluated").format(frappe.bold(self.quiz_title))
+		notification = frappe._dict(
+			{
+				"subject": subject,
+				"email_content": _("You scored {0} out of {1} for the quiz {2}.").format(
+					frappe.bold(self.score),
+					frappe.bold(self.score_out_of),
+					frappe.bold(self.quiz_title),
+				),
+				"document_type": self.doctype,
+				"document_name": self.name,
+				"for_user": self.member,
+				"from_user": frappe.session.user,
+				"type": "Alert",
+				"link": "",
+			}
+		)
+		make_notification_logs(notification, [self.member])
 
 
 class MaximumAttemptsExceededError(frappe.DuplicateEntryError):

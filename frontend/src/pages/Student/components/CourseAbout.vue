@@ -9,7 +9,9 @@
 <template>
 	<div class="flex flex-col gap-12">
 		<section>
-			<h2 class="mb-7 text-[16px] font-semibold text-[var(--learno-ink-strong)]">
+			<h2
+				class="mb-7 text-[16px] font-semibold text-[var(--learno-ink-strong)]"
+			>
 				{{ __('Learning Path and Course Inclusions') }}
 			</h2>
 
@@ -23,7 +25,9 @@
 						<span class="learno-tag w-fit bg-[#dcfce7] text-[#166534]">
 							{{ __('Chapter') }} {{ chapter.idx }}
 						</span>
-						<h3 class="text-[14px] font-semibold text-[var(--learno-ink-strong)]">
+						<h3
+							class="text-[14px] font-semibold text-[var(--learno-ink-strong)]"
+						>
 							{{ chapter.title }}
 						</h3>
 						<p class="text-[11px] leading-[1.6] text-[var(--learno-ink-muted)]">
@@ -33,7 +37,13 @@
 									: __('{0} sessions').format(chapter.lessons?.length || 0)
 							}}
 							<template v-if="chapter.lessons?.length">
-								· {{ chapter.lessons.map((l) => l.title).slice(0, 3).join(' · ') }}
+								·
+								{{
+									chapter.lessons
+										.map((l) => l.title)
+										.slice(0, 3)
+										.join(' · ')
+								}}
 							</template>
 						</p>
 					</li>
@@ -66,27 +76,40 @@
 		</section>
 
 		<section v-if="course.description">
-			<h2 class="mb-4 text-[16px] font-semibold text-[var(--learno-ink-strong)]">
+			<h2
+				class="mb-4 text-[16px] font-semibold text-[var(--learno-ink-strong)]"
+			>
 				{{ __('About this course') }}
 			</h2>
 			<!-- v-safe-html:rich, not v-html: the directive is where this app's
 			     sanitiser and its anchor-target hook live. -->
-			<div class="learno-prose max-w-[80ch]" v-safe-html:rich="course.description" />
+			<div
+				class="learno-prose max-w-[80ch]"
+				v-safe-html:rich="course.description"
+			/>
 		</section>
 
 		<section v-if="skills.length">
-			<h2 class="mb-7 text-[16px] font-semibold text-[var(--learno-ink-strong)]">
+			<h2
+				class="mb-7 text-[16px] font-semibold text-[var(--learno-ink-strong)]"
+			>
 				{{ __('Skills you Unlock') }}
 			</h2>
 			<div class="grid gap-8 sm:grid-cols-2">
-				<div v-for="skill in skills" :key="skill" class="flex items-start gap-4">
+				<div
+					v-for="skill in skills"
+					:key="skill"
+					class="flex items-start gap-4"
+				>
 					<span
 						class="grid size-11 shrink-0 place-items-center rounded-full bg-[var(--learno-primary-soft)] text-[var(--learno-primary)]"
 					>
 						<span class="lucide-sparkles size-5" aria-hidden="true" />
 					</span>
 					<div class="flex flex-col gap-1">
-						<h3 class="text-[13px] font-semibold text-[var(--learno-ink-strong)]">
+						<h3
+							class="text-[13px] font-semibold text-[var(--learno-ink-strong)]"
+						>
 							{{ skill }}
 						</h3>
 						<p class="text-[11px] leading-[1.6] text-[var(--learno-ink-muted)]">

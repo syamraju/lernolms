@@ -139,8 +139,8 @@ const user = inject<SessionUser>('$user')!
 const { capture } = useTelemetry()
 const { updateOnboardingStep } = useOnboarding('learning')
 
-// House style for a route that serves both create and edit
-// (`/job-opening/:jobName/edit`, JobForm.vue:147-149).
+// House style for a route that serves both create and edit: the id segment
+// is the literal `new` on the create route (AssignmentForm.vue, routes.js:342).
 const isEdit = computed(() => props.chapterName !== 'new')
 
 // C2 — the course page keeps its active tab in route.hash as a tab KEY

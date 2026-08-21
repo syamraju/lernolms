@@ -4,6 +4,18 @@
 
 Quizzes, assignments and programming exercises.
 
+A quiz is one of two kinds, set by `LMS Quiz.quiz_type` and fixed once it has
+questions:
+
+- **Objective** — carries its own answer key and is scored the moment it is
+  submitted.
+- **Subjective** — every question is open ended. There is no key, so submissions
+  queue for a person to read. Who that person is comes from the assignment a
+  Moderator makes on the `Course Evaluator` record.
+
+A quiz is never both: mixed types would land half-scored and half-pending, with no
+single percentage for the lesson gate to read.
+
 | Endpoint | Guest | Writes |
 | --- | --- | --- |
 | [`get_assessments`](#get_assessments) | no | — |
@@ -13,6 +25,12 @@ Quizzes, assignments and programming exercises.
 | [`get_own_assignment_submission`](#get_own_assignment_submission) | yes | — |
 | [`create_programming_exercise_submission`](#create_programming_exercise_submission) | no | yes |
 | [`delete_programming_exercise`](#delete_programming_exercise) | no | yes |
+| [`list_evaluation_queue`](#list_evaluation_queue) | no | — |
+| [`get_evaluation`](#get_evaluation) | no | — |
+| [`save_evaluation`](#save_evaluation) | no | yes |
+| [`list_evaluators`](#list_evaluators) | no | — |
+| [`set_evaluator_assignments`](#set_evaluator_assignments) | no | yes |
+| [`get_course_evaluators`](#get_course_evaluators) | no | — |
 
 ---
 
@@ -102,12 +120,26 @@ validated before grading and a malformed entry raises `ValidationError`.
   "submission": "quiz-sub-0912",
   "pass": true,
   "percentage": 70.0,
-  "is_open_ended": false
+  "is_open_ended": false,
+  "pending_evaluation": false,
+  "blocks_progress": false
 }
 ```
 
 `is_open_ended` is `true` when the quiz contains questions requiring manual grading —
 in that case `score` reflects only the auto-gradable portion.
+
+For a **subjective** quiz the submission settles nothing on its own:
+
+- `pending_evaluation` is `true` and the submission's `evaluation_status` is
+  `Pending`. An objective submission is `Not Required`.
+- `pass` is `null`, not `false` — reporting a failure the learner has not earned
+  would be a lie. `score` is `0` until an evaluator awards marks.
+- `blocks_progress` reports whether the lesson waits. When the quiz has
+  `block_progress_until_evaluated` off, handing the work in completes the lesson
+  immediately and the mark that arrives later never takes it back. When it is on,
+  the lesson stays open until [`save_evaluation`](#save_evaluation) releases a
+  passing result.
 
 ---
 
@@ -194,3 +226,118 @@ Deletes a programming exercise and every submission against it.
 **Parameters** — `exercise` (`str`, required).
 
 **Returns** — `null`.
+
+---
+
+## `list_evaluation_queue`
+
+`lms.lms.evaluation.list_evaluation_queue` — **Guest: no** · *Scoped to the caller's assignments*
+
+Subjective submissions waiting on the caller. Pending work is returned oldest
+first — the queue exists to be emptied, so the longest wait surfaces first;
+already-marked work is returned newest first.
+
+**Parameters**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `status` | `str` | no | `Pending` (default) or `Evaluated`. Anything else raises `ValidationError`. |
+| `course` | `str` | no | Narrow to one course. Raises `PermissionError` if it is not assigned to the caller. |
+| `search` | `str` | no | Matches learner name or quiz title. |
+| `limit` | `int` | no | Page size, clamped to 1–100. Defaults to 20. |
+| `start` | `int` | no | Offset. |
+
+**Scope** — a Moderator sees every submission, including those from quizzes with no
+course (a quiz used only through a batch), which no assignment could otherwise
+reach. Everyone else sees the union of the courses assigned to them on their
+`Course Evaluator` record, the courses inside the programs assigned to them, and
+the courses they instruct. An unassigned caller gets an empty queue rather than an
+error.
+
+**Returns** — `{ submissions, total, courses, pending_count }`. `courses` lists only
+courses that actually have work in them, for the filter control; `pending_count`
+is the unmarked total under the same scope, so a badge does not need a second call.
+
+---
+
+## `get_evaluation`
+
+`lms.lms.evaluation.get_evaluation` — **Guest: no** · *Scoped to the caller's assignments*
+
+One submission expanded for review: the learner, the quiz, and every answer with
+the marks awarded so far and what it is out of.
+
+**Parameters** — `submission` (`str`, required).
+
+Each entry in `answers` carries a `row` — the child row's name, which is what
+[`save_evaluation`](#save_evaluation) addresses marks to. `blocks_progress` says
+whether the learner's lesson is being held open by this submission.
+
+Raises `PermissionError` if the submission's course is not in the caller's scope.
+
+---
+
+## `save_evaluation`
+
+`lms.lms.evaluation.save_evaluation` — **Guest: no** · **Writes** · *Scoped to the caller's assignments*
+
+Records an evaluator's marks against a submission.
+
+**Parameters**
+
+| Name | Type | Required | Description |
+| --- | --- | --- | --- |
+| `submission` | `str` | yes | `LMS Quiz Submission` name. |
+| `marks` | `list` | no | `[{ row, marks, evaluator_feedback }]`. `row` comes from `get_evaluation`. |
+| `comment` | `str` | no | An overall note to the learner. |
+| `finalize` | `bool` | no | Defaults to `true`. |
+
+`finalize: false` saves the marks without releasing them, so an evaluator part-way
+through a long answer keeps their work without the learner being told the result is
+final. `true` moves the submission to `Evaluated`, stamps the evaluator and time,
+notifies the learner, and — if the quiz was holding the lesson open and the result
+now passes — writes the learner's course progress.
+
+Score and percentage are **never** accepted from the caller: the submission's own
+`validate()` recomputes both from the marks, so the two cannot drift. A mark above
+what the question is worth, or below zero, raises `ValidationError`.
+
+Returns the same shape as `get_evaluation`.
+
+---
+
+## `list_evaluators`
+
+`lms.lms.evaluation.list_evaluators` — **Guest: no** · *Moderator only*
+
+Every evaluator with the courses and programs they have been given.
+
+---
+
+## `set_evaluator_assignments`
+
+`lms.lms.evaluation.set_evaluator_assignments` — **Guest: no** · **Writes** · *Moderator only*
+
+Replaces an evaluator's assignments wholesale — the lists sent are the lists they
+end up with, so removing an assignment means sending it omitted.
+
+**Parameters** — `evaluator` (`str`, required), `courses` (`list`), `programs` (`list`).
+
+A program assignment is shorthand for its courses, expanded at read time rather
+than stored. Adding a course to a program therefore reaches every evaluator on
+that program without anyone re-assigning anything.
+
+Returns the updated `list_evaluators` payload. Non-moderators raise
+`PermissionError`; an unknown course or program raises `DoesNotExistError`.
+
+---
+
+## `get_course_evaluators`
+
+`lms.lms.evaluation.get_course_evaluators` — **Guest: no** · *Requires `can_modify_course`*
+
+Who can mark this course's subjective work, for the course's own settings page.
+Each row carries `via`: `"course"` for a direct assignment, `"program"` for one
+inherited through a program.
+
+**Parameters** — `course` (`str`, required).

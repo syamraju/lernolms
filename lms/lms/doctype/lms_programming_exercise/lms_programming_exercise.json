@@ -7,10 +7,17 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
+  "is_published",
   "column_break_jlzi",
   "language",
+  "course",
   "section_break_tjwv",
   "problem_statement",
+  "solution_section",
+  "starter_code",
+  "solution_code",
+  "guidance_section",
+  "hints",
   "section_break_ftkh",
   "test_cases"
  ],
@@ -27,7 +34,48 @@
    "fieldtype": "Text Editor",
    "in_list_view": 1,
    "label": "Problem Statement",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.is_published"
+  },
+  {
+   "default": "0",
+   "description": "An unpublished exercise stays hidden from learners while it is being written.",
+   "fieldname": "is_published",
+   "fieldtype": "Check",
+   "label": "Published"
+  },
+  {
+   "fieldname": "course",
+   "fieldtype": "Link",
+   "label": "Course",
+   "options": "LMS Course"
+  },
+  {
+   "fieldname": "solution_section",
+   "fieldtype": "Section Break",
+   "label": "Author Solution"
+  },
+  {
+   "description": "The code a learner starts from. Leave blank for an empty editor.",
+   "fieldname": "starter_code",
+   "fieldtype": "Code",
+   "label": "Starter Code"
+  },
+  {
+   "description": "A working solution, used to check the test cases actually pass. Never shown to learners.",
+   "fieldname": "solution_code",
+   "fieldtype": "Code",
+   "label": "Solution Code"
+  },
+  {
+   "fieldname": "guidance_section",
+   "fieldtype": "Section Break",
+   "label": "Guide Learners"
+  },
+  {
+   "description": "Shown to a learner who asks for help, after their first failed attempt.",
+   "fieldname": "hints",
+   "fieldtype": "Text Editor",
+   "label": "Hints"
   },
   {
    "default": "Python",

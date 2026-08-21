@@ -99,6 +99,19 @@ permission_query_conditions = {
 	"LMS Batch": "lms.lms.doctype.lms_batch.lms_batch.get_permission_query_conditions",
 	"LMS Program": "lms.lms.doctype.lms_program.lms_program.get_permission_query_conditions",
 	"Course Lesson": "lms.lms.doctype.course_lesson.course_lesson.get_permission_query_conditions",
+	"LMS Batch Invite Link": "lms.lms.doctype.lms_batch_invite_link.lms_batch_invite_link.get_permission_query_conditions",
+	# The chat doctypes grant read to LMS Student / Course Creator / Batch
+	# Evaluator. Without these two, that grant is unscoped: the generic REST API
+	# would hand any signed-in student every cohort's messages, staff room
+	# included. The whitelisted API in lms.lms.chat checks access itself.
+	"LMS Chat Channel": "lms.lms.doctype.lms_chat_channel.lms_chat_channel.get_permission_query_conditions",
+	"LMS Chat Message": "lms.lms.doctype.lms_chat_message.lms_chat_message.get_permission_query_conditions",
+	# Same reasoning for direct messages, and the stakes are higher: a DM has no
+	# cohort to fall back on, so an unscoped grant is every private thread on the
+	# site. lms.lms.direct_message reads with ignore_permissions after its own
+	# check, so these exist purely to close the /api/resource door.
+	"LMS Direct Message": "lms.lms.doctype.lms_direct_message.lms_direct_message.get_permission_query_conditions",
+	"LMS Direct Message Read State": "lms.lms.doctype.lms_direct_message_read_state.lms_direct_message_read_state.get_permission_query_conditions",
 }
 
 has_permission = {
@@ -108,6 +121,12 @@ has_permission = {
 	"LMS Certificate": "lms.lms.doctype.lms_certificate.lms_certificate.has_permission",
 	"Course Lesson": "lms.lms.doctype.course_lesson.course_lesson.has_permission",
 	"File": "lms.lms.permissions.file_has_permission",
+	"LMS Batch Invite Link": "lms.lms.doctype.lms_batch_invite_link.lms_batch_invite_link.has_permission",
+	"LMS Certificate Template": "lms.lms.doctype.lms_certificate_template.lms_certificate_template.has_permission",
+	"LMS Chat Channel": "lms.lms.doctype.lms_chat_channel.lms_chat_channel.has_permission",
+	"LMS Chat Message": "lms.lms.doctype.lms_chat_message.lms_chat_message.has_permission",
+	"LMS Direct Message": "lms.lms.doctype.lms_direct_message.lms_direct_message.has_permission",
+	"LMS Direct Message Read State": "lms.lms.doctype.lms_direct_message_read_state.lms_direct_message_read_state.has_permission",
 }
 
 # DocType Class
@@ -133,6 +152,13 @@ doc_events = {
 		"validate": "lms.lms.utils.validate_discussion_reply",
 	},
 	"Notification Log": {"on_change": "lms.lms.utils.publish_notifications"},
+	# Chat channels follow the curriculum. Seeding on after_insert and reconciling
+	# on on_update is what keeps "one sub-channel per course" true without anybody
+	# maintaining a second list — see lms.lms.chat.
+	"LMS Batch": {
+		"after_insert": "lms.lms.chat.sync_course_channels",
+		"on_update": "lms.lms.chat.sync_course_channels",
+	},
 	"User": {
 		"validate": "lms.lms.user.validate_username_duplicates",
 		"before_insert": "lms.lms.user.add_lms_student_role",
@@ -152,7 +178,6 @@ scheduler_events = {
 		"lms.lms.doctype.lms_live_class.lms_live_class.update_attendance",
 	],
 	"daily": [
-		"lms.job.doctype.job_opportunity.job_opportunity.update_job_openings",
 		"lms.lms.doctype.lms_payment.lms_payment.send_payment_reminder",
 		"lms.lms.doctype.lms_batch.lms_batch.send_batch_start_reminder",
 		"lms.lms.doctype.lms_live_class.lms_live_class.send_live_class_reminder",
@@ -207,12 +232,6 @@ website_redirects = [
 	{
 		"source": r"/batches/(.*)",
 		"target": f"/{get_lms_path()}/batches",
-		"match_with_query_string": True,
-	},
-	{"source": "/job-openings", "target": f"/{get_lms_path()}/job-openings"},
-	{
-		"source": r"/job-openings/(.*)",
-		"target": f"/{get_lms_path()}/job-openings",
 		"match_with_query_string": True,
 	},
 	{"source": "/statistics", "target": f"/{get_lms_path()}/statistics"},

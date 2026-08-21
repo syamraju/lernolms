@@ -42,11 +42,7 @@
 
 			<!-- Primary navigation -->
 			<nav class="flex flex-col gap-1.5" :aria-label="__('Main')">
-				<SidebarRow
-					v-for="item in primary"
-					:key="item.label"
-					v-bind="item"
-				/>
+				<SidebarRow v-for="item in primary" :key="item.label" v-bind="item" />
 			</nav>
 		</div>
 

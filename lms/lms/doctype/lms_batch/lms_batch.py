@@ -230,6 +230,12 @@ def send_system_notification_for_published_batch(batch):
 	frappe.db.set_value("LMS Batch", batch.name, "notification_sent", 1)
 
 
+# A live class held in the LMS's own huddle rather than through an external
+# provider. Its "room" is the conversation `class:<name>`, so there is no
+# meeting to create, nothing to authenticate against, and no URL to fetch.
+HUDDLE_PROVIDER = "Learno Huddle"
+
+
 @frappe.whitelist()
 def create_live_class(
 	batch_name: str,
@@ -536,3 +542,41 @@ def get_permission_query_conditions(user=None):
 	return f"""(`tabLMS Batch`.published = 1 or `tabLMS Batch`.name in (
 		select batch from `tabLMS Batch Enrollment` where member = {escaped}
 	))"""
+
+
+@frappe.whitelist()
+def create_huddle_live_class(
+	batch_name: str,
+	title: str,
+	duration: int,
+	date: str,
+	time: str,
+	timezone: str,
+	description: str = None,
+):
+	"""A live class held in the LMS itself, with no external provider.
+
+	Zoom and Google Meet both need an account, a token and a calendar before
+	anyone can be scheduled into a room. An in-app class needs none of that --
+	the room is the class, addressed as the conversation ``class:<name>``, and
+	the join button opens it. That makes this the provider a batch can use on
+	day one, before anybody has wired up a conferencing account.
+	"""
+	assert_batch_moderator(batch_name)
+
+	class_details = frappe.get_doc(
+		{
+			"doctype": "LMS Live Class",
+			"title": title,
+			"host": frappe.session.user,
+			"date": date,
+			"time": time,
+			"duration": duration,
+			"timezone": timezone,
+			"description": description,
+			"batch_name": batch_name,
+			"conferencing_provider": HUDDLE_PROVIDER,
+		}
+	)
+	class_details.save()
+	return class_details

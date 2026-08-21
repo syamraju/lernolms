@@ -17,7 +17,10 @@
   "unavailability_section",
   "unavailable_from",
   "column_break_ahzi",
-  "unavailable_to"
+  "unavailable_to",
+  "assignment_section",
+  "courses",
+  "programs"
  ],
  "fields": [
   {
@@ -79,6 +82,25 @@
    "fieldname": "username",
    "fieldtype": "Data",
    "label": "Username"
+  },
+  {
+   "fieldname": "assignment_section",
+   "fieldtype": "Section Break",
+   "label": "Assigned Work"
+  },
+  {
+   "description": "Courses whose subjective quiz submissions this evaluator may mark.",
+   "fieldname": "courses",
+   "fieldtype": "Table",
+   "label": "Courses",
+   "options": "LMS Evaluator Course"
+  },
+  {
+   "description": "Every course in these programs is assigned to this evaluator.",
+   "fieldname": "programs",
+   "fieldtype": "Table",
+   "label": "Programs",
+   "options": "LMS Evaluator Program"
   }
  ],
  "index_web_pages_for_search": 1,

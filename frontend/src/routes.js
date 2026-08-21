@@ -5,14 +5,26 @@
 // memory history, rather than a copy that could drift from what router.js
 // actually registers.
 export const routes = [
-	// The only route a signed-out visitor may reach. `meta.isPublic` is what the
-	// guard in router.js keys off, so adding another public page is a one-line
-	// change here rather than a name check inside the guard.
+	// `meta.isPublic` is what the guard in router.js keys off, so adding another
+	// public page is a one-line change here rather than a name check inside the
+	// guard.
 	{
 		path: '/login',
 		name: 'Login',
 		component: () => import('@/pages/Login.vue'),
 		meta: { isPublic: true, noLayout: true },
+	},
+	// A certificate's proof of authenticity. Public because that is the whole
+	// point — an employer checking a link does not have an account here — and
+	// `allowLoggedIn` because, unlike the login page, it is also the page a
+	// signed-in learner follows from their own certificate. Without it the guard
+	// would bounce them to Home.
+	{
+		path: '/verify/:code',
+		name: 'CertificateVerification',
+		component: () => import('@/pages/CertificateVerification.vue'),
+		props: true,
+		meta: { isPublic: true, allowLoggedIn: true, noLayout: true },
 	},
 	{
 		path: '/',
@@ -55,14 +67,37 @@ export const routes = [
 			import('@/pages/Courses/Create/CourseCreateWizard.vue'),
 		meta: { noLayout: true },
 	},
+	// Registered before the '/courses/:courseName/manage/:step?' redirect so
+	// 'assignment' and 'exercise' are read as their own editors rather than as
+	// a legacy step named "assignment". Both are full-page editors with their
+	// own chrome.
 	{
-		// `:step?` keeps a bare /manage URL valid; the shell redirects it to the
-		// first step so a refresh always lands somewhere real.
-		path: '/courses/:courseName/manage/:step?',
-		name: 'CourseManage',
-		component: () => import('@/pages/Courses/Manage/CourseManage.vue'),
+		path: '/courses/:courseName/manage/assignment/:assignmentName',
+		name: 'CourseAssignmentEditor',
+		component: () => import('@/pages/Courses/Manage/AssignmentEditor.vue'),
 		props: true,
 		meta: { noLayout: true },
+	},
+	{
+		path: '/courses/:courseName/manage/exercise/:exerciseName',
+		name: 'CourseExerciseEditor',
+		component: () => import('@/pages/Courses/Manage/ExerciseEditor.vue'),
+		props: true,
+		meta: { noLayout: true },
+	},
+	{
+		// The standalone setup wizard that used to live here was folded into the
+		// course tabs — it had grown duplicate curriculum, landing-page, pricing
+		// and messages editors. Old links and bookmarks land on the course, with
+		// the checklist's own entry point in its header.
+		path: '/courses/:courseName/manage/:step?',
+		redirect: (to) => ({
+			name: 'CourseDetail',
+			params: { courseName: to.params.courseName },
+			hash: to.params.step === 'curriculum' ? '#editor' : '#settings',
+			query:
+				to.params.step === 'curriculum' ? { view: 'curriculum' } : {},
+		}),
 	},
 	{
 		path: '/courses/:courseName',
@@ -84,6 +119,17 @@ export const routes = [
 				props: true,
 			},
 		],
+	},
+	// The certificate designer owns its own chrome — a canvas beside a
+	// properties rail — so it opts out of the app layout, like the assignment
+	// and exercise editors above.
+	{
+		path: '/courses/:courseName/certificate',
+		name: 'CourseCertificateDesigner',
+		component: () =>
+			import('@/pages/Certificates/CertificateDesignerPage.vue'),
+		props: true,
+		meta: { noLayout: true },
 	},
 	{
 		path: '/courses/:courseName/learn/:chapterNumber-:lessonNumber',
@@ -226,37 +272,34 @@ export const routes = [
 		],
 	},
 	{
-		path: '/job-openings',
-		name: 'Jobs',
-		component: () => import('@/pages/Jobs.vue'),
-	},
-	{
-		path: '/job-openings/:job',
-		name: 'JobDetail',
-		component: () => import('@/pages/JobDetail.vue'),
-		props: true,
-	},
-	{
-		path: '/job-openings/:job/applications',
-		name: 'JobApplications',
-		component: () => import('@/pages/JobApplications.vue'),
-		props: true,
-	},
-	{
-		path: '/job-opening/:jobName/edit',
-		name: 'JobForm',
-		component: () => import('@/pages/Forms/JobForm.vue'),
-		props: true,
-	},
-	{
 		path: '/certified-participants',
 		name: 'CertifiedParticipants',
 		component: () => import('@/pages/CertifiedParticipants.vue'),
 	},
 	{
+		// The reviewer's worklist: courses instructors have submitted, waiting to
+		// be published or sent back. Gated server-side by get_review_queue.
+		path: '/course-reviews',
+		name: 'CourseReviewQueue',
+		component: () => import('@/pages/Courses/CourseReviewQueue.vue'),
+	},
+	{
 		path: '/quizzes',
 		name: 'Quizzes',
 		component: () => import('@/pages/Quizzes.vue'),
+	},
+	{
+		// An evaluator's own queue: the subjective quiz submissions from the courses
+		// and programs a moderator has assigned them.
+		path: '/evaluations',
+		name: 'Evaluations',
+		component: () => import('@/pages/Evaluations.vue'),
+	},
+	{
+		path: '/evaluations/:submission',
+		name: 'EvaluationReview',
+		component: () => import('@/pages/EvaluationReview.vue'),
+		props: true,
 	},
 	{
 		path: '/quizzes/:quizID',
@@ -327,6 +370,17 @@ export const routes = [
 		component: () => import('@/pages/Programs/ProgramDetail.vue'),
 		props: true,
 	},
+	// The same designer as the course one. A program certificate carries a
+	// different set of mandatory fields — the server decides which from the
+	// reference doctype — so one screen serves both.
+	{
+		path: '/programs/:programName/certificate',
+		name: 'ProgramCertificateDesigner',
+		component: () =>
+			import('@/pages/Certificates/CertificateDesignerPage.vue'),
+		props: true,
+		meta: { noLayout: true },
+	},
 	{
 		path: '/assignments',
 		name: 'Assignments',
@@ -380,14 +434,18 @@ export const routes = [
 		path: '/programming-exercises/submissions',
 		name: 'ProgrammingExerciseSubmissions',
 		component: () =>
-			import('@/pages/ProgrammingExercises/ProgrammingExerciseSubmissions.vue'),
+			import(
+				'@/pages/ProgrammingExercises/ProgrammingExerciseSubmissions.vue'
+			),
 		props: true,
 	},
 	{
 		path: '/programming-exercises/:exerciseID/submission/:submissionID',
 		name: 'ProgrammingExerciseSubmission',
 		component: () =>
-			import('@/pages/ProgrammingExercises/ProgrammingExerciseSubmission.vue'),
+			import(
+				'@/pages/ProgrammingExercises/ProgrammingExerciseSubmission.vue'
+			),
 		props: true,
 	},
 	{
@@ -461,6 +519,26 @@ export const routes = [
 		name: 'StudentSession',
 		component: () => import('@/pages/Student/StudentSession.vue'),
 		meta: { layout: 'student' },
+	},
+	{
+		// Redeeming an invite link. Deliberately NOT `isPublic`: exactly one route
+		// is public and it is Login (see src/tests/loginRoute.test.ts). A
+		// signed-out visitor is sent to sign in with `?redirect=` carrying this
+		// path, so the token survives the round trip and they land back here —
+		// which is the only thing being public would have bought, minus a preview
+		// of the batch title that is not worth a second door.
+		path: '/batches/join/:token',
+		name: 'BatchJoin',
+		component: () => import('@/pages/BatchJoin.vue'),
+		meta: { hideSidebar: true },
+	},
+	{
+		// Where an account provisioned with a temporary password lands, and stays
+		// until it has chosen one. `beforeEach` in router.js enforces the "stays".
+		path: '/set-password',
+		name: 'SetPassword',
+		component: () => import('@/pages/SetPassword.vue'),
+		meta: { hideSidebar: true },
 	},
 	{
 		path: '/learn/calendar',

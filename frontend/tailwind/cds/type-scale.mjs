@@ -40,35 +40,35 @@
  * values would leave large headings visibly loose against the spec.
  */
 export const SCALE = {
-  tiny: [12, 16, 16, 0],
-  '2xs': [12, 16, 16, 0],
-  xs: [12, 16, 18, 0],
-  sm: [12, 16, 18, 0],
-  base: [14, 20, 20, 0, 18],
-  md: [16, 20, 22, -0.08],
-  lg: [16, 20, 22, -0.08],
-  xl: [18, 22, 24, -0.18],
-  '2xl': [18, 22, 24, -0.18],
-  '3xl': [20, 24, 28, -0.3],
-  '4xl': [24, 30, 32, -0.48],
-  '5xl': [28, 34, 38, -0.62],
-  '6xl': [32, 38, 42, -0.8],
-  '7xl': [36, 42, 46, -0.98],
-  '8xl': [42, 48, 52, -1.26],
-  '9xl': [46, 52, 56, -1.38],
-  '10xl': [52, 58, 62, -1.56],
-  '11xl': [58, 64, 68, -1.74],
-  '12xl': [64, 70, 74, -1.92],
-  '13xl': [72, 78, 82, -2.16],
-  '14xl': [80, 86, 90, -2.4],
-  '15xl': [88, 94, 98, -2.64],
-  '16xl': [96, 102, 106, -2.88],
+	tiny: [12, 16, 16, 0],
+	'2xs': [12, 16, 16, 0],
+	xs: [12, 16, 18, 0],
+	sm: [12, 16, 18, 0],
+	base: [14, 20, 20, 0, 18],
+	md: [16, 20, 22, -0.08],
+	lg: [16, 20, 22, -0.08],
+	xl: [18, 22, 24, -0.18],
+	'2xl': [18, 22, 24, -0.18],
+	'3xl': [20, 24, 28, -0.3],
+	'4xl': [24, 30, 32, -0.48],
+	'5xl': [28, 34, 38, -0.62],
+	'6xl': [32, 38, 42, -0.8],
+	'7xl': [36, 42, 46, -0.98],
+	'8xl': [42, 48, 52, -1.26],
+	'9xl': [46, 52, 56, -1.38],
+	'10xl': [52, 58, 62, -1.56],
+	'11xl': [58, 64, 68, -1.74],
+	'12xl': [64, 70, 74, -1.92],
+	'13xl': [72, 78, 82, -2.16],
+	'14xl': [80, 86, 90, -2.4],
+	'15xl': [88, 94, 98, -2.64],
+	'16xl': [96, 102, 106, -2.88],
 }
 
 /** Tracking for a size, as a CSS value. */
 export const trackingOf = (size) => {
-  const t = SCALE[size][3]
-  return t ? `${t}px` : 'normal'
+	const t = SCALE[size][3]
+	return t ? `${t}px` : 'normal'
 }
 
 /** Leading used by the weight variants (headings). */
@@ -90,34 +90,37 @@ export const TRACKING = 'normal'
 export const UPPERCASE = ['tiny']
 
 export const FONT_SANS = [
-  'Open Sans Variable',
-  'Open Sans',
-  '-apple-system',
-  'BlinkMacSystemFont',
-  'Segoe UI',
-  'Roboto',
-  'Helvetica',
-  'Arial',
-  'sans-serif',
+	'Open Sans Variable',
+	'Open Sans',
+	'-apple-system',
+	'BlinkMacSystemFont',
+	'Segoe UI',
+	'Roboto',
+	'Helvetica',
+	'Arial',
+	'sans-serif',
 ]
 
 export const FONT_MONO = [
-  'Monaco',
-  'SF Mono',
-  'Menlo',
-  'Consolas',
-  'Liberation Mono',
-  'monospace',
+	'Monaco',
+	'SF Mono',
+	'Menlo',
+	'Consolas',
+	'Liberation Mono',
+	'monospace',
 ]
 
 /* Tailwind `theme.fontSize` entries for the regular utilities: `text-<size>`
  * (tight leading) and `text-p-<size>` (paragraph leading). */
 export function fontSizeTheme() {
-  const out = {}
-  for (const [size, [px, tight, para]] of Object.entries(SCALE)) {
-    const meta = { letterSpacing: trackingOf(size), fontWeight: String(REGULAR) }
-    out[size] = [`${px}px`, { ...meta, lineHeight: `${tight}px` }]
-    out[`p-${size}`] = [`${px}px`, { ...meta, lineHeight: `${para}px` }]
-  }
-  return out
+	const out = {}
+	for (const [size, [px, tight, para]] of Object.entries(SCALE)) {
+		const meta = {
+			letterSpacing: trackingOf(size),
+			fontWeight: String(REGULAR),
+		}
+		out[size] = [`${px}px`, { ...meta, lineHeight: `${tight}px` }]
+		out[`p-${size}`] = [`${px}px`, { ...meta, lineHeight: `${para}px` }]
+	}
+	return out
 }

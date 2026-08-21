@@ -68,8 +68,25 @@
 							{{ dayjs(getClassEnd(cls)).format('hh:mm A') }}
 						</span>
 					</div>
+					<!-- A huddle class has no external room to open: joining is an
+					     action on this page, not a link off it. -->
 					<div
-						v-if="canAccessClass(cls) && cls.join_url"
+						v-if="canAccessClass(cls) && isHuddle(cls)"
+						class="flex items-center gap-x-2 text-ink-gray-9 mt-auto"
+					>
+						<Button
+							class="w-full"
+							variant="solid"
+							@click.stop="joinHuddle(cls)"
+						>
+							<template #prefix>
+								<span class="lucide-video h-4 w-4" />
+							</template>
+							{{ inHuddle(cls) ? __('In call') : __('Join') }}
+						</Button>
+					</div>
+					<div
+						v-else-if="canAccessClass(cls) && cls.join_url"
 						class="flex items-center gap-x-2 text-ink-gray-9 mt-auto"
 					>
 						<a
@@ -130,7 +147,10 @@ import { openBatchForm } from '@/composables/useBatchForms'
 import LiveClassAttendance from '@/components/Modals/LiveClassAttendance.vue'
 import { safeUrl } from '@/utils/safeUrl'
 
+const HUDDLE_PROVIDER = 'Learno Huddle'
+
 const user = inject('$user')
+const huddle = inject('$huddle', null)
 const route = useRoute()
 const router = useRouter()
 const dayjs = inject('$dayjs')
@@ -178,6 +198,9 @@ const openLiveClassForm = () => {
 
 const hasProviderAccount = () => {
 	const data = props.batch.data
+	// The in-app provider is the one that needs no account -- gating it behind
+	// one would make the zero-setup option the one that cannot be set up.
+	if (data?.conferencing_provider === HUDDLE_PROVIDER) return true
 	if (data?.conferencing_provider === 'Zoom' && data?.zoom_account) return true
 	if (
 		data?.conferencing_provider === 'Google Meet' &&
@@ -185,6 +208,16 @@ const hasProviderAccount = () => {
 	)
 		return true
 	return false
+}
+
+const isHuddle = (cls) => cls.conferencing_provider === HUDDLE_PROVIDER
+
+const inHuddle = (cls) =>
+	huddle?.active.value && huddle.conversation.value === `class:${cls.name}`
+
+const joinHuddle = (cls) => {
+	if (inHuddle(cls)) return
+	return huddle?.join(`class:${cls.name}`)
 }
 
 const canCreateClass = () => {

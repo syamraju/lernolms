@@ -13,7 +13,13 @@
   "type",
   "grade_assignment",
   "course",
+  "is_published",
   "column_break_hmwv",
+  "description",
+  "estimated_duration",
+  "instructions_section",
+  "instructions",
+  "questions_section",
   "question",
   "section_break_sjti",
   "show_answer",
@@ -24,9 +30,10 @@
    "fieldname": "question",
    "fieldtype": "Text Editor",
    "label": "Question",
-   "reqd": 1
+   "mandatory_depends_on": "eval:doc.is_published"
   },
   {
+   "default": "Text",
    "fieldname": "type",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -34,6 +41,43 @@
    "label": "Type",
    "options": "Document\nPDF\nURL\nImage\nText",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "description": "An unpublished assignment stays hidden from learners while it is being written.",
+   "fieldname": "is_published",
+   "fieldtype": "Check",
+   "label": "Published"
+  },
+  {
+   "description": "A one-line summary shown in the curriculum before a learner opens the assignment.",
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "description": "Roughly how long the assignment should take, in minutes.",
+   "fieldname": "estimated_duration",
+   "fieldtype": "Int",
+   "label": "Estimated Duration (minutes)",
+   "mandatory_depends_on": "eval:doc.is_published",
+   "non_negative": 1
+  },
+  {
+   "fieldname": "instructions_section",
+   "fieldtype": "Section Break",
+   "label": "Instructions"
+  },
+  {
+   "description": "What the learner should do before attempting the questions.",
+   "fieldname": "instructions",
+   "fieldtype": "Text Editor",
+   "label": "Instructions"
+  },
+  {
+   "fieldname": "questions_section",
+   "fieldtype": "Section Break",
+   "label": "Questions"
   },
   {
    "fieldname": "title",

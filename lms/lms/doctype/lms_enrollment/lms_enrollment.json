@@ -8,6 +8,7 @@
  "field_order": [
   "course",
   "progress",
+  "due_date",
   "payment",
   "current_lesson",
   "enrollment_from_batch",
@@ -91,6 +92,13 @@
    "fieldname": "progress",
    "fieldtype": "Float",
    "label": "Progress",
+   "read_only": 1
+  },
+  {
+   "description": "Set from the course's Days To Complete when the learner enrolls. Empty when the course has no deadline.",
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date",
    "read_only": 1
   },
   {

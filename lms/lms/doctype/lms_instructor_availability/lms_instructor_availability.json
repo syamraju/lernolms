@@ -1,0 +1,187 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-08-21 04:40:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "instructor",
+  "course",
+  "column_break_main",
+  "slot_duration",
+  "timezone",
+  "published",
+  "schedule_section",
+  "schedule",
+  "unavailability_section",
+  "unavailable_from",
+  "column_break_unavail",
+  "unavailable_to",
+  "meta_section",
+  "instructor_name",
+  "column_break_meta",
+  "course_title"
+ ],
+ "fields": [
+  {
+   "fieldname": "instructor",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Instructor",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "description": "Availability is per course: a student reaches it by picking a course first, and only that course's instructors are offered.",
+   "fieldname": "course",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Course",
+   "options": "LMS Course",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "30",
+   "description": "Minutes. Each weekly window below is divided into slots of this length, and a slot is what a student books.",
+   "fieldname": "slot_duration",
+   "fieldtype": "Int",
+   "label": "Slot Duration",
+   "reqd": 1
+  },
+  {
+   "fieldname": "timezone",
+   "fieldtype": "Data",
+   "label": "Timezone",
+   "read_only": 1
+  },
+  {
+   "default": "1",
+   "description": "Unpublish to stop taking new bookings without deleting the schedule. Existing appointments are unaffected.",
+   "fieldname": "published",
+   "fieldtype": "Check",
+   "label": "Published"
+  },
+  {
+   "fieldname": "schedule_section",
+   "fieldtype": "Section Break",
+   "label": "Weekly Schedule"
+  },
+  {
+   "fieldname": "schedule",
+   "fieldtype": "Table",
+   "label": "Schedule",
+   "options": "LMS Availability Slot"
+  },
+  {
+   "fieldname": "unavailability_section",
+   "fieldtype": "Section Break",
+   "label": "Unavailability"
+  },
+  {
+   "description": "A holiday window. Slots inside it are not offered even when the weekly schedule covers them.",
+   "fieldname": "unavailable_from",
+   "fieldtype": "Date",
+   "label": "Unavailable From"
+  },
+  {
+   "fieldname": "column_break_unavail",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "unavailable_to",
+   "fieldtype": "Date",
+   "label": "Unavailable To"
+  },
+  {
+   "fieldname": "meta_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "instructor.full_name",
+   "fieldname": "instructor_name",
+   "fieldtype": "Data",
+   "label": "Instructor Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_meta",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "course.title",
+   "fieldname": "course_title",
+   "fieldtype": "Data",
+   "label": "Course Title",
+   "read_only": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-08-21 04:40:00.000000",
+ "modified_by": "Administrator",
+ "module": "LMS",
+ "name": "LMS Instructor Availability",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Moderator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "if_owner": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Course Creator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "LMS Student",
+   "share": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "instructor_name"
+}

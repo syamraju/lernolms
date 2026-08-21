@@ -82,7 +82,6 @@ lms.patches.v1_0.create_batch_source
 [post_model_sync]
 lms.patches.v1_0.batch_tabs_settings
 execute:frappe.delete_doc("Notification", "Assignment Submission Notification")
-lms.patches.v1_0.change_jobs_url #19-01-2024
 lms.patches.v1_0.custom_perm_for_discussions #14-01-2024
 lms.patches.v1_0.rename_evaluator_role
 lms.patches.v1_0.change_navbar_urls
@@ -102,7 +101,6 @@ lms.patches.v2_0.migrate_batch_student_data #10-02-2025
 lms.patches.v2_0.delete_old_enrollment_doctypes
 lms.patches.v2_0.delete_unused_custom_fields
 lms.patches.v2_0.update_certificate_request_status
-lms.patches.v2_0.update_job_city_and_country
 lms.patches.v2_0.update_course_evaluator_data
 lms.patches.v2_0.move_zoom_settings #20-05-2025
 lms.patches.v2_0.link_zoom_account_to_live_class
@@ -113,13 +111,11 @@ lms.patches.v2_0.enable_programming_exercises_in_sidebar
 lms.patches.v2_0.count_in_program
 lms.patches.v2_0.fix_scorm_lesson_reference_idx #02-09-2025
 lms.patches.v2_0.certified_members_to_certifications #05-10-2025
-lms.patches.v2_0.fix_job_application_resume_urls
 lms.patches.v2_0.open_to_opportunities
 lms.patches.v2_0.open_to_work
 lms.patches.v2_0.share_enrollment
 lms.patches.v2_0.give_user_list_permission #11-02-2026
 lms.patches.v2_0.rename_badge_assignment_event
-lms.patches.v2_0.enable_allow_job_posting
 lms.patches.v2_0.set_conferencing_provider_for_zoom
 lms.patches.v2_0.sync_evaluator_roles
 lms.patches.v2_0.fix_livecode_url_default
@@ -130,3 +126,8 @@ lms.patches.v2_0.set_course_progress_defaults #02-06-2026
 lms.patches.v2_0.add_video_watch_duration_index #18-06-2026
 lms.patches.v2_0.add_batch_enrollment_index #20-07-2026
 lms.patches.v2_0.make_public_images_public #05-08-2026
+lms.patches.v2_0.seed_batch_moderators #21-08-2026
+lms.patches.v2_0.backfill_certificate_verification_codes #21-08-2026
+lms.patches.v2_0.set_quiz_type #21-08-2026
+lms.patches.v2_0.drop_job_doctypes #21-08-2026
+lms.patches.v2_0.drop_orphan_job_tables #21-08-2026

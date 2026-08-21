@@ -17,6 +17,11 @@ const { batchResource, createResourceMock } = vi.hoisted(() => ({
 			title: 'Batch One',
 			certification: 1,
 			students: ['a@example.com'],
+			// Moderates THIS batch. BatchDetail's `isAdmin` reads the batch payload
+			// rather than the session's `is_moderator`, which only says the user
+			// holds the role somewhere — the openers below are for someone who runs
+			// this cohort.
+			is_moderator: true,
 		} as Record<string, unknown>,
 		loading: false,
 		fetched: true,
@@ -60,8 +65,13 @@ vi.mock('@/pages/Batches/components/BatchDashboard.vue', inert)
 vi.mock('@/pages/Batches/BatchOverview.vue', inert)
 vi.mock('@/pages/Batches/components/LiveClass.vue', inert)
 vi.mock('@/pages/Batches/components/Announcements.vue', inert)
+vi.mock('@/pages/Batches/components/BatchCalendar.vue', inert)
+// Chats and People reach `@/utils`, which touches matchMedia at import time via
+// plyr. They are tab bodies like the rest, so they are inert here for the same
+// reason: this file tests BatchDetail's own tab and opener logic.
+vi.mock('@/pages/Batches/components/BatchChats.vue', inert)
+vi.mock('@/pages/Batches/components/BatchPeople.vue', inert)
 vi.mock('@/pages/Batches/BatchForm.vue', inert)
-vi.mock('@/components/Discussions.vue', inert)
 vi.mock('@/components/SkeletonLoader.vue', inert)
 vi.mock('@/components/ShortcutTooltip.vue', () => ({
 	default: { template: `<div><slot /></div>` },

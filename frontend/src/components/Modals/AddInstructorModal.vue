@@ -90,7 +90,7 @@ const PERMISSIONS = [
 	{ key: 'can_manage_reviews', label: __('Reviews') },
 ] as const
 
-type PermissionKey = (typeof PERMISSIONS)[number]['key']
+type PermissionKey = typeof PERMISSIONS[number]['key']
 
 interface RawUserHit {
 	label?: string
@@ -150,7 +150,9 @@ async function submit() {
 				permissions: { ...permissions },
 			})) as CourseInstructorRow[]
 		} catch (error) {
-			failed.push(errorMessage(error, __('{0} could not be added').format(email)))
+			failed.push(
+				errorMessage(error, __('{0} could not be added').format(email))
+			)
 		}
 	}
 	saving.value = false

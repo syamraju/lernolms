@@ -32,8 +32,21 @@
 									{{ dayjs(getClassEnd(cls)).format('HH:mm A') }}
 								</span>
 							</div>
+							<!-- A huddle class opens in place; there is no external
+							     room to navigate to. -->
 							<div
-								v-if="canAccessClass(cls)"
+								v-if="canAccessClass(cls) && isHuddle(cls)"
+								class="flex items-center gap-x-2 text-ink-gray-9 mt-auto"
+							>
+								<Button class="w-full" variant="solid" @click="joinHuddle(cls)">
+									<template #prefix>
+										<span class="lucide-video size-4" />
+									</template>
+									{{ inHuddle(cls) ? __('In call') : __('Join') }}
+								</Button>
+							</div>
+							<div
+								v-else-if="canAccessClass(cls)"
 								class="flex items-center gap-x-2 text-ink-gray-9 mt-auto"
 							>
 								<a
@@ -142,15 +155,29 @@
 </template>
 <script setup lang="ts">
 import { inject } from 'vue'
-import { createResource, Tooltip } from 'frappe-ui'
+import { Button, createResource, Tooltip } from 'frappe-ui'
 import { formatTime } from '@/utils'
 import CourseCard from '@/components/CourseCard.vue'
 import BatchCard from '@/pages/Batches/components/BatchCard.vue'
 import UpcomingEvaluations from '@/components/UpcomingEvaluations.vue'
 import { safeUrl } from '@/utils/safeUrl'
 
+const HUDDLE_PROVIDER = 'Learno Huddle'
+
 const dayjs = inject<any>('$dayjs')
 const user = inject<any>('$user')
+const huddle = inject<any>('$huddle', null)
+
+const isHuddle = (cls: { conferencing_provider?: string }) =>
+	cls.conferencing_provider === HUDDLE_PROVIDER
+
+const inHuddle = (cls: { name: string }) =>
+	huddle?.active.value && huddle.conversation.value === `class:${cls.name}`
+
+const joinHuddle = (cls: { name: string }) => {
+	if (inHuddle(cls)) return
+	return huddle?.join(`class:${cls.name}`)
+}
 
 const props = defineProps<{
 	myLiveClasses: any

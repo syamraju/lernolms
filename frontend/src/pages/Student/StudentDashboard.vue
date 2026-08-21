@@ -29,7 +29,10 @@
 					:to="tile.to"
 					class="learno-card flex flex-col gap-1 p-5 transition hover:shadow-[var(--learno-shadow)]"
 				>
-					<span class="text-[26px] font-semibold" :style="{ color: tile.color }">
+					<span
+						class="text-[26px] font-semibold"
+						:style="{ color: tile.color }"
+					>
 						{{ tile.value }}
 					</span>
 					<span class="text-[12px] text-[var(--learno-ink-muted)]">
@@ -66,7 +69,10 @@
 							class="grid size-10 shrink-0 place-items-center rounded-full"
 							:style="kindStyle(event.kind)"
 						>
-							<span :class="[kindIcon(event.kind), 'size-4']" aria-hidden="true" />
+							<span
+								:class="[kindIcon(event.kind), 'size-4']"
+								aria-hidden="true"
+							/>
 						</span>
 						<div class="flex min-w-0 flex-1 flex-col gap-1">
 							<span
@@ -163,7 +169,9 @@ const greeting = computed(() => {
 })
 
 const inProgress = computed(() =>
-	courses.value.filter((course) => Number(course.progress || 0) < 100).slice(0, 8)
+	courses.value
+		.filter((course) => Number(course.progress || 0) < 100)
+		.slice(0, 8)
 )
 
 const upcoming = computed(() => (events.data || []).slice(0, 6))

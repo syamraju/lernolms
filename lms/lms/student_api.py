@@ -71,6 +71,35 @@ def _chapter_counts(course_names: list) -> dict:
 	return dict(Counter(rows))
 
 
+def _pacing_by_course(course_names: list) -> dict:
+	"""Deadline state for the signed-in student's enrollments in these courses.
+
+	One query for the whole page rather than one per card: deciding where an
+	enrollment stands is pure arithmetic, so the only cost worth avoiding is the
+	round trip.
+	"""
+	if not course_names or frappe.session.user == "Guest":
+		return {}
+
+	from lms.lms.pacing import compute_due_date, deadline_days, pacing_state
+
+	rows = frappe.get_all(
+		"LMS Enrollment",
+		filters={"member": frappe.session.user, "course": ("in", course_names)},
+		fields=["course", "due_date", "progress", "creation"],
+		limit_page_length=0,
+	)
+
+	pacing = {}
+	for row in rows:
+		# An enrollment made before the course had a deadline carries no stored
+		# date. Deriving one keeps the setting meaningful for a cohort already in
+		# flight instead of applying only to whoever enrolls next.
+		due_date = row.due_date or compute_due_date(row.creation, deadline_days(row.course))
+		pacing[row.course] = pacing_state(due_date, row.progress)
+	return pacing
+
+
 @frappe.whitelist(allow_guest=True)
 def get_student_courses(filters: dict | str = None, start: int = 0, limit_page_length=None) -> list:
 	"""`lms.lms.utils.get_courses` plus the two fields the student card needs.
@@ -86,12 +115,15 @@ def get_student_courses(filters: dict | str = None, start: int = 0, limit_page_l
 	if not courses:
 		return []
 
-	counts = _chapter_counts([course.name for course in courses])
+	course_names = [course.name for course in courses]
+	counts = _chapter_counts(course_names)
+	pacing = _pacing_by_course(course_names)
 	for course in courses:
 		course.chapters_count = counts.get(course.name, 0)
 		# `get_enrollment_details` attaches `membership` only when one exists, so
 		# a plain read of `.progress` would be a KeyError on an unenrolled row.
 		course.progress = cint((course.get("membership") or {}).get("progress"))
+		course.pacing = pacing.get(course.name)
 
 	return courses
 
@@ -335,13 +367,17 @@ def get_my_batches() -> list:
 def get_calendar_events(start: str, end: str) -> list:
 	"""Everything on the student's calendar between `start` and `end` (dates).
 
-	Three sources, flattened into one shape the calendar can render without
+	Five sources, flattened into one shape the calendar can render without
 	knowing where each entry came from:
 
 	  * live classes on the batches the student belongs to,
 	  * evaluation slots the student has booked,
 	  * batches' own start dates, so an upcoming cohort is visible before its
-	    first class exists.
+	    first class exists,
+	  * events the student organised or was invited to (recurrence expanded),
+	  * one-to-one appointments, as student or as instructor.
+
+	Every entry carries `kind`, which is what the UI colours and routes on.
 	"""
 	_require_login()
 
@@ -420,5 +456,105 @@ def get_calendar_events(start: str, end: str) -> list:
 				}
 			)
 
+	events.extend(_student_events(member, start, end))
+	events.extend(_appointments(member, start, end))
+
 	events.sort(key=lambda event: (str(event["date"]), str(event.get("time") or "")))
 	return events
+
+
+def _student_events(member: str, start: str, end: str) -> list:
+	"""Events the member organised or was invited to, expanded over the window.
+
+	Recurrence is stored as a rule, so an event contributes one entry per date it
+	actually lands on inside `[start, end]` — see
+	`LMSStudentEvent.occurrences`.
+	"""
+	invited_to = frappe.get_all(
+		"LMS Event Participant",
+		filters={"participant": member, "parenttype": "LMS Student Event"},
+		pluck="parent",
+		limit_page_length=0,
+	)
+	mine = frappe.get_all("LMS Student Event", filters={"owner": member}, pluck="name", limit_page_length=0)
+
+	names = list(set(invited_to) | set(mine))
+	if not names:
+		return []
+
+	rows = []
+	for name in names:
+		doc = frappe.get_cached_doc("LMS Student Event", name)
+		for day in doc.occurrences(start, end):
+			rows.append(
+				{
+					"kind": "event",
+					"name": doc.name,
+					"title": doc.title,
+					"description": doc.description or "",
+					"date": day,
+					"time": None if doc.all_day else doc.start_time,
+					"end_time": None if doc.all_day else doc.end_time,
+					"all_day": bool(doc.all_day),
+					"url": doc.meet_link,
+					"context": doc.course,
+					"is_owner": doc.owner == member,
+					"participants": [
+						{
+							"participant": row.participant,
+							"full_name": row.full_name,
+							"user_image": row.user_image,
+							"participant_role": row.participant_role,
+						}
+						for row in doc.participants
+					],
+				}
+			)
+	return rows
+
+
+def _appointments(member: str, start: str, end: str) -> list:
+	"""One-to-one sessions the member is on, as student or as instructor."""
+	fields = [
+		"name",
+		"course",
+		"course_title",
+		"instructor",
+		"instructor_name",
+		"student",
+		"student_name",
+		"date",
+		"start_time",
+		"end_time",
+		"topic",
+		"status",
+		"meet_link",
+	]
+	window = {"date": ["between", [start, end]], "status": ["!=", "Cancelled"]}
+
+	# Two reads rather than an or_filter: or_filters would OR away the date and
+	# status restrictions along with the ownership test.
+	rows = frappe.get_all(
+		"LMS Appointment", filters={**window, "student": member}, fields=fields, limit_page_length=0
+	) + frappe.get_all(
+		"LMS Appointment", filters={**window, "instructor": member}, fields=fields, limit_page_length=0
+	)
+
+	seen = {}
+	for row in rows:
+		as_instructor = row.instructor == member
+		seen[row.name] = {
+			"kind": "appointment",
+			"name": row.name,
+			"title": _("1:1 with {0}").format(row.student_name if as_instructor else row.instructor_name),
+			"description": row.topic,
+			"date": row.date,
+			"time": row.start_time,
+			"end_time": row.end_time,
+			"url": row.meet_link,
+			"context": row.course,
+			"course_title": row.course_title,
+			"role": "instructor" if as_instructor else "student",
+			"status": row.status,
+		}
+	return list(seen.values())

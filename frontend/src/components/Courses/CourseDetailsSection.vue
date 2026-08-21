@@ -1,5 +1,5 @@
 <template>
-	<section class="space-y-5">
+	<section id="details" class="scroll-mt-4 space-y-5">
 		<div class="text-base-semibold text-ink-gray-9">
 			{{ __('Course details') }}
 		</div>
@@ -8,6 +8,14 @@
 				v-model="doc.title"
 				:label="__('Title')"
 				:required="true"
+				variant="outline"
+				@input="markDirty()"
+			/>
+			<FormControl
+				v-model="doc.subtitle"
+				:label="__('Subtitle')"
+				:maxlength="120"
+				:placeholder="__('One sentence on what learners walk away with')"
 				variant="outline"
 				@input="markDirty()"
 			/>
@@ -61,6 +69,22 @@
 				</MultiSelect>
 			</div>
 			<FormControl
+				v-model="doc.level"
+				type="select"
+				:options="LEVELS"
+				:label="__('Level')"
+				variant="outline"
+				@update:modelValue="markDirty()"
+			/>
+			<FormControl
+				v-model="doc.language"
+				type="select"
+				:options="LANGUAGES"
+				:label="__('Language')"
+				variant="outline"
+				@update:modelValue="markDirty()"
+			/>
+			<FormControl
 				v-model="doc.short_introduction"
 				type="textarea"
 				:rows="3"
@@ -71,6 +95,15 @@
 				class="md:col-span-2"
 				@change="markDirty()"
 			/>
+			<FormControl
+				v-model="doc.primary_topic"
+				:label="__('Primarily taught')"
+				:placeholder="__('e.g. Landscape Photography')"
+				:description="__('The single skill at the centre of the course.')"
+				variant="outline"
+				class="md:col-span-2"
+				@input="markDirty()"
+			/>
 		</div>
 		<div class="grid gap-5 grid-cols-1 xl:grid-cols-2">
 			<CourseThumbnailField />
@@ -80,6 +113,17 @@
 				@update:modelValue="setVideoLink"
 			/>
 		</div>
+		<Uploader
+			type="video"
+			:modelValue="doc.promo_video"
+			:label="__('Promotional video')"
+			:description="
+				__(
+					'A short, uploaded preview of the course. Courses with a well-made one enrol noticeably better.'
+				)
+			"
+			@update:modelValue="setPromoVideo"
+		/>
 	</section>
 </template>
 
@@ -92,6 +136,7 @@ import Link from '@/components/Controls/Link.vue'
 import CourseInstructorsField from '@/components/Courses/CourseInstructorsField.vue'
 import CourseThumbnailField from '@/components/Courses/CourseThumbnailField.vue'
 import VideoPreviewField from '@/components/Controls/VideoPreviewField.vue'
+import Uploader from '@/components/Controls/Uploader.vue'
 import type { CourseFormContext } from '@/types'
 import { InputLabel } from '@/components/Form/labeling'
 
@@ -99,6 +144,25 @@ interface TagOption {
 	label: string
 	value: string
 }
+
+const LEVELS = [
+	'All Levels',
+	'Beginner Level',
+	'Intermediate Level',
+	'Expert Level',
+]
+
+const LANGUAGES = [
+	'English',
+	'Spanish',
+	'French',
+	'German',
+	'Portuguese',
+	'Hindi',
+	'Arabic',
+	'Japanese',
+	'Mandarin',
+]
 
 const tagsLabelId = useId()
 const { resource, markDirty } = inject<CourseFormContext>('courseForm')!
@@ -137,6 +201,12 @@ const tagsSelectedLabels = computed<string>(() => tagsArray.value.join(', '))
 function setVideoLink(value: string) {
 	if (!resource.doc) return
 	resource.doc.video_link = value
+	markDirty()
+}
+
+function setPromoVideo(value: string) {
+	if (!resource.doc) return
+	resource.doc.promo_video = value
 	markDirty()
 }
 

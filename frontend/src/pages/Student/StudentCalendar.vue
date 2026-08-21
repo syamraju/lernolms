@@ -2,19 +2,63 @@
 	Calendar. Figma: frame 136:88179 — a mini month picker and a legend on the
 	left, a week grid on the right with Week / Today / prev / next controls.
 
-	The design's "+ Add New" and "Book Appointments" are author actions (only an
-	evaluator or a moderator creates anything on a student's calendar), so the
-	student view is read-only and those two buttons are not rendered. Everything
-	on the grid comes from `get_calendar_events`.
+	The design's two header buttons are both live:
+
+	* **Create Event** opens the Add Events sheet (Figma 137:90848) — a student
+	  organises a discussion and invites people from their courses.
+	* **Book Appointment** opens the four-step booking flow — course, then
+	  instructor, then a free slot, then what the doubt is. A booked slot stops
+	  being offered to anyone else; the guarantee is enforced server-side in
+	  `LMSAppointment`, not by this grid.
+
+	Instructors get a third button, **My availability**, which is what puts slots
+	into that flow in the first place.
+
+	Everything on the grid comes from `get_calendar_events`, which flattens five
+	sources into one shape; `kind` is what colours each chip.
 -->
 <template>
 	<div class="flex h-full min-h-0 flex-col">
 		<header
-			class="flex shrink-0 items-center gap-4 border-b border-[var(--learno-line-soft)] bg-white px-6 py-[22px] lg:px-10"
+			class="flex shrink-0 flex-wrap items-center gap-4 border-b border-[var(--learno-line-soft)] bg-white px-6 py-[22px] lg:px-10"
 		>
-			<h1 class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12">
+			<h1
+				class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12"
+			>
 				{{ __('Calendar') }}
 			</h1>
+
+			<div class="ms-auto flex flex-wrap items-center gap-2">
+				<!-- Instructors only. A pure student has no availability to publish,
+				     and the endpoint behind it returns nothing for them anyway. -->
+				<button
+					v-if="isInstructor"
+					type="button"
+					class="learno-btn learno-btn-secondary px-4 py-2.5 text-[13px]"
+					@click="showAvailability = true"
+				>
+					<span class="lucide-clock size-4" aria-hidden="true" />
+					{{ __('My availability') }}
+				</button>
+
+				<button
+					type="button"
+					class="learno-btn learno-btn-secondary px-4 py-2.5 text-[13px]"
+					@click="showBooking = true"
+				>
+					<span class="lucide-calendar-check size-4" aria-hidden="true" />
+					{{ __('Book Appointment') }}
+				</button>
+
+				<button
+					type="button"
+					class="learno-btn learno-btn-primary px-4 py-2.5 text-[13px]"
+					@click="openEventPanel()"
+				>
+					<span class="lucide-plus size-4" aria-hidden="true" />
+					{{ __('Create Event') }}
+				</button>
+			</div>
 		</header>
 
 		<div class="flex min-h-0 flex-1">
@@ -25,7 +69,11 @@
 				<MiniMonth v-model="cursor" :marked="markedDates" />
 
 				<div class="mt-6 flex flex-col gap-4">
-					<div v-for="group in legend" :key="group.kind" class="flex flex-col gap-1.5">
+					<div
+						v-for="group in legend"
+						:key="group.kind"
+						class="flex flex-col gap-1.5"
+					>
 						<span class="flex items-center gap-2 text-[12px]">
 							<span
 								class="size-2.5 rounded-[3px]"
@@ -41,7 +89,9 @@
 			</aside>
 
 			<!-- Grid -->
-			<div class="learno-scroll min-w-0 flex-1 overflow-auto bg-[var(--learno-canvas)]">
+			<div
+				class="learno-scroll min-w-0 flex-1 overflow-auto bg-[var(--learno-canvas)]"
+			>
 				<div
 					class="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-[var(--learno-line-soft)] bg-[var(--learno-canvas)] px-5 py-4"
 				>
@@ -95,10 +145,12 @@
 							{{ day.label }}
 						</div>
 
-						<ul class="flex min-h-[420px] flex-col gap-2 p-2">
+						<ul class="group/day flex min-h-[420px] flex-col gap-2 p-2">
 							<li
 								v-for="event in day.events"
-								:key="`${event.kind}-${event.title}-${event.time}`"
+								:key="
+									event.name || `${event.kind}-${event.title}-${event.time}`
+								"
 								class="rounded-[6px] px-2 py-1.5 text-[10px] leading-[1.35]"
 								:style="chipStyle(event.kind)"
 							>
@@ -106,32 +158,135 @@
 								<p v-if="event.time" class="opacity-80">
 									{{ formatTime(event) }}
 								</p>
-								<a
-									v-if="event.url"
-									:href="safeUrl(event.url)"
-									class="mt-1 inline-block underline"
-									v-external
+								<p v-if="event.description" class="learno-clamp-2 opacity-75">
+									{{ event.description }}
+								</p>
+								<div class="mt-1 flex flex-wrap items-center gap-2">
+									<a
+										v-if="event.url"
+										:href="safeUrl(event.url)"
+										class="underline"
+										v-external
+									>
+										{{ __('Join') }}
+									</a>
+									<button
+										v-if="canCancel(event)"
+										type="button"
+										class="underline opacity-80 hover:opacity-100"
+										@click="cancel(event)"
+									>
+										{{ cancelLabel(event) }}
+									</button>
+								</div>
+							</li>
+
+							<li class="mt-auto">
+								<button
+									type="button"
+									class="w-full rounded-[6px] border border-dashed border-[var(--learno-line)] py-1.5 text-[10px] text-[var(--learno-ink-subtle)] opacity-0 transition hover:border-[var(--learno-primary)] hover:text-[var(--learno-primary)] focus:opacity-100 group-hover/day:opacity-100"
+									:aria-label="__('Add an event on {0}').format(day.label)"
+									@click="openEventPanel(day.iso)"
 								>
-									{{ __('Join') }}
-								</a>
+									+ {{ __('Add') }}
+								</button>
 							</li>
 						</ul>
 					</div>
 				</div>
 			</div>
 		</div>
+
+		<AddEventPanel
+			v-model:open="showEventPanel"
+			:date="eventPanelDate"
+			:courses="myCourses"
+			@created="refresh"
+		/>
+		<BookAppointmentModal v-model:open="showBooking" @booked="refresh" />
+		<AvailabilityModal v-if="isInstructor" v-model:open="showAvailability" />
 	</div>
 </template>
 
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue'
-import { createResource, usePageMeta } from 'frappe-ui'
+import { call, createResource, toast, usePageMeta } from 'frappe-ui'
 import { safeUrl } from '@/utils/safeUrl'
 import MiniMonth from '@/pages/Student/components/MiniMonth.vue'
+import AddEventPanel from '@/components/Learno/Calendar/AddEventPanel.vue'
+import BookAppointmentModal from '@/components/Learno/Calendar/BookAppointmentModal.vue'
+import AvailabilityModal from '@/components/Learno/Calendar/AvailabilityModal.vue'
 
 const dayjs = inject<any>('$dayjs')
+const userResource = inject<any>('$user')
 
 usePageMeta(() => ({ title: __('Calendar') }))
+
+const showEventPanel = ref(false)
+const showBooking = ref(false)
+const showAvailability = ref(false)
+const eventPanelDate = ref('')
+
+// Only someone who teaches has hours to publish. `is_instructor` is the same
+// flag the sidebar's admin switch keys off.
+const isInstructor = computed(() =>
+	Boolean(userResource?.data?.is_instructor || userResource?.data?.is_moderator)
+)
+
+// The Add Events sheet scopes its invite list by course, so it needs the
+// student's own shelf. Enrolled only — you cannot invite people from a course
+// you are not in.
+const enrolled = createResource({
+	url: 'lms.lms.student_api.get_student_courses',
+	params: { filters: { enrolled: 1 }, limit_page_length: 100 },
+	auto: true,
+})
+
+const myCourses = computed(() => enrolled.data || [])
+
+function openEventPanel(date?: string) {
+	eventPanelDate.value = date || dayjs().format('YYYY-MM-DD')
+	showEventPanel.value = true
+}
+
+function refresh() {
+	events.reload()
+}
+
+// Only the two kinds this app creates are cancellable, and only by someone on
+// them. Live classes, evaluations and batch starts belong to staff.
+function canCancel(event: any) {
+	if (event.kind === 'appointment') return true
+	return event.kind === 'event' && event.is_owner
+}
+
+// An event is stored as one row plus a repeat rule, so there is nowhere to
+// record "skip this one occurrence" — deleting removes the series. The label
+// says so rather than letting a student find out afterwards.
+function cancelLabel(event: any) {
+	if (event.kind === 'appointment') return __('Cancel')
+	return event.participants?.length && event.repeat_enabled
+		? __('Delete series')
+		: __('Delete')
+}
+
+async function cancel(event: any) {
+	const method =
+		event.kind === 'appointment'
+			? 'lms.lms.calendar_api.cancel_appointment'
+			: 'lms.lms.calendar_api.delete_event'
+	try {
+		await call(method, { name: event.name })
+		toast.success(
+			event.kind === 'appointment'
+				? __('Appointment cancelled')
+				: __('Event deleted')
+		)
+		refresh()
+	} catch (e: any) {
+		toast.error(e?.messages?.[0] || e?.message || __('Could not cancel that'))
+	}
+}
 
 // The cursor is any day inside the week being shown; the grid derives the week
 // from it, so "next week" is a seven-day shift rather than week-number maths.
@@ -186,6 +341,8 @@ const markedDates = computed(() => new Set(Object.keys(byDate.value)))
 
 const KIND_COLOR: Record<string, { bg: string; fg: string; label: string }> = {
 	live_class: { bg: '#ddf4ff', fg: '#1b4f86', label: 'Live classes' },
+	appointment: { bg: '#fff1f1', fg: '#9f1239', label: 'One-to-one' },
+	event: { bg: '#ede9fe', fg: '#5b21b6', label: 'My events' },
 	evaluation: { bg: '#ffe1e1', fg: '#8f1f1f', label: 'Evaluations' },
 	batch_start: { bg: '#dcfce7', fg: '#14532d', label: 'Batches' },
 }

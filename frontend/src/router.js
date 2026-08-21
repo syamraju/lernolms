@@ -8,6 +8,12 @@ import { routes } from './routes'
 // Run the fresh-site-admin persona check at most once per app load.
 let personaChecked = false
 
+// Same, for the provisioned-password gate. Once per load is enough because
+// `provision_temporary_password` drops the user's existing sessions: a re-issue
+// ends the session it would otherwise have had to interrupt, so the next thing
+// that user does is sign in, and `on_login` lands them on the screen anyway.
+let passwordChecked = false
+
 async function shouldCapturePersona() {
 	const captured = await call('frappe.client.get_single_value', {
 		doctype: 'LMS Settings',
@@ -68,7 +74,28 @@ router.beforeEach(async (to, from, next) => {
 		})
 	}
 
-	if (isLoggedIn && to.meta.isPublic) {
+	// An account still holding a provisioned password goes nowhere else. The
+	// temporary one was mailed, so it stays a working credential in an inbox
+	// until it is replaced — letting the user dismiss the prompt and carry on
+	// would leave it valid indefinitely. `on_login` sets the landing page; this
+	// is what makes it stick across navigation, and it also catches a re-issue
+	// that happened while the user was already signed in on another tab.
+	if (isLoggedIn && !passwordChecked && to.name !== 'SetPassword') {
+		passwordChecked = true
+		try {
+			if (await call('lms.lms.user.must_reset_password')) {
+				return next({ name: 'SetPassword' })
+			}
+		} catch (_) {
+			// Fail open: a transient API error must not lock the app.
+		}
+	}
+
+	// Most public pages are for signed-out visitors only — sending a signed-in
+	// user to the login form is a dead end. A page marked `allowLoggedIn` is
+	// public in the other sense: readable by anyone, including the people who
+	// already have accounts.
+	if (isLoggedIn && to.meta.isPublic && !to.meta.allowLoggedIn) {
 		return next({ name: 'Home' })
 	}
 

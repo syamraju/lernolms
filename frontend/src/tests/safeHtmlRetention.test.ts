@@ -9,7 +9,7 @@ import { SAFE_HTML_LEVELS, sanitizeAt } from '../directives/safeHtmlLevels'
 //
 // `rich` is the profile that matters here: it renders lesson content, course
 // and batch descriptions, quiz questions and answers, assignment questions and
-// feedback, job descriptions and announcements. It is a denylist, so the
+// feedback and announcements. It is a denylist, so the
 // assertion is that authored markup arrives intact.
 
 const RICH_SURVIVES: Record<string, string> = {

@@ -548,6 +548,36 @@ const getSidebarItems = (forMobile = false) => {
 					activeFor: ['Batches', 'BatchDetail', 'Batch', 'BatchForm'],
 				},
 				{
+					label: 'Course Reviews',
+					icon: 'ClipboardCheck',
+					to: 'CourseReviewQueue',
+					activeFor: ['CourseReviewQueue'],
+					condition: () => {
+						// Approving a course publishes it, so the queue is only
+						// offered to the people the server will let act on it.
+						return (
+							userResource?.data?.is_moderator ||
+							userResource?.data?.is_evaluator
+						)
+					},
+				},
+				{
+					label: 'Evaluations',
+					icon: 'ClipboardPen',
+					to: 'Evaluations',
+					activeFor: ['Evaluations', 'EvaluationReview'],
+					condition: () => {
+						// The queue is scoped server-side to what the user has been
+						// assigned, so the link is offered to everyone who can hold an
+						// assignment; a moderator sees the whole site's queue.
+						return (
+							userResource?.data?.is_evaluator ||
+							userResource?.data?.is_moderator ||
+							userResource?.data?.is_instructor
+						)
+					},
+				},
+				{
 					label: 'Certifications',
 					icon: 'GraduationCap',
 					to: 'CertifiedParticipants',
@@ -555,12 +585,6 @@ const getSidebarItems = (forMobile = false) => {
 					condition: () => {
 						return userResource?.data
 					},
-				},
-				{
-					label: 'Jobs',
-					icon: 'Briefcase',
-					to: 'Jobs',
-					activeFor: ['Jobs', 'JobDetail'],
 				},
 				{
 					label: 'Statistics',

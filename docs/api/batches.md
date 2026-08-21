@@ -332,3 +332,123 @@ enrolled in.
 
 The next **4** upcoming live classes across every batch the session user teaches.
 Same row shape as `get_my_live_classes`, without `course_title`.
+
+---
+
+## Batch moderation, chat and calendar
+
+Added with the batch-scoping work. Design: [`docs/design/batches.md`](../design/batches.md).
+
+**The rule these all share:** the batch is the unit of scope. Holding `Moderator`
+says what someone can do; the `LMS Batch.moderators` table says *where*. Every
+endpoint below resolves that through `lms.lms.batch_access`.
+
+### Scope helpers — `lms.lms.batch_access`
+
+Not whitelisted; used by everything else here.
+
+| Function | Answers |
+| --- | --- |
+| `is_batch_moderator(batch, user)` | administers this batch (or is System Manager) |
+| `moderated_batches(user)` | every batch they administer |
+| `batch_instructors(batch)` | derived from `Batch Course` → `Course Instructor`, ∪ the batch's own list |
+| `batch_evaluators(batch)` | derived from `Batch Course` → `LMS Course.evaluator` |
+| `staffed_batches(user)` | the reverse of the two above |
+| `batch_relation(batch, user)` | `moderator` \| `instructor` \| `evaluator` \| `student` \| `None` |
+| `can_read_batch(batch, user)` | read — published batches included |
+| `assert_batch_member(batch)` | the inside of a cohort; published-ness does **not** open it |
+| `visible_batches(user)` | every batch they are attached to, in any capacity |
+
+### People — `lms.lms.batch_people`
+
+| Endpoint | Who |
+| --- | --- |
+| `get_batch_people(batch)` | any member; administrative columns for moderators only |
+| `get_my_people()` | moderators — the union across their batches, deduplicated |
+| `remove_from_batch(batch, user)` | moderators; students only (staff is derived, so there is no row) |
+
+`lms.lms.api.get_members` (site-wide) is now **System Manager only**. It was
+`Moderator`, unfiltered, which made batch scoping meaningless.
+
+### Invitations — `lms.lms.batch_invite`
+
+| Endpoint | Writes | Notes |
+| --- | --- | --- |
+| `preview_invitations(batch, emails)` | — | classifies every address: `existing` / `new` / `already_enrolled` / `invalid` / `no_seats`. Seats count against a running total. Also returns `mail_configured`. |
+| `send_invitations(batch, emails)` | yes | per-address results; enqueues above 25 addresses |
+| `reissue_password(batch, user)` | yes | target's roles must be **exactly** `{LMS Student}` and they must be enrolled here |
+| `create_invite_link(batch, expires_in_days, max_uses)` | yes | raw token returned **once**; only its SHA-256 is stored |
+| `get_invite_links(batch)` | — | moderators |
+| `revoke_invite_link(name)` | yes | moderators |
+| `describe_invite_link(token)` | — | public; returns `valid: false` rather than throwing |
+| `join_with_link(token)` | yes | signed-in caller only; increments `uses` and enrolls under the batch row lock |
+
+**Outgoing email is a precondition, checked once.** An invitation is a message;
+if it cannot be delivered there is no invitation, and for a provisioned account
+the temporary password exists *only* in that message. `send_invitations` and
+`reissue_password` refuse up front when the site has no default outgoing Email
+Account. `preview_invitations` deliberately does **not** refuse — a dry run
+describes rather than blocks — and reports `mail_configured: false` instead, so
+the dialog can say nothing would be delivered. Permission is checked before
+configuration, so an outsider is refused for who they are rather than being told
+this site's mail settings.
+
+**One bad address costs one address.** `invite_many` wraps each address in a
+savepoint and unwinds to it on failure. A bare `frappe.db.rollback()` there
+discards everything uncommitted, including work the caller did before calling —
+which, called inline, silently undid the caller's own changes.
+
+A valid token is a per-request grant that satisfies
+`LMSBatchEnrollment.validate_self_enrollment` for the token holder alone, so a
+batch does not have to stand open to self-enrollment for its links to work.
+
+### Provisioned accounts — `lms.lms.user`
+
+| Endpoint | Notes |
+| --- | --- |
+| `must_reset_password()` | whether the caller still holds a generated password |
+| `set_own_password(new_password)` | acts only on the caller; runs the site password policy; clears the flag |
+
+`User.must_reset_password` (custom field) is set when an account is provisioned.
+`on_login` sends such a session to `/set-password` and the router keeps it there.
+The temporary password is written to one email and nowhere else — no endpoint
+returns it and nothing logs it.
+
+### Chat — `lms.lms.chat`
+
+Two levels: channels and sub-channels. `LMSChatChannel.validate_depth` refuses a
+third. Access is derived from the batch roster on every request, never synced.
+
+| Endpoint | Notes |
+| --- | --- |
+| `get_channel_tree(batch)` | filtered to what the caller may read; carries message count, last message and unread |
+| `get_my_channels()` | the cross-batch sidebar, unread rolling up per batch |
+| `get_messages(channel, limit, before)` | paged backwards from `before` |
+| `post_message(channel, content, reply_to, attachment)` | |
+| `delete_message(message)` | soft — replies keep a parent |
+| `mark_read(channel)` | |
+| `create_channel` / `update_channel` / `delete_channel` | moderators |
+
+| Audience | Who reads |
+| --- | --- |
+| `Everyone` | every member of the batch |
+| `Staff` | moderators, instructors, evaluators |
+| `Students` | enrolled students |
+
+Seeded per batch: `# announcements` (staff post), `# general`, `# staff-room`,
+plus one `Course` sub-channel per curriculum course. Dropping a course
+**archives** its channel rather than deleting the discussion.
+
+### Calendar — `lms.lms.batch_calendar`
+
+No new storage. Every entry carries `kind`, matching
+`lms.lms.student_api.get_calendar_events`.
+
+| Endpoint | Notes |
+| --- | --- |
+| `get_batch_calendar(batch, start, end)` | any member |
+| `get_my_calendar(start, end)` | every batch the caller is attached to, merged |
+
+`kind` ∈ `timetable` · `live_class` · `evaluation` · `appointment` ·
+`batch_start` · `batch_end`. Students see only their own evaluations and
+appointments; moderators see the batch's.

@@ -9,7 +9,9 @@
 		<header
 			class="shrink-0 border-b border-[var(--learno-line-soft)] bg-white px-6 py-[22px] lg:px-10"
 		>
-			<h1 class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12">
+			<h1
+				class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12"
+			>
 				{{ __('Settings') }}
 			</h1>
 		</header>
@@ -18,7 +20,9 @@
 			class="learno-scroll min-h-0 flex-1 overflow-y-auto bg-[var(--learno-canvas)] px-6 py-7 lg:px-10"
 		>
 			<section class="mb-8 max-w-2xl rounded-[var(--learno-r-lg)] bg-white p-6">
-				<h2 class="mb-4 text-[16px] font-semibold text-[var(--learno-ink-strong)]">
+				<h2
+					class="mb-4 text-[16px] font-semibold text-[var(--learno-ink-strong)]"
+				>
 					{{ __('Account') }}
 				</h2>
 
@@ -58,7 +62,9 @@
 			</section>
 
 			<section class="max-w-2xl rounded-[var(--learno-r-lg)] bg-white p-6">
-				<h2 class="mb-4 text-[16px] font-semibold text-[var(--learno-ink-strong)]">
+				<h2
+					class="mb-4 text-[16px] font-semibold text-[var(--learno-ink-strong)]"
+				>
 					{{ __('Session') }}
 				</h2>
 				<button

@@ -51,7 +51,6 @@
 		"certifications",
 		"programming_exercises",
 		"column_break_exdz",
-		"jobs",
 		"statistics",
 		"notifications",
 		"section_break_qlss",
@@ -85,9 +84,7 @@
 		"contact_us_tab",
 		"contact_us_email",
 		"column_break_gcgv",
-		"contact_us_url",
-		"jobs_tab",
-		"allow_job_posting"
+		"contact_us_url"
 	],
 	"fields": [
 		{
@@ -297,12 +294,6 @@
 		},
 		{
 			"default": "1",
-			"fieldname": "jobs",
-			"fieldtype": "Check",
-			"label": "Jobs"
-		},
-		{
-			"default": "1",
 			"fieldname": "statistics",
 			"fieldtype": "Check",
 			"label": "Statistics"
@@ -482,17 +473,6 @@
 		{
 			"fieldname": "column_break_dtns",
 			"fieldtype": "Column Break"
-		},
-		{
-			"fieldname": "jobs_tab",
-			"fieldtype": "Tab Break",
-			"label": "Jobs"
-		},
-		{
-			"default": "1",
-			"fieldname": "allow_job_posting",
-			"fieldtype": "Check",
-			"label": "Allow Job Posting"
 		},
 		{
 			"default": "0",

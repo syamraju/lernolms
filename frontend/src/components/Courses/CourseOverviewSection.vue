@@ -1,5 +1,5 @@
 <template>
-	<section class="space-y-5 border-t pt-6">
+	<section id="overview" class="scroll-mt-4 space-y-5 border-t pt-6">
 		<div class="text-base-semibold text-ink-gray-9">
 			{{ __('Course overview') }}
 		</div>
@@ -27,6 +27,22 @@
 					editorClass="prose-sm max-w-none border-b border-x border-outline-gray-2 hover:border-outline-gray-3 hover:shadow-sm focus-within:border-outline-gray-4 focus-within:shadow-sm rounded-b-md py-1 px-2 min-h-[7rem] transition-colors"
 				/>
 			</div>
+			<p
+				class="text-p-sm"
+				:class="
+					descriptionWords >= MIN_DESCRIPTION_WORDS
+						? 'text-ink-gray-5'
+						: 'text-ink-amber-3'
+				"
+			>
+				{{
+					descriptionWords >= MIN_DESCRIPTION_WORDS
+						? __('{0} words').format(descriptionWords)
+						: __(
+								'{0} of {1} words — a description of at least {1} words is required to submit for review.'
+						  ).format(descriptionWords, MIN_DESCRIPTION_WORDS)
+				}}
+			</p>
 		</div>
 		<MultiLink
 			v-model="relatedCourses"
@@ -79,10 +95,16 @@ import MultiLink from '@/components/Controls/MultiLink.vue'
 import type { CourseFormContext } from '@/types'
 import RichTextEditor from '@/components/RichTextEditor.vue'
 import { InputLabel } from '@/components/Form/labeling'
+import { countWords } from '@/utils/courseCreation'
+
+// Mirrors MIN_DESCRIPTION_WORDS in lms/lms/course_creation.py; copy only — the
+// server is what actually gates submission.
+const MIN_DESCRIPTION_WORDS = 50
 
 const { resource, relatedCourses, meta, markDirty } =
 	inject<CourseFormContext>('courseForm')!
 const doc = computed(() => resource.doc)
 const descriptionId = useId()
 const descriptionLabelId = useId()
+const descriptionWords = computed(() => countWords(doc.value?.description))
 </script>

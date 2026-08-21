@@ -5,7 +5,6 @@ import json
 from pathlib import Path
 
 import frappe
-from frappe.modules.utils import get_module_list
 from frappe.tests.utils import FrappeTestCase
 
 BASELINE = Path(__file__).parent / "docperms.json"
@@ -14,14 +13,55 @@ BASELINE = Path(__file__).parent / "docperms.json"
 # an administrator's involvement. A grant to any of these is the interesting case.
 WATCHED_ROLES = ("LMS Student", "Course Creator", "Batch Evaluator", "Moderator", "All", "Guest")
 
-PTYPES = ("read", "write", "create", "delete", "submit", "cancel", "share", "report", "export")
+# The permission types this guard watches. `print` and `email` are in the set
+# because a grant of either is a real enumeration path — the query-report
+# builder, the email dialog and a print view all read the same rows the REST
+# list does — and they were outside it until 2026-08-21, so a commit granting
+# them to a watched role passed in silence. LMS Certificate and LMS Appointment
+# both grant them to LMS Student today.
+#
+# Still outside the set: `amend` (no doctype in the app is submittable, so no
+# role can hold it — checked, not assumed), `select` (a link-field lookup; the
+# eleven grants of it all sit beside a `read` on the same row, so it adds no
+# reach) and `mask`.
+#
+# `import` is the notable omission and is NOT here for a good reason. Twenty-two
+# grants of it are live to watched roles — LMS Course to Course Creator, LMS
+# Batch Enrollment to Batch Evaluator, LMS Coupon to all three — and it is a
+# bulk WRITE, a bigger step than any read path in this tuple. Adding it is the
+# same purely-additive change print and email were; it is left out only because
+# nobody has decided whether those grants are intended, and recording them here
+# would read as blessing them.
+PTYPES = (
+	"read",
+	"write",
+	"create",
+	"delete",
+	"submit",
+	"cancel",
+	"share",
+	"report",
+	"export",
+	"print",
+	"email",
+)
+
+# The modules lms/modules.txt is expected to list. Kept here rather than derived
+# so that adding a module is a deliberate edit to this file: a module nobody
+# adds to the snapshot is invisible to the baseline test, not absent from the
+# REST API.
+APP_MODULES = {"LMS"}
+
+
+def _app_modules() -> list[str]:
+	"""The app's modules, as listed in lms/modules.txt."""
+	return frappe.get_module_list("lms")
 
 
 def _snapshot():
 	# The app's own modules, read from lms/modules.txt rather than matched with a
-	# LIKE pattern: the app ships both "LMS" and "Job", and a "%LMS%" filter drops
-	# every Job doctype without saying so.
-	modules = get_module_list("lms")
+	# LIKE pattern, so a module added later is covered without editing this file.
+	modules = _app_modules()
 	out = {}
 	for name in frappe.get_all("DocType", filters={"module": ("in", modules)}, pluck="name"):
 		meta = frappe.get_meta(name)
@@ -39,11 +79,11 @@ def _snapshot():
 
 
 class TestDocPermSnapshot(FrappeTestCase):
-	def test_snapshot_covers_both_app_modules(self):
-		modules = set(get_module_list("lms"))
+	def test_snapshot_covers_every_app_module(self):
+		modules = set(_app_modules())
 		self.assertEqual(
 			modules,
-			{"LMS", "Job"},
+			APP_MODULES,
 			"lms/modules.txt changed. Regenerate lms/tests/docperms.json so the new "
 			"module's doctypes are covered — a module missing from the snapshot is "
 			"invisible to the test below, not absent from the REST API.",

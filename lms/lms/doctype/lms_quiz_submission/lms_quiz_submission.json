@@ -18,7 +18,11 @@
   "percentage",
   "passing_percentage",
   "section_break_6",
-  "result"
+  "result",
+  "evaluation_status",
+  "evaluator",
+  "evaluated_on",
+  "evaluator_comment"
  ],
  "fields": [
   {
@@ -112,6 +116,33 @@
    "fieldtype": "Data",
    "label": "Quiz Title",
    "read_only": 1
+  },
+  {
+   "default": "Not Required",
+   "fieldname": "evaluation_status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Evaluation Status",
+   "options": "Not Required\nPending\nEvaluated",
+   "read_only": 1
+  },
+  {
+   "fieldname": "evaluator",
+   "fieldtype": "Link",
+   "label": "Evaluated By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "evaluated_on",
+   "fieldtype": "Datetime",
+   "label": "Evaluated On",
+   "read_only": 1
+  },
+  {
+   "fieldname": "evaluator_comment",
+   "fieldtype": "Small Text",
+   "label": "Evaluator Comment"
   }
  ],
  "grid_page_length": 50,

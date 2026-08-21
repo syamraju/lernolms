@@ -1,0 +1,40 @@
+{#
+    Sent once, to an address that had no account until this invitation created
+    one. This is the only place a provisioned temporary password is ever
+    written: it is not returned by any endpoint, not logged, and not shown to
+    the moderator who triggered it.
+#}
+<p>{{ _("Hello,") }}</p>
+<br>
+<p>
+    {{ _("An account has been created for you and you have been added to the batch") }}
+    <b>{{ title }}</b>.
+</p>
+<br>
+
+<p><b>{{ _("Sign in with:") }}</b></p>
+<p>{{ _("Email:") }} <b>{{ email }}</b></p>
+<p>{{ _("Temporary password:") }} <b>{{ temp_password }}</b></p>
+<br>
+<p>
+    {{ _("You will be asked to choose a new password the first time you sign in. This temporary one stops working at that point.") }}
+</p>
+<br>
+
+{% if start_date %}
+<p>
+    <b>{{ _("Batch starts:") }}</b> {{ frappe.utils.format_date(start_date, "medium") }}
+    {% if start_time %} {{ _("at") }} {{ frappe.utils.format_time(start_time, "hh:mm a") }}{% endif %}
+</p>
+<br>
+{% endif %}
+
+<p>
+    <a href="{{ login_url }}">{{ _("Sign in") }}</a>
+</p>
+<br>
+<p>
+    {{ _("If you were not expecting this, you can ignore this email — the account cannot be used until someone signs in with the password above.") }}
+</p>
+<br>
+<p>{{ _("Best Regards") }}</p>

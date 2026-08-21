@@ -48,20 +48,6 @@ class LearningSearch(SQLiteSearch):
 				{"modified": "start_date"},
 			],
 		},
-		"Job Opportunity": {
-			"fields": [
-				"name",
-				{"title": "job_title"},
-				{"content": "description"},
-				"owner",
-				"location",
-				"country",
-				"company_name",
-				"status",
-				"creation",
-				{"modified": "creation"},
-			],
-		},
 		# Quizzes and programs carry no prose of their own, so the title doubles as
 		# the content field the index requires.
 		"LMS Quiz": {
@@ -120,20 +106,9 @@ class LearningSearch(SQLiteSearch):
 		"published",
 	]
 
-	JOB_FIELDS = [
-		"name",
-		"job_title",
-		"company_name",
-		"description",
-		"creation",
-		"modified",
-		"owner",
-	]
-
 	DOCTYPE_FIELDS = {
 		"LMS Course": COURSE_FIELDS,
 		"LMS Batch": BATCH_FIELDS,
-		"Job Opportunity": JOB_FIELDS,
 	}
 
 	def build_index(self):

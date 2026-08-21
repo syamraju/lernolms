@@ -22,6 +22,11 @@
 					:label="__('Self enrollment')"
 					:description="__('Let users enroll themselves.')"
 				/>
+			</div>
+		</CollapsibleSection>
+
+		<CollapsibleSection :label="__('Pace and progression')">
+			<div class="flex flex-col gap-y-4">
 				<BooleanSwitch
 					size="sm"
 					v-model="doc.enforce_lesson_completion"
@@ -29,8 +34,41 @@
 					:description="
 						__('Students must complete each lesson before the next one opens.')
 					"
+					@update:modelValue="onEnforceCompletionChange"
+				/>
+
+				<!--
+					Section gating is a sub-setting of the sequential gate: with
+					nothing being unlocked in the first place there is no order to
+					relax, so it is hidden rather than shown as a switch that does
+					nothing.
+				-->
+				<BooleanSwitch
+					v-if="doc.enforce_lesson_completion"
+					size="sm"
+					v-model="doc.enforce_section_completion"
+					:label="__('Unlock one section at a time')"
+					:description="
+						__(
+							'Everything inside the current section stays open, in any order. The next section unlocks once this one is fully complete — including any quiz, at the pass mark you set on it.'
+						)
+					"
 					@update:modelValue="markDirty()"
 				/>
+
+				<div class="border-t -mx-5" />
+
+				<FormControl
+					v-model.number="doc.completion_deadline_days"
+					type="number"
+					min="0"
+					:label="__('Days to complete')"
+					variant="outline"
+					@input="markDirty()"
+				/>
+				<p class="-mt-2 text-p-sm text-ink-gray-6">
+					{{ deadlineDescription }}
+				</p>
 			</div>
 		</CollapsibleSection>
 
@@ -147,16 +185,31 @@
 					<span>
 						{{
 							__(
-								'Certificates render from a Print Format. Build or customize templates from the desk.'
+								'The certificate is artwork with the learner’s name, the dates and the course name placed on it. It has to be finished before instructors can be invited.'
 							)
 						}}
 					</span>
+					<router-link
+						v-if="doc?.name"
+						:to="{
+							name: 'CourseCertificateDesigner',
+							params: { courseName: doc.name },
+						}"
+						class="font-medium text-ink-gray-8 underline"
+					>
+						{{ __('Open the designer') }}
+					</router-link>
+					<!--
+						The print-format route still exists for courses certified
+						before the designer did, so the way to it stays — one step
+						further back, where it belongs now.
+					-->
 					<button
 						type="button"
 						class="font-medium text-ink-gray-8 underline"
 						@click="openPrintFormats"
 					>
-						{{ __('Manage templates') }}
+						{{ __('Legacy print formats') }}
 					</button>
 				</div>
 			</div>
@@ -222,6 +275,28 @@ const doc = computed(() => resource.doc)
 const evaluatorLinkRef = ref<{ reload: () => void } | null>(null)
 const showMemberModal = ref<boolean>(false)
 const showPaymentsAppModal = ref<boolean>(false)
+
+const deadlineDescription = computed<string>(() => {
+	const days = Number(doc.value?.completion_deadline_days) || 0
+	if (!days) {
+		return __(
+			'Leave at 0 for no deadline — learners take as long as they need.'
+		)
+	}
+	return __(
+		'Each learner has {0} day(s) from enrolling. After that their enrollment is marked overdue; nothing is taken away.'
+	).format(days)
+})
+
+/**
+ * Turning sequencing off leaves section gating meaningless, so it goes with it.
+ * A hidden switch that is still on would come back the next time sequencing is
+ * enabled, silently applying a rule the author last saw two settings ago.
+ */
+function onEnforceCompletionChange(value: boolean) {
+	if (!value && resource.doc) resource.doc.enforce_section_completion = 0
+	markDirty()
+}
 
 const publishedOnLabel = computed<string>(() =>
 	doc.value?.published_on

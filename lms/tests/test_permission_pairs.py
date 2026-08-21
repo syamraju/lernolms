@@ -16,6 +16,14 @@ from lms.lms.test_helpers import BaseTestUtils
 PAIR_EXEMPT = {
 	# File is a framework doctype; its list surface is governed by frappe core.
 	"File",
+	# LMS Certificate Template gates WRITES per row (you may only redesign the
+	# certificate of a course you can modify) and leaves READS alone. There is no
+	# list read to filter: the DocPerms grant read to Course Creator and
+	# Moderator only, and among those roles a template is no more private than
+	# the course it belongs to — its artwork ends up on a public verification
+	# page. The pairing rule guards against a rule enforced on the single-doc
+	# read and dropped on the list read; this hook has no such rule to drop.
+	"LMS Certificate Template",
 }
 
 

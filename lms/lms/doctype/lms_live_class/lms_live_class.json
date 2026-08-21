@@ -145,7 +145,7 @@
    "fieldname": "conferencing_provider",
    "fieldtype": "Select",
    "label": "Conferencing Provider",
-   "options": "Zoom\nGoogle Meet"
+   "options": "Zoom\nGoogle Meet\nLearno Huddle"
   },
   {
    "fieldname": "zoom_account",
