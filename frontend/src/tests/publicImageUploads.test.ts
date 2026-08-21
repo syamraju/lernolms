@@ -206,6 +206,17 @@ const MANIFEST: Record<string, Privacy[]> = {
 	// the same terms as the poster image — it has to be readable without the
 	// player holding a session for the File itself.
 	'components/Courses/CourseCaptionsSection.vue': ['public'],
+	// The certificate's artwork and any signature or seal placed on it. Both are
+	// drawn on the public verification page, which a stranger with no account
+	// opens from a link on a printed certificate — so a private File here would
+	// be readable by its uploader and Administrator alone, and every employer
+	// checking a certificate would get a broken image with no error anywhere.
+	// Public is what the feature requires, not a default that slipped through:
+	// the background is organisation artwork and the seal is meant to be seen by
+	// exactly the people the certificate is shown to. Nothing personal to the
+	// learner is uploaded here — their name is drawn as text from the frozen
+	// snapshot, never as an image.
+	'components/Certificates/CertificateDesigner.vue': ['public', 'public'],
 	// Deliberately not readable by other users.
 	'components/Assignment.vue': ['private', 'private', 'private'],
 	'pages/Forms/ChapterForm.vue': ['private'],
