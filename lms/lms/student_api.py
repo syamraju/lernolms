@@ -19,6 +19,7 @@ from frappe import _
 from frappe.utils import cint
 
 from lms.lms.utils import (
+	PRIVILEGED_ROLES,
 	get_chapters,
 	get_course_details,
 	get_courses,
@@ -100,6 +101,57 @@ def _pacing_by_course(course_names: list) -> dict:
 	return pacing
 
 
+def _scope_to_visible_courses(filters: dict | None) -> dict:
+	"""Hide unpublished courses from the learner-facing catalogue.
+
+	`get_courses` applies whatever publish state the caller asks for, which is right
+	for the admin list -- it has explicit Published / Unpublished / Created tabs. The
+	student shell sends no publish filter at all for its "Explore courses" view, so a
+	draft an author has not released was listed to learners, with a live Enroll button
+	that could only ever fail (`enroll` refuses: "This course is not open for
+	enrolment.").
+
+	Only the unscoped view is narrowed. `enrolled` and `created` already restrict to
+	rows the caller has a relationship with, and forcing `published` on top of those
+	would hide a learner's own in-progress course the moment its author unpublished
+	it -- which is how the one enrolled course on the dev site would have vanished
+	from "Continue learning".
+	"""
+	filters = dict(filters or {})
+
+	# `enrolled` and `created` restrict to rows the caller already has a
+	# relationship with, so publish state adds nothing and forcing it would hide
+	# a learner's own in-progress course the moment its author unpublished it.
+	if filters.get("enrolled") or filters.get("created"):
+		return filters
+
+	# A caller-supplied `published` used to be honoured here too, and it is not
+	# the same kind of thing at all: those two scope to the caller, a publish
+	# flag scopes nothing and is entirely caller-controlled. Because this
+	# endpoint is `allow_guest=True`, that let an UNAUTHENTICATED request ask
+	# for `published: 0` and receive every unreleased course on the site --
+	# titles, slugs and metadata for work nobody had chosen to release. The
+	# default path was always correct, which is why it went unnoticed; the
+	# escape hatch was one query parameter.
+	#
+	# Staff keep the ability to ask, because the authoring surfaces legitimately
+	# list unreleased work. PRIVILEGED_ROLES is the app's own definition of who
+	# those are -- restating it here is how the two copies drift apart.
+	if "published" in filters and _may_see_unpublished():
+		return filters
+
+	filters["published"] = 1
+	return filters
+
+
+def _may_see_unpublished() -> bool:
+	"""Whether this caller may ask for courses that have not been released."""
+	if frappe.session.user == "Guest":
+		return False
+
+	return bool(set(frappe.get_roles()) & PRIVILEGED_ROLES)
+
+
 @frappe.whitelist(allow_guest=True)
 def get_student_courses(filters: dict | str = None, start: int = 0, limit_page_length=None) -> list:
 	"""`lms.lms.utils.get_courses` plus the two fields the student card needs.
@@ -110,6 +162,8 @@ def get_student_courses(filters: dict | str = None, start: int = 0, limit_page_l
 	"""
 	if isinstance(filters, str):
 		filters = json.loads(filters)
+
+	filters = _scope_to_visible_courses(filters)
 
 	courses = get_courses(filters=filters, start=start, limit_page_length=limit_page_length)
 	if not courses:
