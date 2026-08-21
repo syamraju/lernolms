@@ -8,6 +8,8 @@ from frappe import _
 from frappe.email.doctype.email_template.email_template import get_email_template
 from frappe.model.document import Document
 
+from lms.lms.batch_access import is_batch_moderator
+
 
 class LMSBatchEnrollment(Document):
 	def after_insert(self):
@@ -23,12 +25,17 @@ class LMSBatchEnrollment(Document):
 		self.validate_course_enrollment()
 
 	def validate_owner(self):
+		"""Enrolling somebody else requires moderating *this* batch.
+
+		Previously any Moderator or Batch Evaluator could enroll anyone into any
+		batch. The role is still necessary — it is what gets you a moderators row —
+		but it is no longer sufficient on its own.
+		"""
 		if self.owner == self.member:
 			return
 
-		roles = frappe.get_roles()
-		if "Moderator" not in roles and "Batch Evaluator" not in roles:
-			frappe.throw(_("You must be a Moderator or Batch Evaluator to enroll users in a batch."))
+		if not is_batch_moderator(self.batch):
+			frappe.throw(_("You must moderate this batch to enroll users in it."))
 
 	def validate_payment(self):
 		paid_batch = frappe.db.get_value("LMS Batch", self.batch, "paid_batch")
@@ -53,12 +60,28 @@ class LMSBatchEnrollment(Document):
 		)
 		if batch_details.paid_batch:
 			return
+
+		# A redeemed invite link is a per-request grant that satisfies this check for
+		# the token holder alone. It is set by lms.lms.batch_invite.join_with_link
+		# after the token has been validated against the batch this row names, so a
+		# flag set for one batch cannot open another. A batch therefore does not have
+		# to stand open to self-enrollment for its invite links to work — which is the
+		# point, since `allow_self_enrollment` opens it to the entire internet.
+		if self.flags.invite_link_granted_for == self.batch:
+			return
+
 		if not batch_details.allow_self_enrollment and not self.is_admin():
 			frappe.throw(_("Enrollment in this batch is restricted. Please contact the Administrator."))
 
 	def is_admin(self):
-		roles = frappe.get_roles(frappe.session.user)
-		return "Course Creator" in roles or "Moderator" in roles or "Batch Evaluator" in roles
+		"""Whether this insert is an administrative act on *this* batch.
+
+		Read by validate_payment (waive the payment requirement) and
+		validate_self_enrollment (open a closed door). Both are "a moderator put
+		this person here", and neither should be answerable by a moderator of some
+		other cohort.
+		"""
+		return bool(is_batch_moderator(self.batch))
 
 	def validate_duplicate_members(self):
 		# Lock the batch row for the rest of this transaction before reading. The
@@ -128,8 +151,7 @@ def send_confirmation_email(doc: Document):
 	if isinstance(doc, str):
 		doc = frappe._dict(json.loads(doc))
 
-	roles = frappe.get_roles()
-	is_admin = "Moderator" in roles or "Batch Evaluator" in roles
+	is_admin = is_batch_moderator(doc.batch)
 	is_member = doc.member == frappe.session.user
 
 	if not is_member and not is_admin:
