@@ -46,6 +46,19 @@ LMS_ROLES = ["Moderator", "Course Creator", "Batch Evaluator", "LMS Student"]
 PRIVILEGED_ROLES = {"Moderator", "Course Creator", "Batch Evaluator", "System Manager"}
 
 
+def may_see_unpublished() -> bool:
+	"""Whether this caller may ask for courses that have not been released.
+
+	Lives here rather than beside either caller because both `get_courses` and
+	`lms.lms.student_api` need it, and a second copy is how the two answers drift
+	apart -- which for a publish gate means one of them silently becomes wrong.
+	"""
+	if frappe.session.user == "Guest":
+		return False
+
+	return bool(set(frappe.get_roles()) & PRIVILEGED_ROLES)
+
+
 def get_lms_path():
 	path = frappe.conf.get("lms_path") or "lms"
 	return path.strip("/")
@@ -915,6 +928,38 @@ def resolve_page_length(limit_page_length=None) -> int:
 	return min(max(page_length, 1), MAX_PAGE_LENGTH)
 
 
+def scope_to_published(filters: dict) -> dict:
+	"""Keep unreleased courses out of the catalogue for everyone but staff.
+
+	`get_courses` is `allow_guest=True` and applied whatever publish state the
+	caller asked for -- including none, which returned everything. An anonymous
+	request to the bare endpoint listed every unpublished draft on the site by
+	title and slug:
+
+	    GET /api/method/lms.lms.utils.get_courses
+	      -> 23 courses, published flags [0, 1]
+
+	No parameter, no session. The admin list is what wanted the filter honoured,
+	and it is staff-only, so the answer is to honour it only for staff rather
+	than to take it away.
+
+	`enrolled` and `created` are exempt for the same reason they are in the
+	student shell: they already restrict to rows the caller has a relationship
+	with, and forcing a publish state on top would hide a learner's own
+	in-progress course the moment its author unpublished it.
+	"""
+	filters = dict(filters)
+
+	if filters.get("enrolled") or filters.get("created"):
+		return filters
+
+	if "published" in filters and may_see_unpublished():
+		return filters
+
+	filters["published"] = 1
+	return filters
+
+
 @frappe.whitelist(allow_guest=True)  # nosemgrep: frappe-semgrep-rules.rules.security.guest-whitelisted-method
 @rate_limit(limit=500, seconds=60 * 60)
 def get_courses(filters: dict = None, start: int = 0, limit_page_length: int | str = None) -> list:
@@ -925,6 +970,8 @@ def get_courses(filters: dict = None, start: int = 0, limit_page_length: int | s
 
 	if not filters:
 		filters = {}
+
+	filters = scope_to_published(filters)
 
 	filters, or_filters, show_featured = update_course_filters(filters)
 	fields = get_course_fields()

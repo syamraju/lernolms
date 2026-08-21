@@ -19,13 +19,13 @@ from frappe import _
 from frappe.utils import cint
 
 from lms.lms.utils import (
-	PRIVILEGED_ROLES,
 	get_chapters,
 	get_course_details,
 	get_courses,
 	get_editorjs_blocks,
 	get_membership,
 	guest_access_allowed,
+	may_see_unpublished,
 )
 
 # The card's "New Course" flag and the dashboard's "recently added" row both
@@ -137,19 +137,11 @@ def _scope_to_visible_courses(filters: dict | None) -> dict:
 	# Staff keep the ability to ask, because the authoring surfaces legitimately
 	# list unreleased work. PRIVILEGED_ROLES is the app's own definition of who
 	# those are -- restating it here is how the two copies drift apart.
-	if "published" in filters and _may_see_unpublished():
+	if "published" in filters and may_see_unpublished():
 		return filters
 
 	filters["published"] = 1
 	return filters
-
-
-def _may_see_unpublished() -> bool:
-	"""Whether this caller may ask for courses that have not been released."""
-	if frappe.session.user == "Guest":
-		return False
-
-	return bool(set(frappe.get_roles()) & PRIVILEGED_ROLES)
 
 
 @frappe.whitelist(allow_guest=True)
