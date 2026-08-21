@@ -1,14 +1,19 @@
 <template>
-	<div class="space-y-8">
-		<p class="text-p-base text-ink-gray-7">
-			{{
-				__(
-					'Film a short test video before you record the real thing. A minute of footage is enough to catch problems with lighting, sound and framing while they are still cheap to fix.'
-				)
-			}}
-		</p>
+	<section id="production" class="scroll-mt-4 space-y-8 border-t pt-6">
+		<div>
+			<div class="text-base-semibold text-ink-gray-9">
+				{{ __('Test video') }}
+			</div>
+			<p class="mt-1 text-p-base text-ink-gray-6">
+				{{
+					__(
+						'Film a short test video before you record the real thing. A minute of footage catches problems with lighting, sound and framing while they are still cheap to fix.'
+					)
+				}}
+			</p>
+		</div>
 
-		<section class="space-y-3">
+		<div class="space-y-3">
 			<h3 class="text-p-base-semibold text-ink-gray-9">
 				{{ __('What feedback would be helpful?') }}
 			</h3>
@@ -35,9 +40,9 @@
 					<span class="text-p-base-medium text-ink-gray-9">{{ __(area) }}</span>
 				</label>
 			</div>
-		</section>
+		</div>
 
-		<section class="space-y-3 border-t pt-6">
+		<div class="space-y-3">
 			<h3 class="text-p-base-semibold text-ink-gray-9">
 				{{ __('Upload your test video') }}
 			</h3>
@@ -57,14 +62,14 @@
 				"
 				@update:modelValue="setTestVideo"
 			/>
-		</section>
+		</div>
 
 		<GuidanceList
 			:title="__('What to check when you watch it back')"
 			:items="CHECKLIST"
 			variant="bullets"
 		/>
-	</div>
+	</section>
 </template>
 
 <script setup lang="ts">

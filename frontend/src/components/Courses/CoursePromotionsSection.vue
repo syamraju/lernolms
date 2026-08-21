@@ -1,14 +1,19 @@
 <template>
-	<div class="space-y-8">
-		<p class="text-p-base text-ink-gray-7">
-			{{
-				__(
-					'Promotions let you offer this course at a discount for a limited time. Coupons are managed centrally so the same code can cover several courses.'
-				)
-			}}
-		</p>
+	<section id="promotions" class="scroll-mt-4 space-y-8 border-t pt-6">
+		<div>
+			<div class="text-base-semibold text-ink-gray-9">
+				{{ __('Promotions') }}
+			</div>
+			<p class="mt-1 text-p-base text-ink-gray-6">
+				{{
+					__(
+						'Offer this course at a discount for a limited time. Coupons are managed centrally so the same code can cover several courses.'
+					)
+				}}
+			</p>
+		</div>
 
-		<section
+		<div
 			v-if="!doc.paid_course"
 			class="flex items-start gap-3 rounded-md border border-outline-gray-2 bg-surface-gray-1 p-4"
 		>
@@ -27,13 +32,13 @@
 				<Button
 					variant="outline"
 					class="mt-2"
-					:label="__('Go to Pricing')"
-					@click="goToStep('pricing')"
+					:label="__('Go to pricing')"
+					@click="focusSection('publish')"
 				/>
 			</div>
-		</section>
+		</div>
 
-		<section v-else class="space-y-4">
+		<div v-else class="space-y-4">
 			<div class="flex flex-wrap items-center justify-between gap-3">
 				<h3 class="text-p-base-semibold text-ink-gray-9">
 					{{ __('Coupons covering this course') }}
@@ -89,20 +94,15 @@
 					/>
 				</li>
 			</ul>
-		</section>
-
-		<GuidanceList :title="__('Getting the most from a promotion')" :items="TIPS" />
-	</div>
+		</div>
+	</section>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { Badge, Button, createResource } from 'frappe-ui'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
-import GuidanceList from '@/components/Courses/GuidanceList.vue'
 import { useCourseManage } from '@/composables/useCourseManage'
-import { useSettings } from '@/stores/settings'
 import { openSettings } from '@/utils'
 import type { Resource } from '@/types'
 
@@ -116,29 +116,8 @@ interface CouponRow {
 	enabled?: 0 | 1
 }
 
-const TIPS = [
-	{
-		title: __('Announce the end date.'),
-		body: __(
-			'A deadline is what turns interest into an enrolment. Say when the offer closes wherever you share the code.'
-		),
-	},
-	{
-		title: __('Keep the code short and readable.'),
-		body: __(
-			'Codes get typed by hand and read aloud in videos. Avoid characters that look alike.'
-		),
-	},
-	{
-		title: __('One code per channel.'),
-		body: __(
-			'Separate codes for your newsletter, social posts and partners tell you which channel actually converts.'
-		),
-	},
-]
 
-const router = useRouter()
-const { doc, goToStep } = useCourseManage()
+const { doc, focusSection } = useCourseManage()
 
 // Coupon items are a child table keyed by (reference_doctype, reference_name),
 // so the course's coupons are found through the child rows rather than a field
@@ -178,19 +157,11 @@ function discountLabel(coupon: CouponRow): string {
 }
 
 /**
- * Coupons live in the app-wide Settings dialog, which is only mounted by the
- * desktop sidebar — and this shell deliberately renders without one. So leave
- * the shell first, then open the dialog once the layout that owns it has
- * mounted. The poll is bounded: if Settings never appears (a phone, where it
- * has no mount point at all), `openSettings` says so rather than doing nothing.
+ * Coupons live in the app-wide Settings dialog, which the desktop sidebar
+ * mounts. The Settings tab renders inside that layout, so the dialog is
+ * already available and can just be opened.
  */
-async function openCouponSettings() {
-	await router.push({ name: 'Courses', query: { tab: 'created' } })
-	const settingsStore = useSettings()
-	for (let attempt = 0; attempt < 20; attempt++) {
-		if (settingsStore.isSettingsMounted) break
-		await new Promise((resolve) => setTimeout(resolve, 50))
-	}
+function openCouponSettings() {
 	openSettings('Coupons')
 }
 </script>

@@ -1,14 +1,19 @@
 <template>
-	<div class="space-y-8">
-		<p class="text-p-base text-ink-gray-7">
-			{{
-				__(
-					'The following descriptions will be publicly visible on your course landing page and have a direct impact on how your course performs. They help learners decide whether the course is right for them.'
-				)
-			}}
-		</p>
+	<section id="audience" class="scroll-mt-4 space-y-8 border-t pt-6">
+		<div>
+			<div class="text-base-semibold text-ink-gray-9">
+				{{ __('Who this course is for') }}
+			</div>
+			<p class="mt-1 text-p-base text-ink-gray-6">
+				{{
+					__(
+						'These descriptions are publicly visible on the course landing page and help learners decide whether the course is right for them.'
+					)
+				}}
+			</p>
+		</div>
 
-		<section class="space-y-3">
+		<div class="space-y-3">
 			<h3 class="text-p-base-semibold text-ink-gray-9">
 				{{ __('What will students learn in your course?') }}
 			</h3>
@@ -37,9 +42,9 @@
 					)
 				}}
 			</p>
-		</section>
+		</div>
 
-		<section class="space-y-3 border-t pt-6">
+		<div class="space-y-3">
 			<h3 class="text-p-base-semibold text-ink-gray-9">
 				{{ __('What are the requirements or prerequisites for your course?') }}
 			</h3>
@@ -58,9 +63,9 @@
 				:addLabel="__('Add more to your response')"
 				@update:modelValue="setRows('requirements', $event)"
 			/>
-		</section>
+		</div>
 
-		<section class="space-y-3 border-t pt-6">
+		<div class="space-y-3">
 			<h3 class="text-p-base-semibold text-ink-gray-9">
 				{{ __('Who is this course for?') }}
 			</h3>
@@ -79,8 +84,8 @@
 				:addLabel="__('Add more to your response')"
 				@update:modelValue="setRows('intended_learners', $event)"
 			/>
-		</section>
-	</div>
+		</div>
+	</section>
 </template>
 
 <script setup lang="ts">

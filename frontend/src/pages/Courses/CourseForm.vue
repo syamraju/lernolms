@@ -8,9 +8,16 @@
 		<div class="space-y-8 p-5 md:overflow-y-auto">
 			<CourseDetailsSection />
 			<CourseOverviewSection />
+			<CourseAudienceSection />
+			<CourseMessagesSection />
+			<CourseCaptionsSection />
+			<CourseProductionSection />
+			<CoursePromotionsSection />
+			<CourseAccessSection />
 		</div>
 		<aside
-			class="border-t md:overflow-y-auto md:border-s md:border-t-0 md:px-3"
+			id="publish"
+			class="scroll-mt-4 border-t md:overflow-y-auto md:border-s md:border-t-0 md:px-3"
 		>
 			<CoursePublishSettings />
 		</aside>
@@ -31,7 +38,7 @@ import {
 	watch,
 } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { getMetaInfo, updateMetaInfo } from '@/utils'
 import { validateCourse } from '@/utils/courseForm'
 import {
@@ -42,14 +49,22 @@ import { exportCourseAsZip } from '@/utils/exportCourse'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import CourseDetailsSection from '@/components/Courses/CourseDetailsSection.vue'
 import CourseOverviewSection from '@/components/Courses/CourseOverviewSection.vue'
+import CourseAudienceSection from '@/components/Courses/CourseAudienceSection.vue'
+import CourseMessagesSection from '@/components/Courses/CourseMessagesSection.vue'
+import CourseCaptionsSection from '@/components/Courses/CourseCaptionsSection.vue'
+import CourseProductionSection from '@/components/Courses/CourseProductionSection.vue'
+import CoursePromotionsSection from '@/components/Courses/CoursePromotionsSection.vue'
+import CourseAccessSection from '@/components/Courses/CourseAccessSection.vue'
 import CoursePublishSettings from '@/pages/Courses/CoursePublishSettings.vue'
 import type { LMSCourse } from '@/types/lms/LMSCourse'
 import type { CourseInstructor } from '@/types/lms/CourseInstructor'
 import type { RelatedCourses as RelatedCoursesRow } from '@/types/lms/RelatedCourses'
 import type {
+	CourseCreationStatus,
 	CourseDetails,
 	CourseFormContext,
 	CourseFormMeta,
+	CourseManageContext,
 	Resource,
 	SessionUser,
 } from '@/types'
@@ -94,6 +109,15 @@ const courseResource = createDocumentResource({
 	name: props.course.data?.name,
 	auto: true,
 }) as Resource<LMSCourse | null>
+
+// Completion state for the course-setup checklist. The sections read it to
+// report progress (objective counts, caption coverage); the checklist panel in
+// the page header fetches its own copy, since it must work on every tab.
+const creationStatus = createResource({
+	url: 'lms.lms.course_creation.get_course_creation_status',
+	makeParams: () => ({ course: props.course.data?.name }),
+	auto: true,
+}) as Resource<CourseCreationStatus | null>
 
 // Set while the form is being populated from a server fetch so the resulting
 // field updates don't arm autosave (mirrors the lesson editor's load guard).
@@ -141,6 +165,49 @@ const courseFormContext: CourseFormContext = {
 	markDirty,
 }
 provide<CourseFormContext>('courseForm', courseFormContext)
+
+/**
+ * The authoring sections below the fold (audience, messages, captions, test
+ * video, promotions, access) came from the standalone course-setup wizard,
+ * which kept its own copy of the course document. They inject `courseManage`
+ * rather than `courseForm`, so the tab republishes its own resource under that
+ * name — one document, one autosave, no second surface racing this one.
+ */
+function focusSection(id: string): void {
+	document.getElementById(id)?.scrollIntoView({ block: 'start' })
+}
+
+/**
+ * The course-setup checklist links here with `?focus=<section id>`. The tab
+ * renders a skeleton until the document loads, so the scroll waits for the
+ * section to actually exist rather than firing into an empty page. The param
+ * is then dropped: it describes one arrival, and leaving it in the URL would
+ * scroll the author back every time they returned to this tab.
+ */
+const route = useRoute()
+watch(
+	[() => route.query.focus, () => courseResource.doc],
+	async ([focus, doc]) => {
+		if (!focus || !doc) return
+		await nextTick()
+		focusSection(String(focus))
+		const { focus: _consumed, ...query } = route.query
+		router.replace({ query, hash: route.hash })
+	},
+	{ immediate: true }
+)
+
+provide<CourseManageContext>('courseManage', {
+	resource: courseResource,
+	status: creationStatus,
+	isDirty,
+	markDirty,
+	save: async () => {
+		submitCourse()
+	},
+	focusSection,
+})
+
 
 onMounted(() => {
 	if (!user.data?.is_moderator && !user.data?.is_instructor) {
@@ -301,5 +368,5 @@ const checkPermission = (): void => {
 	if (!isInstructor) router.push({ name: 'Courses' })
 }
 
-defineExpose({ isDirty, submitCourse, trashCourse, courseMenu })
+defineExpose({ isDirty, submitCourse, trashCourse, courseMenu, focusSection })
 </script>

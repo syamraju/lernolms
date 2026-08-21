@@ -163,16 +163,98 @@ export interface CourseCreationStatus {
 	description_words: number
 }
 
-/** What the manage shell provides to every step body. */
+/**
+ * What the Settings tab provides to the course-authoring sections mounted
+ * inside it.
+ *
+ * These sections used to be steps of a standalone creation wizard, each with
+ * its own copy of the course document. They now share the Settings tab's one
+ * resource, which is what stopped two surfaces racing to save the same fields.
+ */
 export interface CourseManageContext {
 	resource: Resource<LMSCourse | null>
 	status: Resource<CourseCreationStatus | null>
 	isDirty: Ref<boolean>
-	/** Queue an autosave; steps call this after mutating `resource.doc`. */
+	/** Queue an autosave; sections call this after mutating `resource.doc`. */
 	markDirty: () => void
 	/** Save now and resolve once the write lands. */
 	save: () => Promise<void>
-	goToStep: (key: string) => void
+	/** Scroll a sibling section of the Settings tab into view, by its id. */
+	focusSection: (id: string) => void
+}
+
+export type CurriculumItemType =
+	| 'Lecture'
+	| 'Quiz'
+	| 'Assignment'
+	| 'Coding Exercise'
+
+export type ResourceType =
+	| 'Downloadable File'
+	| 'External Resource'
+	| 'Source Code'
+
+export interface LessonResourceRow {
+	name: string
+	resource_type: ResourceType
+	title: string
+	file?: string | null
+	url?: string | null
+}
+
+/** One row in a section — a lecture, quiz, assignment or coding exercise. */
+export interface CurriculumItem {
+	name: string
+	title: string
+	item_type: CurriculumItemType
+	is_published: 0 | 1
+	duration_minutes?: number | null
+	video_duration?: number | null
+	description?: string | null
+	include_in_preview?: 0 | 1
+	/** Set only on the matching item_type; the backing document's name. */
+	quiz?: string | null
+	assignment?: string | null
+	exercise?: string | null
+	idx: number
+	resources: LessonResourceRow[]
+	has_video: boolean
+}
+
+export interface CurriculumSection {
+	name: string
+	title: string
+	learning_objective?: string | null
+	is_published: 0 | 1
+	is_scorm_package?: 0 | 1
+	idx: number
+	items: CurriculumItem[]
+}
+
+export interface QuizAnswer {
+	index?: number
+	option: string
+	is_correct: 0 | 1 | boolean
+	explanation?: string | null
+}
+
+export interface QuizQuestion {
+	name: string
+	question: string
+	type: string
+	multiple: 0 | 1
+	answers: QuizAnswer[]
+}
+
+export interface QuizDetail {
+	name: string
+	title: string
+	passing_percentage: number
+	total_marks: number
+	max_attempts?: number
+	show_answers: 0 | 1
+	shuffle_questions: 0 | 1
+	questions: QuizQuestion[]
 }
 
 export interface CourseInstructorRow {

@@ -55,14 +55,36 @@ export const routes = [
 			import('@/pages/Courses/Create/CourseCreateWizard.vue'),
 		meta: { noLayout: true },
 	},
+	// Registered before the '/courses/:courseName/manage/:step?' redirect so
+	// 'assignment' and 'exercise' are read as their own editors rather than as
+	// a legacy step named "assignment". Both are full-page editors with their
+	// own chrome.
 	{
-		// `:step?` keeps a bare /manage URL valid; the shell redirects it to the
-		// first step so a refresh always lands somewhere real.
-		path: '/courses/:courseName/manage/:step?',
-		name: 'CourseManage',
-		component: () => import('@/pages/Courses/Manage/CourseManage.vue'),
+		path: '/courses/:courseName/manage/assignment/:assignmentName',
+		name: 'CourseAssignmentEditor',
+		component: () => import('@/pages/Courses/Manage/AssignmentEditor.vue'),
 		props: true,
 		meta: { noLayout: true },
+	},
+	{
+		path: '/courses/:courseName/manage/exercise/:exerciseName',
+		name: 'CourseExerciseEditor',
+		component: () => import('@/pages/Courses/Manage/ExerciseEditor.vue'),
+		props: true,
+		meta: { noLayout: true },
+	},
+	{
+		// The standalone setup wizard that used to live here was folded into the
+		// course tabs — it had grown duplicate curriculum, landing-page, pricing
+		// and messages editors. Old links and bookmarks land on the course, with
+		// the checklist's own entry point in its header.
+		path: '/courses/:courseName/manage/:step?',
+		redirect: (to) => ({
+			name: 'CourseDetail',
+			params: { courseName: to.params.courseName },
+			hash: to.params.step === 'curriculum' ? '#editor' : '#settings',
+			query: to.params.step === 'curriculum' ? { view: 'curriculum' } : {},
+		}),
 	},
 	{
 		path: '/courses/:courseName',

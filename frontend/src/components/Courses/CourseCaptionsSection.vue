@@ -1,5 +1,8 @@
 <template>
-	<div class="space-y-6">
+	<section id="captions" class="scroll-mt-4 space-y-6 border-t pt-6">
+		<div class="text-base-semibold text-ink-gray-9">
+			{{ __('Captions') }}
+		</div>
 		<div class="flex flex-wrap items-center justify-between gap-3">
 			<div class="flex flex-wrap items-center gap-3">
 				<FormControl
@@ -141,7 +144,7 @@
 				</ul>
 			</section>
 		</div>
-	</div>
+	</section>
 </template>
 
 <script setup lang="ts">

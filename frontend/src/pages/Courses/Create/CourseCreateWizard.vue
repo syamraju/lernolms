@@ -324,9 +324,14 @@ async function createCourse() {
 			time_commitment: draft.time_commitment || null,
 		})
 		toast.success(__('Course created'))
+		// A brand-new course has nothing to edit yet, so land on Settings with
+		// the audience fields in view — the first thing the setup checklist
+		// asks for.
 		router.replace({
-			name: 'CourseManage',
-			params: { courseName, step: 'intended-learners' },
+			name: 'CourseDetail',
+			params: { courseName },
+			hash: '#settings',
+			query: { focus: 'audience' },
 		})
 	} catch (error) {
 		toast.error(errorMessage(error, __('Could not create the course')))

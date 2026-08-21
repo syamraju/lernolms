@@ -193,7 +193,7 @@ const MANIFEST: Record<string, Privacy[]> = {
 	// A caption track is fetched by the video player alongside the lecture, on
 	// the same terms as the poster image — it has to be readable without the
 	// player holding a session for the File itself.
-	'pages/Courses/Manage/StepCaptions.vue': ['public'],
+	'components/Courses/CourseCaptionsSection.vue': ['public'],
 	// Deliberately not readable by other users.
 	'components/Assignment.vue': ['private', 'private', 'private'],
 	'components/Modals/JobApplicationModal.vue': ['private'],
@@ -203,7 +203,14 @@ const MANIFEST: Record<string, Privacy[]> = {
 	// to its Course Lesson, so access follows the lesson's own permission —
 	// the same shape UploadPlugin uses for video dropped into a lesson body,
 	// and what keeps paid course content out of reach of a bare URL.
-	'pages/Courses/Manage/StepCurriculum.vue': ['private'],
+	// Two uploaders. The scanner groups by tag, not document position, so the
+	// FileUploader (the lecture video) is listed before the RichTextEditor (the
+	// item's description, `undeclared` like every other one).
+	'components/Curriculum/CurriculumItemBody.vue': ['private', 'undeclared'],
+	// Course materials a learner downloads: worksheets, source bundles. Private
+	// and attached to the lesson for the same reason as the video — they are
+	// part of the paid content, not public collateral.
+	'components/Curriculum/ResourceList.vue': ['private'],
 	// Neither literal. `per-field` reads the field's own `public` flag and
 	// `computed` is any other expression. `undeclared` passes no uploadArgs at
 	// all — for a RichTextEditor that means private, because its uploadFile
@@ -226,11 +233,19 @@ const MANIFEST: Record<string, Privacy[]> = {
 	'pages/Forms/EmailTemplateForm.vue': ['undeclared'],
 	'pages/Forms/NewBatchForm.vue': ['undeclared'],
 	'components/Courses/CourseOverviewSection.vue': ['undeclared'],
-	// RichTextEditor bodies in the guided creation flow: the course description
-	// and the two automated course messages. Same standing caveat as the other
+	// RichTextEditor bodies across the guided creation and curriculum flows:
+	// the course description, the two automated course messages, a quiz
+	// question, the assignment's instructions/questions/solution, and the
+	// exercise's problem statement and hints. Same standing caveat as the other
 	// `undeclared` rows — a pasted image lands private.
-	'pages/Courses/Manage/StepLandingPage.vue': ['undeclared'],
-	'pages/Courses/Manage/StepMessages.vue': ['undeclared', 'undeclared'],
+	'components/Courses/CourseMessagesSection.vue': ['undeclared', 'undeclared'],
+	'components/Curriculum/QuizBuilder.vue': ['undeclared'],
+	'pages/Courses/Manage/AssignmentEditor.vue': [
+		'undeclared',
+		'undeclared',
+		'undeclared',
+	],
+	'pages/Courses/Manage/ExerciseEditor.vue': ['undeclared', 'undeclared'],
 	'pages/Forms/NewCourseForm.vue': ['undeclared'],
 	'pages/JobApplications.vue': ['undeclared'],
 	'pages/Forms/JobForm.vue': ['undeclared'],

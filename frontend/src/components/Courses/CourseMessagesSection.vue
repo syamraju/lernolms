@@ -1,14 +1,19 @@
 <template>
-	<div class="space-y-8">
-		<p class="text-p-base text-ink-gray-7">
-			{{
-				__(
-					'Write optional messages that are sent automatically when a learner joins or completes your course. Leave a box blank to send nothing.'
-				)
-			}}
-		</p>
+	<section id="messages" class="scroll-mt-4 space-y-8 border-t pt-6">
+		<div>
+			<div class="text-base-semibold text-ink-gray-9">
+				{{ __('Course messages') }}
+			</div>
+			<p class="mt-1 text-p-base text-ink-gray-6">
+				{{
+					__(
+						'Sent automatically when a learner joins or completes the course. Leave a box blank to send nothing.'
+					)
+				}}
+			</p>
+		</div>
 
-		<section class="space-y-1.5">
+		<div class="space-y-1.5">
 			<InputLabel
 				:id="welcomeLabelId"
 				:for-id="welcomeId"
@@ -29,9 +34,9 @@
 					)
 				}}
 			</p>
-		</section>
+		</div>
 
-		<section class="space-y-1.5">
+		<div class="space-y-1.5">
 			<InputLabel
 				:id="congratsLabelId"
 				:for-id="congratsId"
@@ -52,8 +57,8 @@
 					)
 				}}
 			</p>
-		</section>
-	</div>
+		</div>
+	</section>
 </template>
 
 <script setup lang="ts">
