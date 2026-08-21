@@ -201,7 +201,10 @@ function save() {
 		error.value = __('Pick the date the repeat ends on.')
 		return
 	}
-	if (draft.value.repeat_ends === 'After' && Number(draft.value.repeat_count) < 1) {
+	if (
+		draft.value.repeat_ends === 'After' &&
+		Number(draft.value.repeat_count) < 1
+	) {
 		error.value = __('Set how many times the event repeats.')
 		return
 	}

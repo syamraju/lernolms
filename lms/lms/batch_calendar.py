@@ -154,15 +154,22 @@ def _evaluations(batch: str, start: str, end: str) -> list[dict]:
 			"member": ["in", members],
 			"date": ["between", [start, end]],
 		},
-		fields=["name", "member", "member_name", "course", "date", "start_time", "end_time", "google_meet_link"],
+		fields=[
+			"name",
+			"member",
+			"member_name",
+			"course",
+			"date",
+			"start_time",
+			"end_time",
+			"google_meet_link",
+		],
 		order_by="date asc, start_time asc",
 	)
 	return [
 		_entry(
 			"evaluation",
-			_("Evaluation: {0}").format(
-				frappe.db.get_value("LMS Course", row.course, "title") or row.course
-			),
+			_("Evaluation: {0}").format(frappe.db.get_value("LMS Course", row.course, "title") or row.course),
 			row.date,
 			start_time=row.start_time,
 			end_time=row.end_time,
@@ -270,9 +277,7 @@ def get_my_calendar(start: str, end: str) -> list[dict]:
 
 	titles = {
 		row.name: row.title
-		for row in frappe.get_all(
-			"LMS Batch", filters={"name": ["in", batches]}, fields=["name", "title"]
-		)
+		for row in frappe.get_all("LMS Batch", filters={"name": ["in", batches]}, fields=["name", "title"])
 	}
 
 	events = []

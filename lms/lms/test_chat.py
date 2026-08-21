@@ -26,7 +26,10 @@ from lms.lms.test_batch_access import _batch, _user
 
 def _channel(batch: str, title: str):
 	return frappe.db.get_value(
-		"LMS Chat Channel", {"batch": batch, "title": title}, ["name", "batch", "audience", "post_permission", "is_archived"], as_dict=True
+		"LMS Chat Channel",
+		{"batch": batch, "title": title},
+		["name", "batch", "audience", "post_permission", "is_archived"],
+		as_dict=True,
 	)
 
 
@@ -43,9 +46,9 @@ class ChatTestCase(FrappeTestCase):
 	def _enrol(self, email):
 		user = _user(email, ["LMS Student"])
 		frappe.set_user(self.moderator)
-		frappe.get_doc(
-			{"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": user}
-		).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": user}).insert(
+			ignore_permissions=True
+		)
 		return user
 
 
@@ -54,9 +57,7 @@ class TestSeeding(ChatTestCase):
 	batch_title = "Chat Seed Cohort"
 
 	def test_a_new_batch_gets_three_channels(self):
-		titles = frappe.get_all(
-			"LMS Chat Channel", filters={"batch": self.batch}, pluck="title"
-		)
+		titles = frappe.get_all("LMS Chat Channel", filters={"batch": self.batch}, pluck="title")
 		self.assertIn("announcements", titles)
 		self.assertIn("general", titles)
 		self.assertIn("staff-room", titles)
@@ -298,9 +299,7 @@ class TestRestDoor(ChatTestCase):
 		student = self._enrol("chat-restdoor-student@example.com")
 
 		frappe.set_user(student)
-		self.assertNotIn(
-			channel, frappe.get_list("LMS Chat Channel", pluck="name", limit_page_length=0)
-		)
+		self.assertNotIn(channel, frappe.get_list("LMS Chat Channel", pluck="name", limit_page_length=0))
 		self.assertFalse(frappe.has_permission("LMS Chat Channel", "read", doc=channel))
 
 	def test_a_student_cannot_list_another_cohorts_messages(self):
@@ -308,9 +307,7 @@ class TestRestDoor(ChatTestCase):
 		student = self._enrol("chat-restdoor-reader@example.com")
 
 		frappe.set_user(student)
-		self.assertNotIn(
-			message, frappe.get_list("LMS Chat Message", pluck="name", limit_page_length=0)
-		)
+		self.assertNotIn(message, frappe.get_list("LMS Chat Message", pluck="name", limit_page_length=0))
 		self.assertFalse(frappe.has_permission("LMS Chat Message", "read", doc=message))
 
 	def test_a_student_cannot_edit_someone_elses_message(self):

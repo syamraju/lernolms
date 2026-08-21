@@ -37,7 +37,9 @@
 					<ul class="list-disc ps-5 space-y-1">
 						<li v-if="counts.existing">
 							{{
-								__('{0} existing users will be invited.').format(counts.existing)
+								__('{0} existing users will be invited.').format(
+									counts.existing
+								)
 							}}
 						</li>
 						<li v-if="counts.new" class="font-medium text-ink-gray-9">
@@ -76,7 +78,9 @@
 						class="flex items-center justify-between px-3 py-2 text-sm"
 					>
 						<span class="truncate text-ink-gray-8">
-							{{ row.full_name ? `${row.full_name} · ${row.email}` : row.email }}
+							{{
+								row.full_name ? `${row.full_name} · ${row.email}` : row.email
+							}}
 						</span>
 						<Badge :theme="verdictTheme(row.verdict)">
 							{{ verdictLabel(row.verdict) }}

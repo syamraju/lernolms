@@ -115,7 +115,10 @@
 								"
 								@click="openFileSelector"
 							/>
-							<span v-if="draft.file" class="truncate text-p-sm text-ink-gray-6">
+							<span
+								v-if="draft.file"
+								class="truncate text-p-sm text-ink-gray-6"
+							>
 								{{ draft.file_name }}
 							</span>
 						</div>
@@ -134,7 +137,12 @@
 			</div>
 		</div>
 
-		<Button v-else variant="outline" :label="__('Resources')" @click="adding = true">
+		<Button
+			v-else
+			variant="outline"
+			:label="__('Resources')"
+			@click="adding = true"
+		>
 			<template #prefix>
 				<span class="lucide-plus size-4" />
 			</template>
@@ -184,7 +192,9 @@ const grouped = computed(() => ({
 	downloads: props.resources.filter(
 		(row) => row.resource_type !== 'External Resource'
 	),
-	links: props.resources.filter((row) => row.resource_type === 'External Resource'),
+	links: props.resources.filter(
+		(row) => row.resource_type === 'External Resource'
+	),
 }))
 
 const canSave = computed(() => {
@@ -226,7 +236,8 @@ async function submit() {
 			resource_type: draft.resource_type,
 			title: draft.title.trim(),
 			file: draft.resource_type === 'External Resource' ? null : draft.file,
-			url: draft.resource_type === 'External Resource' ? draft.url.trim() : null,
+			url:
+				draft.resource_type === 'External Resource' ? draft.url.trim() : null,
 		})
 		emit('changed', rows as LessonResourceRow[])
 		cancel()

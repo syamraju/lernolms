@@ -24,35 +24,25 @@ class TestComputeLockedSections(FrappeTestCase):
 		self.assertEqual(locked, set())
 
 	def test_a_later_section_waits_for_the_one_before_it(self):
-		locked = compute_locked_sections(
-			rows(("C1", ["L1", "L2"]), ("C2", ["L3", "L4"])), {"L1"}
-		)
+		locked = compute_locked_sections(rows(("C1", ["L1", "L2"]), ("C2", ["L3", "L4"])), {"L1"})
 		self.assertEqual(locked, {"L3", "L4"})
 
 	def test_finishing_a_section_opens_the_next(self):
-		locked = compute_locked_sections(
-			rows(("C1", ["L1", "L2"]), ("C2", ["L3", "L4"])), {"L1", "L2"}
-		)
+		locked = compute_locked_sections(rows(("C1", ["L1", "L2"]), ("C2", ["L3", "L4"])), {"L1", "L2"})
 		self.assertEqual(locked, set())
 
 	def test_everything_after_the_open_section_is_locked(self):
-		locked = compute_locked_sections(
-			rows(("C1", ["L1"]), ("C2", ["L2"]), ("C3", ["L3"])), set()
-		)
+		locked = compute_locked_sections(rows(("C1", ["L1"]), ("C2", ["L2"]), ("C3", ["L3"])), set())
 		self.assertEqual(locked, {"L2", "L3"})
 
 	# Switching the setting on mid-cohort must not take back work already done,
 	# the same courtesy the lesson rule extends.
 	def test_a_lesson_already_completed_stays_open(self):
-		locked = compute_locked_sections(
-			rows(("C1", ["L1"]), ("C2", ["L2", "L3"])), {"L3"}
-		)
+		locked = compute_locked_sections(rows(("C1", ["L1"]), ("C2", ["L2", "L3"])), {"L3"})
 		self.assertEqual(locked, {"L2"})
 
 	def test_all_complete_locks_nothing(self):
-		locked = compute_locked_sections(
-			rows(("C1", ["L1"]), ("C2", ["L2"])), {"L1", "L2"}
-		)
+		locked = compute_locked_sections(rows(("C1", ["L1"]), ("C2", ["L2"])), {"L1", "L2"})
 		self.assertEqual(locked, set())
 
 	def test_an_empty_course_locks_nothing(self):

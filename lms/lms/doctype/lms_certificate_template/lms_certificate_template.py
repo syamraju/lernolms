@@ -29,9 +29,7 @@ class LMSCertificateTemplate(Document):
 		if self.reference_doctype not in REFERENCE_DOCTYPES:
 			frappe.throw(_("{0} does not have certificates.").format(self.reference_doctype))
 		if not frappe.db.exists(self.reference_doctype, self.reference_name):
-			frappe.throw(
-				_("{0} {1} does not exist.").format(_(self.reference_doctype), self.reference_name)
-			)
+			frappe.throw(_("{0} {1} does not exist.").format(_(self.reference_doctype), self.reference_name))
 
 	def validate_one_template_per_reference(self):
 		"""A course or program owns exactly one certificate design.

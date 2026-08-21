@@ -109,7 +109,11 @@ class LMSAppointment(Document):
 
 		windows = frappe.get_all(
 			"LMS Availability Slot",
-			filters={"parent": availability.name, "parenttype": "LMS Instructor Availability", "day": self.day},
+			filters={
+				"parent": availability.name,
+				"parenttype": "LMS Instructor Availability",
+				"day": self.day,
+			},
 			fields=["start_time", "end_time"],
 		)
 		for window in windows:

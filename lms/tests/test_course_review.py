@@ -183,9 +183,7 @@ class TestCourseReview(BaseTestUtils):
 		# image) would test the thresholds instead.
 		frappe.set_user(self.author.email)
 		ready = {"blockers": [], "status": "In Progress"}
-		with patch(
-			"lms.lms.course_creation.get_course_creation_status", return_value=ready
-		):
+		with patch("lms.lms.course_creation.get_course_creation_status", return_value=ready):
 			submit_course_for_review(self.course.name)
 
 		status = self._status()
@@ -199,9 +197,7 @@ class TestCourseReview(BaseTestUtils):
 
 		frappe.set_user(self.author.email)
 		ready = {"blockers": [], "status": "In Progress"}
-		with patch(
-			"lms.lms.course_creation.get_course_creation_status", return_value=ready
-		):
+		with patch("lms.lms.course_creation.get_course_creation_status", return_value=ready):
 			submit_course_for_review(self.course.name)
 
 		told = frappe.get_all(

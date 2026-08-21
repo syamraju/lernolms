@@ -46,10 +46,7 @@
 				v-if="isNew"
 				class="learno-tag absolute start-[7px] top-[7px] bg-white/90 text-[#1f1f1f] backdrop-blur"
 			>
-				<span
-					class="lucide-star size-3 text-[#ffc800]"
-					aria-hidden="true"
-				/>
+				<span class="lucide-star size-3 text-[#ffc800]" aria-hidden="true" />
 				{{ __('New Course') }}
 			</span>
 

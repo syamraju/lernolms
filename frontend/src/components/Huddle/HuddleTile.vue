@@ -29,7 +29,9 @@
 			/>
 		</div>
 
-		<div class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-2">
+		<div
+			class="pointer-events-none absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-2"
+		>
 			<span
 				class="max-w-[70%] truncate rounded-[var(--learno-r-sm)] bg-black/55 px-2 py-1 text-[12px] font-medium text-white"
 			>
@@ -66,7 +68,9 @@ const props = defineProps<{
 const videoEl = ref<HTMLVideoElement | null>(null)
 
 const showsVideo = computed(
-	() => (props.participant.video || props.participant.screensharing) && !!props.stream
+	() =>
+		(props.participant.video || props.participant.screensharing) &&
+		!!props.stream
 )
 
 const speakingRing = computed(() =>

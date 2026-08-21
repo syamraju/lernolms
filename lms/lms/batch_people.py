@@ -99,9 +99,7 @@ def get_batch_people(batch: str) -> list[dict]:
 					"enabled": bool(person.enabled),
 					"last_active": person.last_active,
 					"never_signed_in": not person.last_active,
-					"must_reset_password": bool(
-						frappe.db.get_value("User", email, "must_reset_password")
-					),
+					"must_reset_password": bool(frappe.db.get_value("User", email, "must_reset_password")),
 					"enrollment": enrollments.get(email, {}).get("name"),
 					"confirmation_email_sent": bool(
 						enrollments.get(email, {}).get("confirmation_email_sent")

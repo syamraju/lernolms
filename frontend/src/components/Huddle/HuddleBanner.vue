@@ -30,7 +30,9 @@
 		</span>
 
 		<div class="min-w-0 flex-1">
-			<p class="truncate text-[13px] font-medium text-[var(--learno-ink-strong)]">
+			<p
+				class="truncate text-[13px] font-medium text-[var(--learno-ink-strong)]"
+			>
 				{{ __('Call in progress') }}
 			</p>
 			<p class="truncate text-[11px] text-[var(--learno-ink-subtle)]">
@@ -50,7 +52,10 @@ import { Button } from 'frappe-ui'
 import { Headphones } from 'lucide-vue-next'
 
 const props = defineProps<{
-	active?: { participant_count: number; participants: { full_name: string }[] } | null
+	active?: {
+		participant_count: number
+		participants: { full_name: string }[]
+	} | null
 	inThisCall?: boolean
 }>()
 

@@ -116,7 +116,6 @@ interface CouponRow {
 	enabled?: 0 | 1
 }
 
-
 const { doc, focusSection } = useCourseManage()
 
 // Coupon items are a child table keyed by (reference_doctype, reference_name),

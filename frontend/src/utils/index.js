@@ -136,7 +136,7 @@ const INLINE_TOOLBAR_ORDER = [
 export function getEditorTools(
 	isInstructorEditor = false,
 	uploadContext = {},
-	{ studentView = false } = {},
+	{ studentView = false } = {}
 ) {
 	return {
 		header: {
@@ -685,13 +685,13 @@ const checkIfCanAddProgram = (forMobile = false) => {
 export function getFormattedDateRange(
 	startDate,
 	endDate,
-	format = 'DD MMM YYYY',
+	format = 'DD MMM YYYY'
 ) {
 	if (startDate === endDate) {
 		return dayjs(startDate).format(format)
 	}
 	return `${dayjs(startDate).format(format)} - ${dayjs(endDate).format(
-		format,
+		format
 	)}`
 }
 
@@ -723,14 +723,14 @@ export function singularize(word) {
 	}
 	return word.replace(
 		new RegExp(`(${Object.keys(endings).join('|')})$`),
-		(r) => endings[r],
+		(r) => endings[r]
 	)
 }
 
 export const validateFile = async (
 	file,
 	showToast = true,
-	fileType = 'image',
+	fileType = 'image'
 ) => {
 	const extension = file.name.split('.').pop().toLowerCase()
 	const error = (msg) => {
@@ -743,7 +743,7 @@ export const validateFile = async (
 		return error(__('Only PDF files are allowed.'))
 	} else if (fileType == 'document' && !['doc', 'docx'].includes(extension)) {
 		return error(
-			__('Only document file of type .doc or .docx are allowed.'),
+			__('Only document file of type .doc or .docx are allowed.')
 		)
 	} else if (fileType == 'zip' && extension != 'zip') {
 		return error(__('Only ZIP files are allowed.'))
@@ -868,8 +868,7 @@ export const createLMSCategory = (name) => {
 		})
 		.catch((err) => {
 			toast.error(
-				cleanError(err.messages?.[0]) ||
-					__('Unable to create category'),
+				cleanError(err.messages?.[0]) || __('Unable to create category')
 			)
 		})
 }
@@ -992,7 +991,7 @@ const wrapRangeInHighlight = (
 	{ node, startIndex, endIndex },
 	color,
 	name,
-	scrollIntoView,
+	scrollIntoView
 ) => {
 	const range = document.createRange()
 	range.setStart(node, startIndex)

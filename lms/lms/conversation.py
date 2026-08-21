@@ -163,9 +163,7 @@ def channel_audience(channel: str) -> list:
 	"""
 	from lms.lms.chat import can_access_channel
 
-	row = frappe.db.get_value(
-		"LMS Chat Channel", channel, ["name", "batch", "audience"], as_dict=True
-	)
+	row = frappe.db.get_value("LMS Chat Channel", channel, ["name", "batch", "audience"], as_dict=True)
 	if not row:
 		frappe.throw(_("Channel not found."), frappe.DoesNotExistError)
 
@@ -212,9 +210,7 @@ def assert_access(conversation: str) -> list:
 		# A DM needs a reason to exist beyond one party having typed the other's
 		# address into the id.
 		if kind == "dm" and not dm_allowed(people):
-			frappe.throw(
-				_("You can only message people you share a batch with."), frappe.PermissionError
-			)
+			frappe.throw(_("You can only message people you share a batch with."), frappe.PermissionError)
 		return people
 
 	# Staff can drop into a shared conversation to help -- their presence shows

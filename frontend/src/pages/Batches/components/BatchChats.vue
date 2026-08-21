@@ -68,7 +68,10 @@
 						<div class="font-semibold text-ink-gray-9 truncate">
 							# {{ activeChannel.title }}
 						</div>
-						<div v-if="activeChannel.description" class="text-sm text-ink-gray-6">
+						<div
+							v-if="activeChannel.description"
+							class="text-sm text-ink-gray-6"
+						>
 							{{ activeChannel.description }}
 						</div>
 					</div>
@@ -76,7 +79,9 @@
 						<Badge v-if="activeChannel.is_archived" theme="orange">
 							{{ __('Archived') }}
 						</Badge>
-						<Badge theme="gray">{{ audienceLabel(activeChannel.audience) }}</Badge>
+						<Badge theme="gray">{{
+							audienceLabel(activeChannel.audience)
+						}}</Badge>
 					</div>
 				</header>
 
@@ -159,10 +164,7 @@
 			</section>
 		</div>
 
-		<Dialog
-			v-model="showNewChannel"
-			:options="{ title: __('New channel') }"
-		>
+		<Dialog v-model="showNewChannel" :options="{ title: __('New channel') }">
 			<template #body-content>
 				<div class="space-y-4">
 					<FormControl

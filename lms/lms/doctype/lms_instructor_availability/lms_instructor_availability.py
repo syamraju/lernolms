@@ -33,7 +33,8 @@ class LMSInstructorAvailability(Document):
 		created from the desk too.
 		"""
 		if frappe.db.exists(
-			"Course Instructor", {"parent": self.course, "parenttype": "LMS Course", "instructor": self.instructor}
+			"Course Instructor",
+			{"parent": self.course, "parenttype": "LMS Course", "instructor": self.instructor},
 		):
 			return
 
@@ -64,9 +65,7 @@ class LMSInstructorAvailability(Document):
 			end = get_time(row.end_time)
 
 			if start >= end:
-				frappe.throw(
-					_("Row {0}: the end time must be after the start time.").format(row.idx)
-				)
+				frappe.throw(_("Row {0}: the end time must be after the start time.").format(row.idx))
 
 			# A window shorter than one slot can never be booked, which reads as
 			# "my availability does not work" rather than as a mistake.
@@ -82,9 +81,7 @@ class LMSInstructorAvailability(Document):
 				if other_day != row.day:
 					continue
 				if start < other_end and other_start < end:
-					frappe.throw(
-						_("Row {0} overlaps row {1} on {2}.").format(row.idx, other_idx, row.day)
-					)
+					frappe.throw(_("Row {0} overlaps row {1} on {2}.").format(row.idx, other_idx, row.day))
 
 			seen.append((row.day, start, end, row.idx))
 

@@ -29,9 +29,9 @@ from lms.lms.conversation import (
 	dm_like_patterns,
 	dm_peer,
 	parse,
+	user_card,
 )
 from lms.lms.conversation import title as conversation_title
-from lms.lms.conversation import user_card
 
 EVENT_MESSAGE = "lms_direct_message"
 
@@ -193,9 +193,7 @@ def get_people(search: str | None = None, limit: int | str = 25) -> list:
 		return []
 
 	filters = {"name": ["in", list(people)], "enabled": 1}
-	or_filters = (
-		{"full_name": ["like", f"%{search}%"], "name": ["like", f"%{search}%"]} if search else None
-	)
+	or_filters = {"full_name": ["like", f"%{search}%"], "name": ["like", f"%{search}%"]} if search else None
 
 	return frappe.get_all(
 		"User",

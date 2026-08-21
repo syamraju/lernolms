@@ -116,9 +116,7 @@ const REQUIREMENT_PLACEHOLDERS = [
 ]
 
 const LEARNER_PLACEHOLDERS = [
-	__(
-		'Example: Beginner photographers curious about landscape work'
-	),
+	__('Example: Beginner photographers curious about landscape work'),
 ]
 
 const { doc, markDirty } = useCourseManage()
@@ -130,7 +128,10 @@ const objectiveCount = computed(
 		).length
 )
 
-type ObjectiveField = 'learning_objectives' | 'requirements' | 'intended_learners'
+type ObjectiveField =
+	| 'learning_objectives'
+	| 'requirements'
+	| 'intended_learners'
 
 function setRows(field: ObjectiveField, rows: LMSCourseObjective[]) {
 	const target = doc.value as LMSCourse

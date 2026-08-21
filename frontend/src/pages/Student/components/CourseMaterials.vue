@@ -148,6 +148,8 @@ function formatSize(bytes?: number) {
 		value /= 1000
 		index += 1
 	}
-	return `${value < 10 && index > 0 ? value.toFixed(1) : Math.round(value)} ${units[index]}`
+	return `${value < 10 && index > 0 ? value.toFixed(1) : Math.round(value)} ${
+		units[index]
+	}`
 }
 </script>

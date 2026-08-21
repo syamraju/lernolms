@@ -10,7 +10,11 @@
 		<section
 			v-if="huddle.active.value"
 			class="fixed bottom-4 end-4 z-40 flex flex-col overflow-hidden rounded-[var(--learno-r-lg)] border border-[var(--learno-line)] bg-white shadow-[0_18px_40px_rgba(16,24,40,0.18)]"
-			:class="expanded ? 'w-[min(680px,calc(100vw-2rem))]' : 'w-[min(320px,calc(100vw-2rem))]'"
+			:class="
+				expanded
+					? 'w-[min(680px,calc(100vw-2rem))]'
+					: 'w-[min(320px,calc(100vw-2rem))]'
+			"
 			role="region"
 			:aria-label="__('Call')"
 		>
@@ -29,7 +33,9 @@
 				</span>
 
 				<div class="min-w-0 flex-1">
-					<p class="truncate text-[13px] font-semibold text-[var(--learno-ink-strong)]">
+					<p
+						class="truncate text-[13px] font-semibold text-[var(--learno-ink-strong)]"
+					>
 						{{ title || __('Call') }}
 					</p>
 					<p class="text-[11px] text-[var(--learno-ink-subtle)]">

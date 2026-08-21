@@ -47,10 +47,7 @@
 					:aria-expanded="railOpen"
 					@click="railOpen = !railOpen"
 				>
-					<span
-						class="lucide-panel-left size-4 shrink-0"
-						aria-hidden="true"
-					/>
+					<span class="lucide-panel-left size-4 shrink-0" aria-hidden="true" />
 					<span v-if="railOpen">{{ __('Hide Sessions') }}</span>
 				</button>
 
@@ -90,7 +87,7 @@
 														chapterNumber: String(item.number).split('-')[0],
 														lessonNumber: String(item.number).split('-')[1],
 													},
-												}
+											  }
 									"
 									class="flex flex-col gap-1 rounded-e-[6px] border-s-2 px-3 py-2 transition"
 									:class="rowClass(item)"
@@ -101,8 +98,8 @@
 												item.locked
 													? 'lucide-lock'
 													: item.is_complete
-														? 'lucide-circle-check-big'
-														: 'lucide-circle',
+													? 'lucide-circle-check-big'
+													: 'lucide-circle',
 												'size-3 shrink-0',
 											]"
 											aria-hidden="true"
@@ -126,7 +123,9 @@
 				class="learno-scroll min-w-0 flex-1 overflow-y-auto bg-[var(--learno-canvas)]"
 			>
 				<div v-if="lesson.loading && !lesson.data" class="p-8">
-					<div class="h-[420px] animate-pulse rounded-[var(--learno-r-lg)] bg-black/5" />
+					<div
+						class="h-[420px] animate-pulse rounded-[var(--learno-r-lg)] bg-black/5"
+					/>
 				</div>
 
 				<div
@@ -182,9 +181,7 @@
 					</div>
 
 					<div class="mb-5 flex flex-wrap items-center justify-between gap-4">
-						<h1
-							class="text-[24px] font-semibold text-[var(--learno-primary)]"
-						>
+						<h1 class="text-[24px] font-semibold text-[var(--learno-primary)]">
 							{{ lesson.data.title }}
 						</h1>
 
@@ -305,7 +302,12 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { createListResource, createResource, toast, usePageMeta } from 'frappe-ui'
+import {
+	createListResource,
+	createResource,
+	toast,
+	usePageMeta,
+} from 'frappe-ui'
 import { extractYoutubeID } from '@/utils/lessonMacros'
 import { completionBlockerMessage } from '@/utils/lessonProgress'
 import LessonBody from '@/pages/Student/components/LessonBody.vue'

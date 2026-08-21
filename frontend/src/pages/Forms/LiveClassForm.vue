@@ -265,8 +265,8 @@ const submitLiveClass = () => {
 		conferencingProvider.value === HUDDLE_PROVIDER
 			? createHuddleLiveClass
 			: conferencingProvider.value === 'Google Meet'
-				? createGoogleMeetLiveClass
-				: createLiveClass
+			? createGoogleMeetLiveClass
+			: createLiveClass
 	return submitResource(resource, liveClass, {
 		// NOTE: carried over verbatim — the return value is discarded, so
 		// validateFormFields() has never actually blocked a submit. Fixing it

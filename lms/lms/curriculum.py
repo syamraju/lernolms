@@ -267,9 +267,7 @@ def set_section_published(chapter: str, published: bool) -> list[dict]:
 	if published:
 		lessons = frappe.get_all("Lesson Reference", filters={"parent": chapter}, pluck="lesson")
 		visible = [
-			lesson
-			for lesson in lessons
-			if cint(frappe.db.get_value("Course Lesson", lesson, "is_published"))
+			lesson for lesson in lessons if cint(frappe.db.get_value("Course Lesson", lesson, "is_published"))
 		]
 		if not visible:
 			frappe.throw(_("Publish at least one item in this section before publishing the section."))
@@ -572,9 +570,7 @@ def add_lesson_resource(
 		url = None
 
 	doc = frappe.get_doc("Course Lesson", lesson)
-	doc.append(
-		"resources", {"resource_type": resource_type, "title": title, "file": file, "url": url}
-	)
+	doc.append("resources", {"resource_type": resource_type, "title": title, "file": file, "url": url})
 	doc.save()
 	return get_lesson_resources(lesson)
 
@@ -685,9 +681,7 @@ LIBRARY_MAX_LIMIT = 50
 
 
 @frappe.whitelist()
-def list_quiz_library(
-	course: str | None = None, search: str | None = None, limit: int = 20
-) -> list[dict]:
+def list_quiz_library(course: str | None = None, search: str | None = None, limit: int = 20) -> list[dict]:
 	"""Quizzes the session user may place in a course.
 
 	Backs the "use an existing quiz" picker. Standalone quizzes — the ones
@@ -842,9 +836,7 @@ def update_quiz_settings(quiz: str, **values) -> dict:
 			# The two types take different questions — one has answers, the other has
 			# nothing to compare against. Switching would silently invalidate every
 			# question already written, so an author has to clear them first.
-			frappe.throw(
-				_("Remove the questions before changing the quiz type. They do not carry across.")
-			)
+			frappe.throw(_("Remove the questions before changing the quiz type. They do not carry across."))
 		updates["quiz_type"] = requested
 
 	doc.update(updates)
@@ -877,6 +869,7 @@ def get_quiz(quiz: str) -> dict:
 			if row.question
 		],
 	}
+
 
 MAX_QUESTION_MARKS = 100
 

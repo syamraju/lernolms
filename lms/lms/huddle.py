@@ -29,8 +29,8 @@ import frappe
 from frappe import _
 from frappe.utils import cint
 
-from lms.lms.direct_message import post_system_message
 from lms.lms.conversation import assert_access, audience, can_access, parse, user_card
+from lms.lms.direct_message import post_system_message
 
 # --- storage -----------------------------------------------------------------
 

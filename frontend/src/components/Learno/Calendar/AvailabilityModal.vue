@@ -24,7 +24,10 @@
 		@update:open="$emit('update:open', $event)"
 		@save="save"
 	>
-		<div v-if="courses.loading" class="py-10 text-center text-[13px] text-[var(--learno-ink-subtle)]">
+		<div
+			v-if="courses.loading"
+			class="py-10 text-center text-[13px] text-[var(--learno-ink-subtle)]"
+		>
 			{{ __('Loading your courses…') }}
 		</div>
 
@@ -44,7 +47,11 @@
 					v-model="selectedCourse"
 					class="w-full rounded-[var(--learno-r-sm)] border border-[var(--learno-line)] px-4 py-3 text-[14px]"
 				>
-					<option v-for="course in courses.data" :key="course.name" :value="course.name">
+					<option
+						v-for="course in courses.data"
+						:key="course.name"
+						:value="course.name"
+					>
 						{{ course.title }}
 					</option>
 				</select>
@@ -52,14 +59,20 @@
 
 			<div class="flex flex-wrap items-end gap-6">
 				<div>
-					<label class="mb-1.5 block text-[12px] text-[var(--learno-ink-muted)]">
+					<label
+						class="mb-1.5 block text-[12px] text-[var(--learno-ink-muted)]"
+					>
 						{{ __('Session length') }}
 					</label>
 					<select
 						v-model.number="form.slot_duration"
 						class="w-[160px] rounded-[var(--learno-r-sm)] border border-[var(--learno-line)] px-4 py-2.5 text-[14px]"
 					>
-						<option v-for="minutes in [15, 20, 30, 45, 60, 90]" :key="minutes" :value="minutes">
+						<option
+							v-for="minutes in [15, 20, 30, 45, 60, 90]"
+							:key="minutes"
+							:value="minutes"
+						>
 							{{ __('{0} minutes').format(minutes) }}
 						</option>
 					</select>
@@ -68,7 +81,9 @@
 				<label class="flex cursor-pointer items-center gap-3 pb-2">
 					<span
 						class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition"
-						:class="form.published ? 'bg-[var(--learno-primary)]' : 'bg-[#d9dbe3]'"
+						:class="
+							form.published ? 'bg-[var(--learno-primary)]' : 'bg-[#d9dbe3]'
+						"
 					>
 						<input v-model="form.published" type="checkbox" class="sr-only" />
 						<span
@@ -114,7 +129,9 @@
 							v-model="row.day"
 							class="w-[140px] rounded-[var(--learno-r-sm)] border border-[var(--learno-line)] px-3 py-2.5 text-[13px]"
 						>
-							<option v-for="day in DAYS" :key="day" :value="day">{{ day }}</option>
+							<option v-for="day in DAYS" :key="day" :value="day">
+								{{ day }}
+							</option>
 						</select>
 						<TimeSelect
 							v-model="row.start_time"
@@ -123,7 +140,9 @@
 							:step-minutes="15"
 							class="flex-1"
 						/>
-						<span class="text-[12px] text-[var(--learno-ink-muted)]">{{ __('to') }}</span>
+						<span class="text-[12px] text-[var(--learno-ink-muted)]">{{
+							__('to')
+						}}</span>
 						<TimeSelect
 							v-model="row.end_time"
 							:counterpart="row.start_time"
@@ -144,7 +163,9 @@
 			</div>
 
 			<div>
-				<p class="mb-3 text-[13px] font-semibold text-[var(--learno-ink-strong)]">
+				<p
+					class="mb-3 text-[13px] font-semibold text-[var(--learno-ink-strong)]"
+				>
 					{{ __('Time off') }}
 				</p>
 				<div class="flex flex-wrap items-center gap-3">
@@ -153,7 +174,9 @@
 						type="date"
 						class="rounded-[var(--learno-r-sm)] border border-[var(--learno-line)] px-3 py-2.5 text-[13px]"
 					/>
-					<span class="text-[12px] text-[var(--learno-ink-muted)]">{{ __('to') }}</span>
+					<span class="text-[12px] text-[var(--learno-ink-muted)]">{{
+						__('to')
+					}}</span>
 					<input
 						v-model="form.unavailable_to"
 						type="date"
@@ -169,11 +192,17 @@
 					</button>
 				</div>
 				<p class="mt-2 text-[11px] text-[var(--learno-ink-subtle)]">
-					{{ __('Slots inside this window are not offered. Existing bookings are unaffected.') }}
+					{{
+						__(
+							'Slots inside this window are not offered. Existing bookings are unaffected.'
+						)
+					}}
 				</p>
 			</div>
 
-			<p v-if="error" class="text-[12px] text-[#ea2b2b]" role="alert">{{ error }}</p>
+			<p v-if="error" class="text-[12px] text-[#ea2b2b]" role="alert">
+				{{ error }}
+			</p>
 		</div>
 	</LearnoDialog>
 </template>
@@ -216,7 +245,8 @@ const form = ref({
 const courses = createResource({
 	url: 'lms.lms.calendar_api.get_my_courses_for_availability',
 	onSuccess(data: any[]) {
-		if (!selectedCourse.value && data?.length) selectedCourse.value = data[0].name
+		if (!selectedCourse.value && data?.length)
+			selectedCourse.value = data[0].name
 	},
 })
 
@@ -233,7 +263,9 @@ watch(
 // Load whatever is already saved for the chosen course, so switching courses
 // shows that course's hours rather than carrying the previous one's over.
 watch([selectedCourse, () => courses.data], () => {
-	const row = (courses.data || []).find((c: any) => c.name === selectedCourse.value)
+	const row = (courses.data || []).find(
+		(c: any) => c.name === selectedCourse.value
+	)
 	if (!row) return
 
 	form.value = {
@@ -293,7 +325,8 @@ async function save() {
 		emit('saved')
 		emit('update:open', false)
 	} catch (e: any) {
-		error.value = e?.messages?.[0] || e?.message || __('Could not save your availability')
+		error.value =
+			e?.messages?.[0] || e?.message || __('Could not save your availability')
 	} finally {
 		busy.value = false
 	}

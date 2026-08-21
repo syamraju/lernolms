@@ -74,7 +74,9 @@ class TestSendMessage(ChatTestCase):
 		with patch("frappe.publish_realtime") as publish:
 			direct_message.send_message(self.dm, "hello")
 
-		notified = {c.kwargs["user"] for c in publish.call_args_list if c.args[0] == direct_message.EVENT_MESSAGE}
+		notified = {
+			c.kwargs["user"] for c in publish.call_args_list if c.args[0] == direct_message.EVENT_MESSAGE
+		}
 		self.assertEqual(notified, {self.alice, self.bob})
 
 	def test_content_is_stored_verbatim_rather_than_escaped(self):
@@ -215,9 +217,7 @@ class TestDmReachability(ChatTestCase):
 		# moment their batch is unenrolled.
 		direct_message.send_message(self.dm, "hello")
 		frappe.set_user("Administrator")
-		for name in frappe.get_all(
-			"LMS Batch Enrollment", filters={"batch": self.batch}, pluck="name"
-		):
+		for name in frappe.get_all("LMS Batch Enrollment", filters={"batch": self.batch}, pluck="name"):
 			frappe.delete_doc("LMS Batch Enrollment", name, force=True)
 		frappe.set_user(self.alice)
 
@@ -281,17 +281,13 @@ class TestRestDoor(ChatTestCase):
 		# agrees, which is the part that actually protects anyone.
 		victim = "dm:axb@example.com|someone@example.com"
 		pattern = f"dm:{like_literal('a_b@example.com')}|%"
-		matched = frappe.db.sql(
-			"SELECT %s LIKE %s ESCAPE '!'", (victim, pattern)
-		)[0][0]
+		matched = frappe.db.sql("SELECT %s LIKE %s ESCAPE '!'", (victim, pattern))[0][0]
 		self.assertEqual(matched, 0)
 
 	def test_the_real_address_still_matches(self):
 		mine = "dm:a_b@example.com|someone@example.com"
 		pattern = f"dm:{like_literal('a_b@example.com')}|%"
-		matched = frappe.db.sql(
-			"SELECT %s LIKE %s ESCAPE '!'", (mine, pattern)
-		)[0][0]
+		matched = frappe.db.sql("SELECT %s LIKE %s ESCAPE '!'", (mine, pattern))[0][0]
 		self.assertEqual(matched, 1)
 
 	def test_a_guest_query_matches_nothing_rather_than_everything(self):
@@ -341,18 +337,14 @@ class TestRestDoorLive(ChatTestCase):
 		# negative case returns zero rows either way.
 		direct_message.send_message(self.dm, "mine")
 
-		rows = frappe.get_list(
-			"LMS Direct Message", fields=["content"], limit_page_length=0
-		)
+		rows = frappe.get_list("LMS Direct Message", fields=["content"], limit_page_length=0)
 		self.assertEqual([r.content for r in rows], ["mine"])
 
 	def test_an_uninvolved_student_sees_nothing(self):
 		direct_message.send_message(self.dm, "private")
 		frappe.set_user(self.mallory)
 
-		self.assertEqual(
-			frappe.get_list("LMS Direct Message", fields=["content"], limit_page_length=0), []
-		)
+		self.assertEqual(frappe.get_list("LMS Direct Message", fields=["content"], limit_page_length=0), [])
 
 	def test_a_course_creator_sees_nothing(self):
 		# The original hole: Course Creator is an authoring role a user can hold
@@ -363,9 +355,7 @@ class TestRestDoorLive(ChatTestCase):
 		author = self._create_user("author.dm@example.com", "Author", "DM", ["Course Creator"]).name
 		frappe.set_user(author)
 
-		self.assertEqual(
-			frappe.get_list("LMS Direct Message", fields=["content"], limit_page_length=0), []
-		)
+		self.assertEqual(frappe.get_list("LMS Direct Message", fields=["content"], limit_page_length=0), [])
 
 	def test_a_read_cursor_is_not_visible_to_anyone_else(self):
 		# Less sensitive than a message, but it still says who has been talking
@@ -374,8 +364,6 @@ class TestRestDoorLive(ChatTestCase):
 		frappe.set_user(self.mallory)
 
 		self.assertEqual(
-			frappe.get_list(
-				"LMS Direct Message Read State", fields=["conversation"], limit_page_length=0
-			),
+			frappe.get_list("LMS Direct Message Read State", fields=["conversation"], limit_page_length=0),
 			[],
 		)

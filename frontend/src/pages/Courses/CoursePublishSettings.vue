@@ -279,7 +279,9 @@ const showPaymentsAppModal = ref<boolean>(false)
 const deadlineDescription = computed<string>(() => {
 	const days = Number(doc.value?.completion_deadline_days) || 0
 	if (!days) {
-		return __('Leave at 0 for no deadline — learners take as long as they need.')
+		return __(
+			'Leave at 0 for no deadline — learners take as long as they need.'
+		)
 	}
 	return __(
 		'Each learner has {0} day(s) from enrolling. After that their enrollment is marked overdue; nothing is taken away.'

@@ -19,10 +19,7 @@
 
 		<dl v-else class="space-y-4">
 			<div v-for="(item, index) in items" :key="index">
-				<dt
-					v-if="item.title"
-					class="text-p-base-medium text-ink-gray-9"
-				>
+				<dt v-if="item.title" class="text-p-base-medium text-ink-gray-9">
 					{{ item.title }}
 				</dt>
 				<dd class="text-p-base text-ink-gray-7">{{ item.body }}</dd>

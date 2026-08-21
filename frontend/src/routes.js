@@ -434,14 +434,18 @@ export const routes = [
 		path: '/programming-exercises/submissions',
 		name: 'ProgrammingExerciseSubmissions',
 		component: () =>
-			import('@/pages/ProgrammingExercises/ProgrammingExerciseSubmissions.vue'),
+			import(
+				'@/pages/ProgrammingExercises/ProgrammingExerciseSubmissions.vue'
+			),
 		props: true,
 	},
 	{
 		path: '/programming-exercises/:exerciseID/submission/:submissionID',
 		name: 'ProgrammingExerciseSubmission',
 		component: () =>
-			import('@/pages/ProgrammingExercises/ProgrammingExerciseSubmission.vue'),
+			import(
+				'@/pages/ProgrammingExercises/ProgrammingExerciseSubmission.vue'
+			),
 		props: true,
 	},
 	{

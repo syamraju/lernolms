@@ -80,7 +80,9 @@ const submit = async () => {
 
 	saving.value = true
 	try {
-		await call('lms.lms.user.set_own_password', { new_password: password.value })
+		await call('lms.lms.user.set_own_password', {
+			new_password: password.value,
+		})
 		// A full load, not a router push: `update_password` drops the other
 		// sessions and the app's boot state was fetched under the old one.
 		window.location.href = '/lms'

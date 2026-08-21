@@ -34,7 +34,10 @@
 			</div>
 		</div>
 
-		<div v-if="!people.data?.length" class="text-ink-gray-7 text-sm border rounded-lg p-6">
+		<div
+			v-if="!people.data?.length"
+			class="text-ink-gray-7 text-sm border rounded-lg p-6"
+		>
 			{{ __('Nobody has been added to this batch yet.') }}
 		</div>
 
@@ -44,7 +47,11 @@
 				:key="person.user"
 				class="flex items-center gap-3 px-4 py-3"
 			>
-				<Avatar :label="person.full_name" :image="person.user_image" size="lg" />
+				<Avatar
+					:label="person.full_name"
+					:image="person.user_image"
+					size="lg"
+				/>
 				<div class="min-w-0 flex-1">
 					<div class="text-ink-gray-8 font-medium truncate">
 						{{ person.full_name }}
@@ -60,9 +67,17 @@
 				<Badge v-else-if="person.never_signed_in" theme="gray">
 					{{ __('Never signed in') }}
 				</Badge>
-				<Dropdown v-if="menu(person).length" :options="menu(person)" placement="left">
+				<Dropdown
+					v-if="menu(person).length"
+					:options="menu(person)"
+					placement="left"
+				>
 					<template v-slot="{ open }">
-						<Button variant="ghost" :label="__('Actions')" :aria-expanded="open">
+						<Button
+							variant="ghost"
+							:label="__('Actions')"
+							:aria-expanded="open"
+						>
 							<template #icon>
 								<span class="lucide-ellipsis-vertical w-4 h-4" />
 							</template>

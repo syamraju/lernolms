@@ -31,8 +31,8 @@
 				editable && index === selectedIndex
 					? 'outline outline-2 outline-offset-1 outline-blue-500'
 					: editable
-					  ? 'outline-dashed outline-1 outline-outline-gray-3'
-					  : '',
+					? 'outline-dashed outline-1 outline-outline-gray-3'
+					: '',
 			]"
 			:style="elementStyle(element, scale)"
 			:aria-label="editable ? describe(element) : undefined"
@@ -145,14 +145,19 @@ function justifyClass(align: TextAlign) {
 }
 
 function text(element: CertificateElement): string {
-	const value = renderValue(element, props.variables, props.values, (raw, format) =>
-		dayjs(raw).format(format)
+	const value = renderValue(
+		element,
+		props.variables,
+		props.values,
+		(raw, format) => dayjs(raw).format(format)
 	)
 	if (value) return value
 	// An empty box in the editor is unclickable and looks like a bug. On the
 	// issued certificate the same element renders genuinely blank.
 	if (!props.editable) return ''
-	const label = props.variables.find((entry) => entry.key === element.variable)?.label
+	const label = props.variables.find(
+		(entry) => entry.key === element.variable
+	)?.label
 	return label || __('Empty')
 }
 
@@ -247,7 +252,12 @@ function startResize(event: PointerEvent, index: number) {
 
 // Dragging with a mouse is not the only way to place a field. Arrow keys move
 // the selected element a pixel at a time, ten with Shift.
-const NUDGE = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }
+const NUDGE = {
+	ArrowLeft: [-1, 0],
+	ArrowRight: [1, 0],
+	ArrowUp: [0, -1],
+	ArrowDown: [0, 1],
+}
 
 function onKeydown(event: KeyboardEvent, index: number) {
 	if (!props.editable) return

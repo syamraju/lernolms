@@ -160,7 +160,9 @@ def assert_can_post(channel) -> None:
 def seed_default_channels(batch: str) -> None:
 	"""Create the three standing channels for a new batch. Idempotent."""
 	for spec in DEFAULT_CHANNELS:
-		if frappe.db.exists("LMS Chat Channel", {"batch": batch, "title": spec["title"], "parent_channel": ["is", "not set"]}):
+		if frappe.db.exists(
+			"LMS Chat Channel", {"batch": batch, "title": spec["title"], "parent_channel": ["is", "not set"]}
+		):
 			continue
 		frappe.get_doc({"doctype": "LMS Chat Channel", "batch": batch, **spec}).insert(
 			ignore_permissions=True
@@ -371,9 +373,7 @@ def get_my_channels() -> list[dict]:
 
 	titles = {
 		row.name: row.title
-		for row in frappe.get_all(
-			"LMS Batch", filters={"name": ["in", batches]}, fields=["name", "title"]
-		)
+		for row in frappe.get_all("LMS Batch", filters={"name": ["in", batches]}, fields=["name", "title"])
 	}
 
 	out = []
@@ -422,12 +422,16 @@ def get_messages(channel: str, limit: int = 50, before: str = None) -> list[dict
 	)
 
 	senders = {row.sender for row in rows}
-	people = {
-		row.name: row
-		for row in frappe.get_all(
-			"User", filters={"name": ["in", list(senders)]}, fields=["name", "full_name", "user_image"]
-		)
-	} if senders else {}
+	people = (
+		{
+			row.name: row
+			for row in frappe.get_all(
+				"User", filters={"name": ["in", list(senders)]}, fields=["name", "full_name", "user_image"]
+			)
+		}
+		if senders
+		else {}
+	)
 
 	out = []
 	for row in reversed(rows):
@@ -489,9 +493,7 @@ def delete_message(message: str) -> None:
 def mark_read(channel: str) -> None:
 	assert_channel_access(channel)
 
-	existing = frappe.db.exists(
-		"LMS Chat Read State", {"channel": channel, "user": frappe.session.user}
-	)
+	existing = frappe.db.exists("LMS Chat Read State", {"channel": channel, "user": frappe.session.user})
 	if existing:
 		frappe.db.set_value("LMS Chat Read State", existing, "last_read_at", now_datetime())
 		return

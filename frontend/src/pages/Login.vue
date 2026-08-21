@@ -48,7 +48,7 @@
 						<p class="mt-5 text-[16px] leading-[1.7] text-[#7a5b5b]">
 							{{
 								__(
-									'Your courses, sessions, materials and certificates — with your progress carried across all of them.',
+									'Your courses, sessions, materials and certificates — with your progress carried across all of them.'
 								)
 							}}
 						</p>
@@ -345,13 +345,13 @@ const loginOptions = createResource({
 const providers = computed(() => loginOptions.data?.providers ?? [])
 const allowSignup = computed(() => Boolean(loginOptions.data?.allow_signup))
 const hasOtherOptions = computed(
-	() => providers.value.length > 0 || allowSignup.value,
+	() => providers.value.length > 0 || allowSignup.value
 )
 
 const subtitle = computed(() =>
 	mode.value === 'signup'
 		? __('Create an account to get started')
-		: __('Sign in to continue'),
+		: __('Sign in to continue')
 )
 
 usePageMeta(() => ({ title: __('Sign in') }))
@@ -487,8 +487,7 @@ function messageFrom(e: any, fallback: string) {
    band on 8-bit panels, so a few percent of noise dithers it — the same
    technique the previous brand panel used, retuned to the coral palette. */
 .login-wash {
-	background:
-		radial-gradient(
+	background: radial-gradient(
 			70% 55% at 78% 78%,
 			rgba(255, 96, 96, 0.22) 0%,
 			rgba(255, 96, 96, 0.04) 55%,

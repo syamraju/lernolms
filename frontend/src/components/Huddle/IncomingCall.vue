@@ -21,7 +21,9 @@
 			/>
 
 			<div class="min-w-0 flex-1">
-				<p class="truncate text-[13px] font-semibold text-[var(--learno-ink-strong)]">
+				<p
+					class="truncate text-[13px] font-semibold text-[var(--learno-ink-strong)]"
+				>
 					{{ ring.from.full_name }}
 				</p>
 				<p class="text-[12px] text-[var(--learno-ink-subtle)]">
@@ -85,7 +87,8 @@ async function answer() {
 function onRing(payload: Ring) {
 	// Already in the call being rung? Then this is a second person joining, not
 	// an invitation.
-	if (huddle.active.value && huddle.conversation.value === payload.conversation) return
+	if (huddle.active.value && huddle.conversation.value === payload.conversation)
+		return
 
 	ring.value = payload
 	if (expiry) window.clearTimeout(expiry)

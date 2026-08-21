@@ -14,7 +14,9 @@
 				{{ __('Learning Path and Course Inclusions') }}
 			</h2>
 
-			<p class="max-w-[52ch] text-[13px] leading-[1.7] text-[var(--learno-ink-muted)]">
+			<p
+				class="max-w-[52ch] text-[13px] leading-[1.7] text-[var(--learno-ink-muted)]"
+			>
 				<template v-if="!offered">
 					{{ __('This course does not issue a certificate.') }}
 				</template>
@@ -105,8 +107,8 @@
 						certificate
 							? __('Certificate of Achievement')
 							: offered
-								? __('Not earned yet')
-								: __('No certificate for this course')
+							? __('Not earned yet')
+							: __('No certificate for this course')
 					}}
 				</p>
 				<p

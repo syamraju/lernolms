@@ -79,7 +79,6 @@
 			<BatchOverview v-if="batch.data" :batch="batch" />
 			<SkeletonLoader v-else variant="course-page" />
 		</template>
-
 	</TabbedDetailPage>
 
 	<router-view />

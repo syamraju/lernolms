@@ -28,12 +28,18 @@
 						class="flex w-full items-center gap-3 rounded-[var(--learno-r-md)] px-2 py-2 text-start hover:bg-[var(--learno-canvas)]"
 						@click="pick(person)"
 					>
-						<Avatar :label="person.full_name" :image="person.avatar || undefined" size="lg" />
+						<Avatar
+							:label="person.full_name"
+							:image="person.avatar || undefined"
+							size="lg"
+						/>
 						<span class="min-w-0 flex-1">
 							<span class="block truncate text-[13px] font-medium">
 								{{ person.full_name }}
 							</span>
-							<span class="block truncate text-[11px] text-[var(--learno-ink-subtle)]">
+							<span
+								class="block truncate text-[11px] text-[var(--learno-ink-subtle)]"
+							>
 								{{ person.user }}
 							</span>
 						</span>
@@ -49,7 +55,9 @@ import { ref, watch } from 'vue'
 import { Avatar, Dialog, call, createResource } from 'frappe-ui'
 
 const open = defineModel<boolean>({ required: true })
-const emit = defineEmits<{ (e: 'picked', conversation: string, person: any): void }>()
+const emit = defineEmits<{
+	(e: 'picked', conversation: string, person: any): void
+}>()
 
 const search = ref('')
 
@@ -66,7 +74,9 @@ watch(search, () => {
 })
 
 async function pick(person: any) {
-	const result = await call('lms.lms.direct_message.start_dm', { user: person.user })
+	const result = await call('lms.lms.direct_message.start_dm', {
+		user: person.user,
+	})
 	open.value = false
 	search.value = ''
 	emit('picked', result.conversation, result.peer)

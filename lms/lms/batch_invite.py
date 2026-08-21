@@ -88,9 +88,7 @@ def outgoing_mail_configured() -> bool:
 	"""
 	if frappe.conf.get("mail_login") or frappe.conf.get("mail_server"):
 		return True
-	return bool(
-		frappe.db.exists("Email Account", {"default_outgoing": 1, "enable_outgoing": 1})
-	)
+	return bool(frappe.db.exists("Email Account", {"default_outgoing": 1, "enable_outgoing": 1}))
 
 
 def assert_can_send_mail() -> None:

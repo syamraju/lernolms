@@ -8,7 +8,9 @@
 		<header
 			class="shrink-0 border-b border-[var(--learno-line-soft)] bg-white px-6 py-[22px] lg:px-10"
 		>
-			<h1 class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12">
+			<h1
+				class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12"
+			>
 				{{ __('Support') }}
 			</h1>
 			<p class="mt-1 text-[13px] text-[var(--learno-ink-muted)]">
@@ -33,10 +35,14 @@
 					>
 						<span :class="[channel.icon, 'size-5']" aria-hidden="true" />
 					</span>
-					<span class="text-[15px] font-semibold text-[var(--learno-ink-strong)]">
+					<span
+						class="text-[15px] font-semibold text-[var(--learno-ink-strong)]"
+					>
 						{{ channel.label }}
 					</span>
-					<span class="text-[12px] leading-[1.6] text-[var(--learno-ink-muted)]">
+					<span
+						class="text-[12px] leading-[1.6] text-[var(--learno-ink-muted)]"
+					>
 						{{ channel.description }}
 					</span>
 				</a>

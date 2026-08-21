@@ -126,7 +126,12 @@
 				@add="onAddItem"
 				@cancel="addingItem = false"
 			/>
-			<Button v-else variant="outline" :label="__('Curriculum item')" @click="addingItem = true">
+			<Button
+				v-else
+				variant="outline"
+				:label="__('Curriculum item')"
+				@click="addingItem = true"
+			>
 				<template #prefix>
 					<span class="lucide-plus size-4" />
 				</template>
@@ -142,7 +147,11 @@ import Draggable from 'vuedraggable'
 import CurriculumItemRow from './CurriculumItemRow.vue'
 import CurriculumItemBody from './CurriculumItemBody.vue'
 import AddItemForm from './AddItemForm.vue'
-import type { CurriculumItem, CurriculumItemType, CurriculumSection } from '@/types'
+import type {
+	CurriculumItem,
+	CurriculumItemType,
+	CurriculumSection,
+} from '@/types'
 
 const props = defineProps<{
 	section: CurriculumSection
@@ -165,7 +174,7 @@ const emit = defineEmits<{
 			title: string
 			description: string
 			quiz: string | null
-		},
+		}
 	]
 	'set-quiz': [{ lesson: string; quiz: string | null }]
 	'rename-item': [{ item: CurriculumItem; title: string }]

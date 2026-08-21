@@ -22,7 +22,9 @@
 		<header
 			class="flex shrink-0 flex-wrap items-center gap-4 border-b border-[var(--learno-line-soft)] bg-white px-6 py-[22px] lg:px-10"
 		>
-			<h1 class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12">
+			<h1
+				class="text-[27px] font-semibold leading-[1.2] text-black max-lg:ps-12"
+			>
 				{{ __('Calendar') }}
 			</h1>
 
@@ -67,7 +69,11 @@
 				<MiniMonth v-model="cursor" :marked="markedDates" />
 
 				<div class="mt-6 flex flex-col gap-4">
-					<div v-for="group in legend" :key="group.kind" class="flex flex-col gap-1.5">
+					<div
+						v-for="group in legend"
+						:key="group.kind"
+						class="flex flex-col gap-1.5"
+					>
 						<span class="flex items-center gap-2 text-[12px]">
 							<span
 								class="size-2.5 rounded-[3px]"
@@ -83,7 +89,9 @@
 			</aside>
 
 			<!-- Grid -->
-			<div class="learno-scroll min-w-0 flex-1 overflow-auto bg-[var(--learno-canvas)]">
+			<div
+				class="learno-scroll min-w-0 flex-1 overflow-auto bg-[var(--learno-canvas)]"
+			>
 				<div
 					class="sticky top-0 z-10 flex flex-wrap items-center gap-3 border-b border-[var(--learno-line-soft)] bg-[var(--learno-canvas)] px-5 py-4"
 				>
@@ -140,7 +148,9 @@
 						<ul class="group/day flex min-h-[420px] flex-col gap-2 p-2">
 							<li
 								v-for="event in day.events"
-								:key="event.name || `${event.kind}-${event.title}-${event.time}`"
+								:key="
+									event.name || `${event.kind}-${event.title}-${event.time}`
+								"
 								class="rounded-[6px] px-2 py-1.5 text-[10px] leading-[1.35]"
 								:style="chipStyle(event.kind)"
 							>
@@ -268,7 +278,9 @@ async function cancel(event: any) {
 	try {
 		await call(method, { name: event.name })
 		toast.success(
-			event.kind === 'appointment' ? __('Appointment cancelled') : __('Event deleted')
+			event.kind === 'appointment'
+				? __('Appointment cancelled')
+				: __('Event deleted')
 		)
 		refresh()
 	} catch (e: any) {

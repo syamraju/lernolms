@@ -124,7 +124,9 @@ const publishable = computed(() => canPublishItem(props.item))
 // cannot go live yet rides on the tooltip.
 const publishTooltip = computed(() => {
 	if (props.item.is_published) return __('Hide this from learners')
-	return publishable.value.ok ? __('Show this to learners') : publishable.value.reason
+	return publishable.value.ok
+		? __('Show this to learners')
+		: publishable.value.reason
 })
 
 // Emitting rather than mutating keeps this row purely presentational — the

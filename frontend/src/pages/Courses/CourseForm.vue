@@ -208,7 +208,6 @@ provide<CourseManageContext>('courseManage', {
 	focusSection,
 })
 
-
 onMounted(() => {
 	if (!user.data?.is_moderator && !user.data?.is_instructor) {
 		router.push({ name: 'Courses' })

@@ -16,7 +16,9 @@
 	<div
 		class="learno flex min-h-dvh w-full items-center justify-center bg-[var(--learno-app)] p-4"
 	>
-		<div class="w-full max-w-[28rem] rounded-[var(--learno-r-lg)] bg-white p-8 shadow-sm">
+		<div
+			class="w-full max-w-[28rem] rounded-[var(--learno-r-lg)] bg-white p-8 shadow-sm"
+		>
 			<div v-if="loading" class="text-[14px] text-[var(--learno-ink-muted)]">
 				{{ __('Checking this invitation…') }}
 			</div>
@@ -32,7 +34,9 @@
 						)
 					}}
 				</p>
-				<Button class="mt-6 w-full" @click="goHome">{{ __('Go to Learno') }}</Button>
+				<Button class="mt-6 w-full" @click="goHome">{{
+					__('Go to Learno')
+				}}</Button>
 			</template>
 
 			<template v-else-if="joined">
@@ -56,7 +60,9 @@
 					class="mt-2 text-[13px] leading-5 text-[var(--learno-ink-muted)]"
 				>
 					{{ __('Starts {0}').format(formatDate(link.batch.start_date)) }}
-					<template v-if="link.batch.medium"> · {{ link.batch.medium }}</template>
+					<template v-if="link.batch.medium">
+						· {{ link.batch.medium }}</template
+					>
 				</p>
 
 				<ErrorMessage class="mt-4" :message="error" />
@@ -129,7 +135,10 @@ const join = async () => {
 }
 
 const openBatch = () => {
-	router.push({ name: 'BatchDetail', params: { batchName: link.value.batch.name } })
+	router.push({
+		name: 'BatchDetail',
+		params: { batchName: link.value.batch.name },
+	})
 }
 
 const goHome = () => {

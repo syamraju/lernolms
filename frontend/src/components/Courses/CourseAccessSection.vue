@@ -50,9 +50,7 @@
 				size="sm"
 				:modelValue="Boolean(doc.daily_qa_digest)"
 				:label="__('Daily Q&A digest')"
-				:description="
-					__('One email a day summarising new learner questions.')
-				"
+				:description="__('One email a day summarising new learner questions.')"
 				@update:modelValue="setCheck('daily_qa_digest', $event)"
 			/>
 			<BooleanSwitch
@@ -141,10 +139,7 @@
 									class="size-4 rounded border-outline-gray-3 text-ink-gray-9 focus:ring-outline-gray-4"
 									:checked="Boolean(row[permission.key])"
 									:aria-label="
-										__('{0} for {1}').format(
-											permission.label,
-											row.full_name
-										)
+										__('{0} for {1}').format(permission.label, row.full_name)
 									"
 									@change="togglePermission(row, permission.key)"
 								/>

@@ -52,10 +52,9 @@ import type { LessonResourceRow } from '@/types'
  * the lesson body. Split into downloads and links because the two behave
  * differently: one saves to disk, the other leaves the site.
  */
-const props = withDefaults(
-	defineProps<{ resources?: LessonResourceRow[] }>(),
-	{ resources: () => [] }
-)
+const props = withDefaults(defineProps<{ resources?: LessonResourceRow[] }>(), {
+	resources: () => [],
+})
 
 const resources = computed(() => props.resources ?? [])
 const downloads = computed(() =>

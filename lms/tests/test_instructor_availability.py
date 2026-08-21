@@ -187,9 +187,7 @@ class TestInstructorAvailability(BaseTestUtils):
 
 	def test_saving_again_replaces_the_hours_rather_than_adding_a_second_row(self):
 		first = self._save()
-		second = self._save(
-			schedule=[{"day": "Friday", "start_time": "09:00:00", "end_time": "11:00:00"}]
-		)
+		second = self._save(schedule=[{"day": "Friday", "start_time": "09:00:00", "end_time": "11:00:00"}])
 
 		self.assertEqual(first, second)
 		self.assertEqual(

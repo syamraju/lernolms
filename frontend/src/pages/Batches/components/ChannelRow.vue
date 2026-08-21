@@ -13,7 +13,10 @@
 		@click="$emit('select', channel.name)"
 	>
 		<span class="text-ink-gray-5 shrink-0">#</span>
-		<span class="truncate flex-1 text-sm" :class="channel.is_archived ? 'text-ink-gray-5' : ''">
+		<span
+			class="truncate flex-1 text-sm"
+			:class="channel.is_archived ? 'text-ink-gray-5' : ''"
+		>
 			{{ channel.title }}
 		</span>
 		<Badge v-if="channel.unread" theme="blue" size="sm">

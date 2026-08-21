@@ -124,7 +124,9 @@ class TestClampElement(FrappeTestCase):
 
 class TestRenderElements(FrappeTestCase):
 	def test_a_variable_renders_its_resolved_value(self):
-		rendered = render_elements("LMS Course", [variable("participant_name")], {"participant_name": "Asha Rao"})
+		rendered = render_elements(
+			"LMS Course", [variable("participant_name")], {"participant_name": "Asha Rao"}
+		)
 		self.assertEqual(rendered[0]["value"], "Asha Rao")
 
 	def test_a_date_variable_is_formatted_by_its_own_format(self):
@@ -144,9 +146,7 @@ class TestRenderElements(FrappeTestCase):
 		self.assertEqual(rendered[0]["value"], "Certificate of Completion")
 
 	def test_an_image_carries_its_file_and_draws_no_text(self):
-		rendered = render_elements(
-			"LMS Course", [{"element_type": "Image", "image": "/files/sign.png"}], {}
-		)
+		rendered = render_elements("LMS Course", [{"element_type": "Image", "image": "/files/sign.png"}], {})
 		self.assertEqual(rendered[0]["image"], "/files/sign.png")
 		self.assertEqual(rendered[0]["value"], "")
 

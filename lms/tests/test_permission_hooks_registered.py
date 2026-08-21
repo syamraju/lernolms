@@ -69,8 +69,7 @@ class TestPermissionHooksRegistered(FrappeTestCase):
 		missing = [
 			f"{doctype}.{function} ({module}.{function})"
 			for doctype, module, function in _defined_perm_functions()
-			if (doctype, function) not in UNREGISTERED_EXEMPT
-			and doctype not in registered[function]
+			if (doctype, function) not in UNREGISTERED_EXEMPT and doctype not in registered[function]
 		]
 
 		self.assertEqual(

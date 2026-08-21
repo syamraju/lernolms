@@ -91,7 +91,10 @@
 
 		<SkeletonLoader v-if="captions.loading && !captions.data" variant="form" />
 
-		<div v-else-if="!visibleSections.length" class="rounded-md border border-dashed p-8 text-center">
+		<div
+			v-else-if="!visibleSections.length"
+			class="rounded-md border border-dashed p-8 text-center"
+		>
 			<p class="text-p-base text-ink-gray-6">
 				{{
 					filter === 'uncaptioned'
@@ -149,7 +152,13 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Button, FileUploader, FormControl, createResource, toast } from 'frappe-ui'
+import {
+	Button,
+	FileUploader,
+	FormControl,
+	createResource,
+	toast,
+} from 'frappe-ui'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { useCourseManage } from '@/composables/useCourseManage'
 import type { Resource } from '@/types'

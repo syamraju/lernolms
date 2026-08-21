@@ -88,10 +88,7 @@
 								:label="__('Open')"
 								@click="open(course)"
 							/>
-							<Button
-								:label="__('Send back')"
-								@click="startReject(course)"
-							/>
+							<Button :label="__('Send back')" @click="startReject(course)" />
 							<Button
 								variant="solid"
 								:loading="acting === course.name"
@@ -135,7 +132,9 @@
 					variant="outline"
 					:label="__('What needs changing?')"
 					:placeholder="
-						__('e.g. Section 3 has no assessment, and the audio drops out in lecture 5.')
+						__(
+							'e.g. Section 3 has no assessment, and the audio drops out in lecture 5.'
+						)
 					"
 				/>
 			</template>

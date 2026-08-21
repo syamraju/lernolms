@@ -51,9 +51,7 @@ class TestSubjectiveQuizzes(BaseTestUtils):
 		# get_lesson_quizzes (the lesson gate) reads Course Lesson.quiz, while the
 		# progress writes read LMS Quiz.lesson/course. Setting only the latter left the
 		# gate seeing an empty lesson.
-		frappe.db.set_value(
-			"Course Lesson", self.lesson.name, {"quiz": self.quiz.name, "item_type": "Quiz"}
-		)
+		frappe.db.set_value("Course Lesson", self.lesson.name, {"quiz": self.quiz.name, "item_type": "Quiz"})
 
 		self._register_evaluator(EVALUATOR, courses=[self.course.name])
 		self._register_evaluator(OTHER_EVALUATOR)

@@ -94,7 +94,15 @@
 
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { Badge, Button, Dialog, FormControl, call, createResource, toast } from 'frappe-ui'
+import {
+	Badge,
+	Button,
+	Dialog,
+	FormControl,
+	call,
+	createResource,
+	toast,
+} from 'frappe-ui'
 
 const props = defineProps({
 	modelValue: { type: Boolean, default: false },

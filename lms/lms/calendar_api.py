@@ -544,8 +544,7 @@ def get_available_slots(course: str, instructor: str, date_from: str = None, dat
 					continue
 
 				if not any(
-					at < other_end and other_start < slot_end
-					for other_start, other_end in taken.get(iso, [])
+					at < other_end and other_start < slot_end for other_start, other_end in taken.get(iso, [])
 				):
 					slots.append({"start_time": _clock(at), "end_time": _clock(slot_end)})
 

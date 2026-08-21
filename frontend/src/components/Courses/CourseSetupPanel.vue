@@ -5,9 +5,7 @@
 				<div class="flex flex-wrap items-center gap-x-4 gap-y-2">
 					<Badge :theme="statusTheme" :label="statusLabel" />
 					<span class="text-p-sm text-ink-gray-6">
-						{{
-							__('{0} of {1} steps complete').format(doneCount, gatedCount)
-						}}
+						{{ __('{0} of {1} steps complete').format(doneCount, gatedCount) }}
 					</span>
 					<span v-if="status.data" class="text-p-sm text-ink-gray-6">
 						{{
@@ -52,7 +50,9 @@
 						v-if="status.data.review_feedback"
 						class="rounded-md border border-outline-red-2 bg-surface-red-1 p-4"
 					>
-						<div class="flex items-center gap-2 text-p-base-medium text-ink-gray-9">
+						<div
+							class="flex items-center gap-2 text-p-base-medium text-ink-gray-9"
+						>
 							<span class="lucide-undo-2 size-4" aria-hidden="true" />
 							{{ __('Sent back by the reviewer') }}
 						</div>
@@ -99,10 +99,7 @@
 										"
 										aria-hidden="true"
 									>
-										<span
-											v-if="isDone(item.key)"
-											class="lucide-check size-3"
-										/>
+										<span v-if="isDone(item.key)" class="lucide-check size-3" />
 									</span>
 
 									<div class="min-w-0 flex-1">
@@ -207,7 +204,11 @@ import { useRouter } from 'vue-router'
 import { Badge, Button, Dialog, call, createResource, toast } from 'frappe-ui'
 import GuidanceList from '@/components/Courses/GuidanceList.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
-import { SETUP_GROUPS, SETUP_ITEMS, itemsFor } from '@/pages/Courses/setupChecklist'
+import {
+	SETUP_GROUPS,
+	SETUP_ITEMS,
+	itemsFor,
+} from '@/pages/Courses/setupChecklist'
 import type { SetupItem } from '@/pages/Courses/setupChecklist'
 import { errorMessage, formatVideoLength } from '@/utils/courseCreation'
 import type { CourseCreationStatus, Resource } from '@/types'

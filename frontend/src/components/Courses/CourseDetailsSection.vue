@@ -99,9 +99,7 @@
 				v-model="doc.primary_topic"
 				:label="__('Primarily taught')"
 				:placeholder="__('e.g. Landscape Photography')"
-				:description="
-					__('The single skill at the centre of the course.')
-				"
+				:description="__('The single skill at the centre of the course.')"
 				variant="outline"
 				class="md:col-span-2"
 				@input="markDirty()"

@@ -74,7 +74,11 @@
 						v-if="canAccessClass(cls) && isHuddle(cls)"
 						class="flex items-center gap-x-2 text-ink-gray-9 mt-auto"
 					>
-						<Button class="w-full" variant="solid" @click.stop="joinHuddle(cls)">
+						<Button
+							class="w-full"
+							variant="solid"
+							@click.stop="joinHuddle(cls)"
+						>
 							<template #prefix>
 								<span class="lucide-video h-4 w-4" />
 							</template>

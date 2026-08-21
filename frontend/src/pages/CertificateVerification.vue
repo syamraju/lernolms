@@ -26,7 +26,9 @@
 				v-else-if="!certificate.data"
 				class="rounded-md border bg-surface-base p-8 text-center"
 			>
-				<span class="mx-auto block size-8 lucide-shield-alert text-ink-gray-5" />
+				<span
+					class="mx-auto block size-8 lucide-shield-alert text-ink-gray-5"
+				/>
 				<h1 class="mt-3 text-lg font-semibold text-ink-gray-9">
 					{{ __('No certificate found') }}
 				</h1>
@@ -40,12 +42,10 @@
 			</div>
 
 			<template v-else>
-				<div class="rounded-md border bg-surface-base p-4 print:border-0 print:p-0">
-					<CertificateCanvas
-						v-if="canvas"
-						:template="canvas"
-						:variables="[]"
-					/>
+				<div
+					class="rounded-md border bg-surface-base p-4 print:border-0 print:p-0"
+				>
+					<CertificateCanvas v-if="canvas" :template="canvas" :variables="[]" />
 					<!--
 						Certificates issued before designed templates existed have
 						no artwork to draw. The record itself is still real and is
@@ -126,7 +126,9 @@ import dayjs from '@/utils/dayjs'
 
 const props = defineProps<{ code: string }>()
 
-const { brand } = sessionStore() as { brand: { name?: string; favicon?: string } }
+const { brand } = sessionStore() as {
+	brand: { name?: string; favicon?: string }
+}
 
 interface PublicCertificate {
 	code: string

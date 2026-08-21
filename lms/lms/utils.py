@@ -1264,9 +1264,7 @@ def get_course_outline(course: str, progress: bool = False) -> list:
 	if not can_modify_course(course):
 		chapters = [c for c in chapters if cint(c.is_published)]
 		visible = {c.name for c in chapters}
-		lesson_rows = [
-			row for row in lesson_rows if cint(row.is_published) and row.chapter_name in visible
-		]
+		lesson_rows = [row for row in lesson_rows if cint(row.is_published) and row.chapter_name in visible]
 
 	files_by_name = get_scorm_files(chapters)
 	completed = get_completed_lessons(course, lesson_rows) if progress else set()

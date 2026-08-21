@@ -261,13 +261,9 @@ def create_quiz():
 		)
 	)
 	questions.append(
-		create_quiz_questions(
-			"What is the top-level structure in Learno?", "Chapter", False, "Course", True
-		)
+		create_quiz_questions("What is the top-level structure in Learno?", "Chapter", False, "Course", True)
 	)
-	questions.append(
-		create_quiz_questions("Can you create quizzes in Learno?", "Yes", True, "No", False)
-	)
+	questions.append(create_quiz_questions("Can you create quizzes in Learno?", "Yes", True, "No", False))
 	questions.append(
 		create_quiz_questions(
 			"Which of the following content can be added to lessons?", "Bugs", False, "Videos", True
@@ -391,9 +387,7 @@ def get_video_content():
 			{
 				"id": "tCJD0yMAGd",
 				"type": "paragraph",
-				"data": {
-					"text": "Learno automatically detects the video source and embeds it for learners."
-				},
+				"data": {"text": "Learno automatically detects the video source and embeds it for learners."},
 			},
 			{"id": "KpfuszbA09", "type": "markdown", "data": {"text": ""}},
 			{"id": "PZYmdlzQj2", "type": "header", "data": {"text": "YouTube", "level": 2}},

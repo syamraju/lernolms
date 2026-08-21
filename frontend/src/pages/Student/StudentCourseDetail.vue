@@ -65,13 +65,18 @@
 							{{ course.data.short_introduction }}
 						</p>
 
-						<div v-if="course.data.instructors?.length" class="flex flex-col gap-1.5">
+						<div
+							v-if="course.data.instructors?.length"
+							class="flex flex-col gap-1.5"
+						>
 							<span
 								class="text-[11px] font-semibold text-[var(--learno-ink-strong)]"
 							>
 								{{ __('Instructors') }}
 							</span>
-							<div class="flex flex-wrap gap-2 rounded-[var(--learno-r-md)] bg-white/70 p-2">
+							<div
+								class="flex flex-wrap gap-2 rounded-[var(--learno-r-md)] bg-white/70 p-2"
+							>
 								<span
 									v-for="person in course.data.instructors"
 									:key="person.name"
@@ -121,15 +126,21 @@
 								{{ primaryLabel }}
 							</button>
 
-							<span class="flex items-center gap-1.5 text-[12px] text-[var(--learno-ink-muted)]">
+							<span
+								class="flex items-center gap-1.5 text-[12px] text-[var(--learno-ink-muted)]"
+							>
 								<span class="size-2 rounded-full bg-[#1cb0f6]" />
 								{{ chapterCount }} {{ __('Chapters') }}
 							</span>
-							<span class="flex items-center gap-1.5 text-[12px] text-[var(--learno-ink-muted)]">
+							<span
+								class="flex items-center gap-1.5 text-[12px] text-[var(--learno-ink-muted)]"
+							>
 								<span class="size-2 rounded-full bg-[#ff9600]" />
 								{{ course.data.lessons || 0 }} {{ __('Sessions') }}
 							</span>
-							<span class="flex items-center gap-1.5 text-[12px] text-[var(--learno-ink-muted)]">
+							<span
+								class="flex items-center gap-1.5 text-[12px] text-[var(--learno-ink-muted)]"
+							>
 								<span class="lucide-users size-3.5" aria-hidden="true" />
 								{{ course.data.enrollments || 0 }} {{ __('Enrolments') }}
 							</span>
@@ -156,7 +167,11 @@
 				<section
 					class="mt-1 grid grid-cols-2 gap-6 rounded-[var(--learno-r-lg)] bg-[#fff1f1] px-6 py-6 lg:grid-cols-4 lg:px-10"
 				>
-					<div v-for="stat in stats" :key="stat.label" class="flex flex-col gap-1">
+					<div
+						v-for="stat in stats"
+						:key="stat.label"
+						class="flex flex-col gap-1"
+					>
 						<span class="text-[20px] font-semibold text-[#900303]">
 							{{ stat.value }}
 						</span>
@@ -207,7 +222,10 @@
 						:course="course.data"
 						:outline="outline.data || []"
 					/>
-					<CourseCertificate v-else-if="tab === 'certificate'" :course="course.data" />
+					<CourseCertificate
+						v-else-if="tab === 'certificate'"
+						:course="course.data"
+					/>
 					<CourseSessions
 						v-else-if="tab === 'sessions'"
 						:course-name="courseName"
@@ -228,7 +246,10 @@
 				class="h-[420px] animate-pulse rounded-[var(--learno-r-lg)] bg-black/5"
 			/>
 
-			<p v-else class="py-24 text-center text-[14px] text-[var(--learno-ink-muted)]">
+			<p
+				v-else
+				class="py-24 text-center text-[14px] text-[var(--learno-ink-muted)]"
+			>
 				{{ __('This course is not available.') }}
 			</p>
 		</div>
@@ -253,7 +274,7 @@ const courseName = computed(() => String(route.params.courseName))
 const busy = ref(false)
 
 const TAB_VALUES = ['about', 'certificate', 'sessions', 'materials'] as const
-type Tab = (typeof TAB_VALUES)[number]
+type Tab = typeof TAB_VALUES[number]
 
 const tab = computed<Tab>(() => {
 	const requested = String(route.query.tab || 'about') as Tab
@@ -337,9 +358,7 @@ const stats = computed(() => [
 ])
 
 const certificateEnabled = computed(() =>
-	Boolean(
-		course.data?.enable_certification || course.data?.paid_certificate
-	)
+	Boolean(course.data?.enable_certification || course.data?.paid_certificate)
 )
 
 const primaryLabel = computed(() => {

@@ -305,10 +305,7 @@
 								:quizId="lesson.data.quiz_id"
 							/>
 						</div>
-						<LessonResources
-							class="mt-8"
-							:resources="lesson.data.resources"
-						/>
+						<LessonResources class="mt-8" :resources="lesson.data.resources" />
 					</div>
 					<div
 						v-if="lesson.data && (allowDiscussions || tabs.length > 1)"

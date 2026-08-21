@@ -155,9 +155,7 @@ def batch_evaluators(batch: str) -> set[str]:
 	)
 	if not names:
 		return set()
-	return set(
-		frappe.get_all("Course Evaluator", filters={"name": ["in", names]}, pluck="evaluator")
-	)
+	return set(frappe.get_all("Course Evaluator", filters={"name": ["in", names]}, pluck="evaluator"))
 
 
 def staffed_batches(user: str | None = None) -> list[str]:

@@ -100,7 +100,9 @@
 				</div>
 				<Button
 					variant="outline"
-					:label="isSharedQuiz ? __('Replace quiz') : __('Use an existing quiz')"
+					:label="
+						isSharedQuiz ? __('Replace quiz') : __('Use an existing quiz')
+					"
 					@click="openPicker"
 				>
 					<template #prefix>
@@ -226,7 +228,14 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue'
 import { useRouter } from 'vue-router'
-import { Button, Dialog, FileUploader, FormControl, call, toast } from 'frappe-ui'
+import {
+	Button,
+	Dialog,
+	FileUploader,
+	FormControl,
+	call,
+	toast,
+} from 'frappe-ui'
 import RichTextEditor from '@/components/RichTextEditor.vue'
 import { InputLabel } from '@/components/Form/labeling'
 import QuizBuilder from './QuizBuilder.vue'
@@ -257,7 +266,8 @@ const showPicker = ref(false)
 const picked = ref<string | null>(null)
 
 const isSharedQuiz = computed(
-	() => props.item.item_type === 'Quiz' && Boolean(props.item.is_shared_activity)
+	() =>
+		props.item.item_type === 'Quiz' && Boolean(props.item.is_shared_activity)
 )
 
 /** The one line describing a shared quiz: its size and the bar it sets. */
@@ -268,7 +278,9 @@ const sharedQuizSummary = computed(() => {
 		summary.question_count === 1
 			? __('1 question')
 			: __('{0} questions').format(summary.question_count)
-	return `${count} · ${__('{0}% to pass').format(summary.passing_percentage ?? 0)}`
+	return `${count} · ${__('{0}% to pass').format(
+		summary.passing_percentage ?? 0
+	)}`
 })
 
 function openPicker() {

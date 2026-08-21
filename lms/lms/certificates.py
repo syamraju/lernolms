@@ -211,7 +211,8 @@ def mandatory_keys(reference_doctype: str) -> list[str]:
 
 def variable_labels(reference_doctype: str) -> dict[str, str]:
 	return {
-		variable["key"]: variable["label"] for variable in VARIABLES[validate_reference_doctype(reference_doctype)]
+		variable["key"]: variable["label"]
+		for variable in VARIABLES[validate_reference_doctype(reference_doctype)]
 	}
 
 
@@ -412,9 +413,7 @@ def certificate_readiness(reference_doctype: str, reference_name: str) -> dict:
 	validate_reference_doctype(reference_doctype)
 	doc = get_template_doc(reference_doctype, reference_name)
 	template = template_payload(doc) if doc else blank_template(reference_doctype, reference_name)
-	missing = missing_requirements(
-		reference_doctype, template["background_image"], template["elements"]
-	)
+	missing = missing_requirements(reference_doctype, template["background_image"], template["elements"])
 	return {
 		"exists": bool(doc),
 		"is_complete": not missing,
@@ -505,9 +504,7 @@ def enforce_design_access(reference_doctype: str, reference_name: str) -> None:
 		)
 
 	if not can_design_certificate(reference_doctype, reference_name):
-		frappe.throw(
-			_("You are not permitted to design this certificate."), frappe.PermissionError
-		)
+		frappe.throw(_("You are not permitted to design this certificate."), frappe.PermissionError)
 
 
 def sample_values(reference_doctype: str, reference_name: str) -> dict:
@@ -628,9 +625,7 @@ def resolve_issue_date(template, completion_date):
 	fixed date for a whole cohort — a convocation, say. Both are legitimate and
 	the template says which.
 	"""
-	if template and template.get("issue_date_source") == "Custom Date" and template.get(
-		"custom_issue_date"
-	):
+	if template and template.get("issue_date_source") == "Custom Date" and template.get("custom_issue_date"):
 		return getdate(template["custom_issue_date"])
 	return getdate(completion_date or nowdate())
 
@@ -672,8 +667,7 @@ def course_certificate_values(certificate) -> dict:
 	)
 
 	return {
-		"participant_name": certificate.member_name
-		or frappe.db.get_value("User", member, "full_name"),
+		"participant_name": certificate.member_name or frappe.db.get_value("User", member, "full_name"),
 		"course_name": frappe.db.get_value("LMS Course", course, "title"),
 		"course_start_date": start_date,
 		"course_end_date": end_date,
@@ -786,8 +780,7 @@ def get_public_certificate(code: str) -> dict:
 	return {
 		"code": code,
 		"participant_name": (snapshot or {}).get("participant_name") or row.member_name,
-		"title": (snapshot or {}).get("title")
-		or frappe.db.get_value("LMS Course", row.course, "title"),
+		"title": (snapshot or {}).get("title") or frappe.db.get_value("LMS Course", row.course, "title"),
 		"issue_date": (snapshot or {}).get("issue_date") or str(row.issue_date or ""),
 		"expiry_date": str(row.expiry_date) if row.expiry_date else None,
 		"is_expired": expired,

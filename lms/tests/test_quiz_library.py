@@ -65,9 +65,7 @@ class TestQuizLibrary(BaseTestUtils):
 
 	def _place(self, title=None):
 		"""Add a Quiz item that reuses the library quiz."""
-		result = add_curriculum_item(
-			self.chapter, "Quiz", title, quiz=self.library_quiz.name
-		)
+		result = add_curriculum_item(self.chapter, "Quiz", title, quiz=self.library_quiz.name)
 		return result["lesson"]
 
 	def _lesson(self, lesson):
@@ -199,9 +197,7 @@ class TestQuizLibrary(BaseTestUtils):
 
 	def test_the_pass_mark_is_settable(self):
 		update_quiz_settings(self.library_quiz.name, passing_percentage=65)
-		self.assertEqual(
-			frappe.db.get_value("LMS Quiz", self.library_quiz.name, "passing_percentage"), 65
-		)
+		self.assertEqual(frappe.db.get_value("LMS Quiz", self.library_quiz.name, "passing_percentage"), 65)
 
 	def test_an_out_of_range_pass_mark_is_refused(self):
 		with self.assertRaises(frappe.ValidationError):

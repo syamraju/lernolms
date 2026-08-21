@@ -476,9 +476,7 @@ def _student_events(member: str, start: str, end: str) -> list:
 		pluck="parent",
 		limit_page_length=0,
 	)
-	mine = frappe.get_all(
-		"LMS Student Event", filters={"owner": member}, pluck="name", limit_page_length=0
-	)
+	mine = frappe.get_all("LMS Student Event", filters={"owner": member}, pluck="name", limit_page_length=0)
 
 	names = list(set(invited_to) | set(mine))
 	if not names:
@@ -548,9 +546,7 @@ def _appointments(member: str, start: str, end: str) -> list:
 		seen[row.name] = {
 			"kind": "appointment",
 			"name": row.name,
-			"title": _("1:1 with {0}").format(
-				row.student_name if as_instructor else row.instructor_name
-			),
+			"title": _("1:1 with {0}").format(row.student_name if as_instructor else row.instructor_name),
 			"description": row.topic,
 			"date": row.date,
 			"time": row.start_time,

@@ -84,9 +84,9 @@ class TestPreviewIsADryRun(InviteTestCase):
 	def test_already_enrolled_is_reported_not_repeated(self):
 		student = _user("invite-preview-enrolled@example.com", ["LMS Student"])
 		frappe.set_user(self.moderator)
-		frappe.get_doc(
-			{"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": student}
-		).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": student}).insert(
+			ignore_permissions=True
+		)
 
 		result = preview_invitations(self.batch, [student])
 		self.assertEqual(result["counts"]["already_enrolled"], 1)
@@ -170,9 +170,9 @@ class TestPasswordReissue(InviteTestCase):
 	def _enrolled(self, email, roles):
 		user = _user(email, roles)
 		frappe.set_user(self.moderator)
-		frappe.get_doc(
-			{"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": user}
-		).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": user}).insert(
+			ignore_permissions=True
+		)
 		return user
 
 	def test_a_student_can_be_reset_and_is_forced_to_choose(self):
@@ -242,17 +242,15 @@ class TestInviteLinks(InviteTestCase):
 		result = join_with_link(token)
 
 		self.assertEqual(result["batch"], self.batch)
-		self.assertTrue(
-			frappe.db.exists("LMS Batch Enrollment", {"batch": self.batch, "member": joiner})
-		)
+		self.assertTrue(frappe.db.exists("LMS Batch Enrollment", {"batch": self.batch, "member": joiner}))
 
 	def test_without_a_link_a_closed_batch_refuses(self):
 		joiner = _user("link-refused@example.com", ["LMS Student"])
 		frappe.set_user(joiner)
 		with self.assertRaises(frappe.ValidationError):
-			frappe.get_doc(
-				{"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": joiner}
-			).insert(ignore_permissions=True)
+			frappe.get_doc({"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": joiner}).insert(
+				ignore_permissions=True
+			)
 
 	def test_a_revoked_link_stops_working(self):
 		link = create_invite_link(self.batch)
@@ -333,9 +331,9 @@ class TestMailIsAPrecondition(InviteTestCase):
 	def test_reissuing_a_password_is_refused_too(self):
 		student = _user("invite-mail-student@example.com", ["LMS Student"])
 		frappe.set_user(self.moderator)
-		frappe.get_doc(
-			{"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": student}
-		).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": student}).insert(
+			ignore_permissions=True
+		)
 
 		self._unconfigured()
 		with self.assertRaises(frappe.ValidationError):

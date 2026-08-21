@@ -2890,9 +2890,7 @@ def clear_demo_data():
 	quiz_titles = ["Do you know Learno?", "Do you know Frappe Learning?"]
 	frappe.db.delete("LMS Quiz", {"title": ["in", quiz_titles]})
 
-	demo_courses = frappe.get_all(
-		"LMS Course", {"title": ["in", list(DEMO_COURSE_TITLES)]}, pluck="name"
-	)
+	demo_courses = frappe.get_all("LMS Course", {"title": ["in", list(DEMO_COURSE_TITLES)]}, pluck="name")
 
 	for demo_course in demo_courses:
 		delete_course(demo_course)

@@ -89,9 +89,7 @@ class LMSCertificate(Document):
 			"template": self.template,
 			# The public page, when there is one. It needs no sign-in and it is
 			# the thing worth forwarding, so it is the link the mail leads with.
-			"verification_url": verification_url(self.verification_code)
-			if self.verification_code
-			else None,
+			"verification_url": verification_url(self.verification_code) if self.verification_code else None,
 		}
 
 		if custom_template:

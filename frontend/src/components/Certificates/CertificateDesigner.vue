@@ -16,8 +16,8 @@
 								uploading
 									? __('Uploading {0}%').format(progress)
 									: template.background_image
-										? __('Replace background')
-										: __('Upload background')
+									? __('Replace background')
+									: __('Upload background')
 							"
 							@click="openFileSelector"
 						/>
@@ -169,7 +169,9 @@
 				/>
 
 				<FormControl
-					v-if="selected.element_type === 'Variable' && isDateVariable(selected)"
+					v-if="
+						selected.element_type === 'Variable' && isDateVariable(selected)
+					"
 					class="mt-2"
 					type="select"
 					:label="__('Date format')"
@@ -304,7 +306,8 @@ function isPlaced(key: string) {
 
 function isDateVariable(element: CertificateElement) {
 	return (
-		props.variables.find((entry) => entry.key === element.variable)?.type === 'date'
+		props.variables.find((entry) => entry.key === element.variable)?.type ===
+		'date'
 	)
 }
 
@@ -345,7 +348,10 @@ function addElement(kind: ElementType, variable?: CertificateVariable) {
 	if (kind === 'Variable' && variable && isPlaced(variable.key)) return
 	const element = newElement(
 		kind,
-		{ width: template.value.canvas_width, height: template.value.canvas_height },
+		{
+			width: template.value.canvas_width,
+			height: template.value.canvas_height,
+		},
 		template.value.elements.length,
 		variable
 	)
@@ -380,7 +386,9 @@ function removeSelected() {
 	const index = selectedIndex.value
 	template.value = {
 		...template.value,
-		elements: template.value.elements.filter((_, position) => position !== index),
+		elements: template.value.elements.filter(
+			(_, position) => position !== index
+		),
 	}
 	selectedIndex.value = -1
 }

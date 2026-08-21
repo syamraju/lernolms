@@ -171,9 +171,7 @@ def get_video_stats(course: str) -> dict:
 	if not chapters:
 		return empty
 
-	lesson_names = frappe.get_all(
-		"Lesson Reference", filters={"parent": ["in", chapters]}, pluck="lesson"
-	)
+	lesson_names = frappe.get_all("Lesson Reference", filters={"parent": ["in", chapters]}, pluck="lesson")
 	if not lesson_names:
 		return empty
 
@@ -414,7 +412,9 @@ def add_course_instructor(course: str, email: str, permissions=None) -> list[dic
 		frappe.throw(_("{0} is already an instructor on this course.").format(email))
 
 	doc = frappe.get_doc("LMS Course", course)
-	doc.append("instructors", {"instructor": email, "invitation_status": "Pending", **clean_permissions(permissions)})
+	doc.append(
+		"instructors", {"instructor": email, "invitation_status": "Pending", **clean_permissions(permissions)}
+	)
 	doc.save(ignore_permissions=True)
 	return get_course_instructors(course)
 

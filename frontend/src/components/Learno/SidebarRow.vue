@@ -10,12 +10,7 @@
 	the routes it owns instead.
 -->
 <template>
-	<a
-		v-if="href"
-		:href="safeUrl(href)"
-		class="learno-nav-row"
-		v-external
-	>
+	<a v-if="href" :href="safeUrl(href)" class="learno-nav-row" v-external>
 		<span :class="[icon, 'size-6 shrink-0']" aria-hidden="true" />
 		<span class="flex-1 truncate text-start">{{ label }}</span>
 		<span

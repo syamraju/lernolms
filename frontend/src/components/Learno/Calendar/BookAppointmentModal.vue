@@ -22,7 +22,11 @@
 	>
 		<!-- Step rail -->
 		<ol class="mb-6 flex items-center gap-2" :aria-label="__('Progress')">
-			<li v-for="(label, index) in STEPS" :key="label" class="flex items-center gap-2">
+			<li
+				v-for="(label, index) in STEPS"
+				:key="label"
+				class="flex items-center gap-2"
+			>
 				<span
 					class="grid size-6 place-items-center rounded-full text-[11px] font-semibold transition"
 					:class="
@@ -35,7 +39,11 @@
 				</span>
 				<span
 					class="text-[12px]"
-					:class="index === stepIndex ? 'font-semibold' : 'text-[var(--learno-ink-subtle)]'"
+					:class="
+						index === stepIndex
+							? 'font-semibold'
+							: 'text-[var(--learno-ink-subtle)]'
+					"
 				>
 					{{ label }}
 				</span>
@@ -49,14 +57,19 @@
 
 		<!-- 1. Course -->
 		<section v-if="step === 'course'">
-			<p v-if="courses.loading" class="py-8 text-center text-[13px] text-[var(--learno-ink-subtle)]">
+			<p
+				v-if="courses.loading"
+				class="py-8 text-center text-[13px] text-[var(--learno-ink-subtle)]"
+			>
 				{{ __('Loading your courses…') }}
 			</p>
 			<p
 				v-else-if="!courses.data?.length"
 				class="py-10 text-center text-[13px] text-[var(--learno-ink-muted)]"
 			>
-				{{ __('None of your courses have an instructor taking appointments yet.') }}
+				{{
+					__('None of your courses have an instructor taking appointments yet.')
+				}}
 			</p>
 			<ul v-else class="flex flex-col gap-2">
 				<li v-for="course in courses.data" :key="course.name">
@@ -141,7 +154,10 @@
 
 		<!-- 3. Slot -->
 		<section v-else-if="step === 'slot'">
-			<p v-if="slots.loading" class="py-8 text-center text-[13px] text-[var(--learno-ink-subtle)]">
+			<p
+				v-if="slots.loading"
+				class="py-8 text-center text-[13px] text-[var(--learno-ink-subtle)]"
+			>
 				{{ __('Checking availability…') }}
 			</p>
 			<p
@@ -152,7 +168,9 @@
 			</p>
 			<div v-else class="flex flex-col gap-5">
 				<div v-for="day in slots.data" :key="day.date">
-					<p class="mb-2 text-[13px] font-semibold text-[var(--learno-ink-strong)]">
+					<p
+						class="mb-2 text-[13px] font-semibold text-[var(--learno-ink-strong)]"
+					>
 						{{ formatDay(day.date) }}
 					</p>
 					<div class="flex flex-wrap gap-2">
@@ -177,7 +195,9 @@
 
 		<!-- 4. Topic -->
 		<section v-else>
-			<div class="mb-5 rounded-[var(--learno-r-md)] bg-[var(--learno-canvas)] p-4">
+			<div
+				class="mb-5 rounded-[var(--learno-r-md)] bg-[var(--learno-canvas)] p-4"
+			>
 				<p class="text-[13px] font-semibold text-[var(--learno-ink-strong)]">
 					{{ chosen.instructorName }}
 				</p>
@@ -185,8 +205,9 @@
 					{{ chosen.courseTitle }}
 				</p>
 				<p class="mt-2 text-[13px]">
-					{{ formatDay(chosen.date) }} ·
-					{{ formatTime(chosen.startTime) }}–{{ formatTime(chosen.endTime) }}
+					{{ formatDay(chosen.date) }} · {{ formatTime(chosen.startTime) }}–{{
+						formatTime(chosen.endTime)
+					}}
 				</p>
 			</div>
 
@@ -214,7 +235,10 @@
 					class="learno-btn learno-btn-secondary px-5 py-2.5 text-[13px]"
 					@click="back"
 				>
-					<span class="lucide-arrow-left size-4 rtl:rotate-180" aria-hidden="true" />
+					<span
+						class="lucide-arrow-left size-4 rtl:rotate-180"
+						aria-hidden="true"
+					/>
 					{{ __('Back') }}
 				</button>
 				<span v-else />
@@ -227,7 +251,10 @@
 					@click="confirm"
 				>
 					<span
-						:class="[busy ? 'lucide-loader-circle animate-spin' : 'lucide-check', 'size-4']"
+						:class="[
+							busy ? 'lucide-loader-circle animate-spin' : 'lucide-check',
+							'size-4',
+						]"
 						aria-hidden="true"
 					/>
 					{{ __('Book session') }}
@@ -252,7 +279,7 @@ const emit = defineEmits<{
 
 const STEPS = [__('Course'), __('Instructor'), __('Slot'), __('Topic')]
 const ORDER = ['course', 'instructor', 'slot', 'topic'] as const
-type Step = (typeof ORDER)[number]
+type Step = typeof ORDER[number]
 
 const step = ref<Step>('course')
 const topic = ref('')
@@ -272,16 +299,19 @@ const chosen = ref({
 
 const stepIndex = computed(() => ORDER.indexOf(step.value))
 
-const title = computed(() =>
-	({
-		course: __('Book an appointment'),
-		instructor: __('Pick an instructor'),
-		slot: __('Pick a time'),
-		topic: __('Describe your doubt'),
-	})[step.value]
+const title = computed(
+	() =>
+		({
+			course: __('Book an appointment'),
+			instructor: __('Pick an instructor'),
+			slot: __('Pick a time'),
+			topic: __('Describe your doubt'),
+		}[step.value])
 )
 
-const courses = createResource({ url: 'lms.lms.calendar_api.get_bookable_courses' })
+const courses = createResource({
+	url: 'lms.lms.calendar_api.get_bookable_courses',
+})
 
 const instructors = createResource({
 	url: 'lms.lms.calendar_api.get_bookable_instructors',
@@ -345,7 +375,9 @@ async function pickSlot(day: any, slot: any) {
 }
 
 function isChosen(date: string, slot: any) {
-	return chosen.value.date === date && chosen.value.startTime === slot.start_time
+	return (
+		chosen.value.date === date && chosen.value.startTime === slot.start_time
+	)
 }
 
 function back() {
@@ -371,7 +403,8 @@ async function confirm() {
 		emit('booked')
 		emit('update:open', false)
 	} catch (e: any) {
-		const message = e?.messages?.[0] || e?.message || __('Could not book that slot')
+		const message =
+			e?.messages?.[0] || e?.message || __('Could not book that slot')
 		error.value = message
 
 		// Someone else took it first. Send the student back to a freshly loaded
@@ -399,6 +432,9 @@ function formatTime(value: string) {
 	const [h, m] = value.split(':').map(Number)
 	const suffix = h < 12 ? 'AM' : 'PM'
 	const hour12 = h % 12 === 0 ? 12 : h % 12
-	return `${String(hour12).padStart(2, '0')}:${String(m).padStart(2, '0')} ${suffix}`
+	return `${String(hour12).padStart(2, '0')}:${String(m).padStart(
+		2,
+		'0'
+	)} ${suffix}`
 }
 </script>

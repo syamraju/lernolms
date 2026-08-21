@@ -62,7 +62,14 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Mic, MicOff, MonitorUp, PhoneOff, Video, VideoOff } from 'lucide-vue-next'
+import {
+	Mic,
+	MicOff,
+	MonitorUp,
+	PhoneOff,
+	Video,
+	VideoOff,
+} from 'lucide-vue-next'
 
 defineProps<{
 	muted: boolean
@@ -80,6 +87,8 @@ defineEmits<{
 // getDisplayMedia is absent on most mobile browsers. Offering a button that
 // can only fail is worse than not offering it.
 const screenshareSupported = computed(
-	() => typeof navigator !== 'undefined' && !!navigator.mediaDevices?.getDisplayMedia
+	() =>
+		typeof navigator !== 'undefined' &&
+		!!navigator.mediaDevices?.getDisplayMedia
 )
 </script>

@@ -101,7 +101,8 @@ const days = computed(() => {
 })
 
 function dayClass(day: any) {
-	if (day.isSelected) return 'bg-[var(--learno-primary)] text-white font-semibold'
+	if (day.isSelected)
+		return 'bg-[var(--learno-primary)] text-white font-semibold'
 	if (day.isToday) return 'text-[var(--learno-primary)] font-semibold'
 	if (day.outside) return 'text-[#c9ccd6]'
 	return 'text-[var(--learno-ink)] hover:bg-black/5'

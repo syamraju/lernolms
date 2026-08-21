@@ -339,9 +339,7 @@ const showSetup = ref(false)
 // The editor tab's view switch names where it goes, not where it is, so the
 // icon has to follow the destination too.
 const editorViewIcon = computed<string>(() =>
-	courseEditorRef.value?.isCurriculumView
-		? 'lucide-book-open'
-		: 'lucide-layers'
+	courseEditorRef.value?.isCurriculumView ? 'lucide-book-open' : 'lucide-layers'
 )
 
 type CourseMenuItem = {

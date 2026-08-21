@@ -87,7 +87,14 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Button, Dialog, FormControl, call, createResource, toast } from 'frappe-ui'
+import {
+	Button,
+	Dialog,
+	FormControl,
+	call,
+	createResource,
+	toast,
+} from 'frappe-ui'
 import PickList from '@/components/Modals/PickList.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { errorMessage } from '@/utils/courseCreation'
@@ -175,9 +182,7 @@ const coverageSummary = computed(() => {
 	const parts = []
 	if (courseCount) {
 		parts.push(
-			courseCount === 1
-				? __('1 course')
-				: __('{0} courses').format(courseCount)
+			courseCount === 1 ? __('1 course') : __('{0} courses').format(courseCount)
 		)
 	}
 	if (programCount) {

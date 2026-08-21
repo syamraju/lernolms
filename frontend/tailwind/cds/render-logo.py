@@ -12,6 +12,7 @@ Keep the shapes in step with learning.svg if the mark changes.
 
 Usage: python3 tailwind/cds/render-logo.py
 """
+
 import struct
 import zlib
 from pathlib import Path
@@ -31,103 +32,103 @@ SS = 4  # supersampling factor per axis; 16 samples per output pixel
 
 
 def inside_rounded_rect(x, y, w, h, r):
-    if x < 0 or y < 0 or x > w or y > h:
-        return False
-    # Only the four corner boxes need the radius test.
-    cx = r if x < r else (w - r if x > w - r else None)
-    cy = r if y < r else (h - r if y > h - r else None)
-    if cx is None or cy is None:
-        return True
-    return (x - cx) ** 2 + (y - cy) ** 2 <= r * r
+	if x < 0 or y < 0 or x > w or y > h:
+		return False
+	# Only the four corner boxes need the radius test.
+	cx = r if x < r else (w - r if x > w - r else None)
+	cy = r if y < r else (h - r if y > h - r else None)
+	if cx is None or cy is None:
+		return True
+	return (x - cx) ** 2 + (y - cy) ** 2 <= r * r
 
 
 def inside_l(x, y):
-    stem = L_X <= x <= L_X + L_W and L_Y <= y <= L_Y + L_STEM_H + L_FOOT_H
-    foot = L_X <= x <= L_X + L_FOOT_W and L_Y + L_STEM_H <= y <= L_Y + L_STEM_H + L_FOOT_H
-    return stem or foot
+	stem = L_X <= x <= L_X + L_W and L_Y <= y <= L_Y + L_STEM_H + L_FOOT_H
+	foot = L_X <= x <= L_X + L_FOOT_W and L_Y + L_STEM_H <= y <= L_Y + L_STEM_H + L_FOOT_H
+	return stem or foot
 
 
 def inside_dot(x, y):
-    return (x - DOT_CX) ** 2 + (y - DOT_CY) ** 2 <= DOT_R * DOT_R
+	return (x - DOT_CX) ** 2 + (y - DOT_CY) ** 2 <= DOT_R * DOT_R
 
 
 def sample(x, y):
-    """Colour + coverage at one point in user space. Returns (r,g,b,a) 0-255."""
-    if not inside_rounded_rect(x, y, VB_W, VB_H, TILE_RADIUS):
-        return (0, 0, 0, 0)
-    if inside_l(x, y):
-        return WHITE + (255,)
-    if inside_dot(x, y):
-        # Composite the 85%-opacity dot over the blue tile.
-        a = DOT_ALPHA
-        return tuple(round(WHITE[i] * a + BLUE[i] * (1 - a)) for i in range(3)) + (255,)
-    return BLUE + (255,)
+	"""Colour + coverage at one point in user space. Returns (r,g,b,a) 0-255."""
+	if not inside_rounded_rect(x, y, VB_W, VB_H, TILE_RADIUS):
+		return (0, 0, 0, 0)
+	if inside_l(x, y):
+		return WHITE + (255,)
+	if inside_dot(x, y):
+		# Composite the 85%-opacity dot over the blue tile.
+		a = DOT_ALPHA
+		return tuple(round(WHITE[i] * a + BLUE[i] * (1 - a)) for i in range(3)) + (255,)
+	return BLUE + (255,)
 
 
 def render(size):
-    """Render `size`x`size` RGBA rows, supersampled for antialiasing."""
-    rows = []
-    # Preserve the source aspect by fitting the 80x79 box into a square.
-    scale = max(VB_W, VB_H) / size
-    off_x = (max(VB_W, VB_H) - VB_W) / 2
-    off_y = (max(VB_W, VB_H) - VB_H) / 2
-    for py in range(size):
-        row = bytearray()
-        for px in range(size):
-            acc = [0, 0, 0, 0]
-            for sy in range(SS):
-                uy = (py + (sy + 0.5) / SS) * scale - off_y
-                for sx in range(SS):
-                    ux = (px + (sx + 0.5) / SS) * scale - off_x
-                    r, g, b, a = sample(ux, uy)
-                    # Premultiply so partially covered edges blend correctly.
-                    acc[0] += r * a
-                    acc[1] += g * a
-                    acc[2] += b * a
-                    acc[3] += a
-            n = SS * SS
-            alpha = acc[3] / n
-            if alpha < 0.5:
-                row += bytes((0, 0, 0, 0))
-            else:
-                row += bytes(
-                    (
-                        min(255, round(acc[0] / acc[3])),
-                        min(255, round(acc[1] / acc[3])),
-                        min(255, round(acc[2] / acc[3])),
-                        min(255, round(alpha)),
-                    )
-                )
-        rows.append(bytes(row))
-    return rows
+	"""Render `size`x`size` RGBA rows, supersampled for antialiasing."""
+	rows = []
+	# Preserve the source aspect by fitting the 80x79 box into a square.
+	scale = max(VB_W, VB_H) / size
+	off_x = (max(VB_W, VB_H) - VB_W) / 2
+	off_y = (max(VB_W, VB_H) - VB_H) / 2
+	for py in range(size):
+		row = bytearray()
+		for px in range(size):
+			acc = [0, 0, 0, 0]
+			for sy in range(SS):
+				uy = (py + (sy + 0.5) / SS) * scale - off_y
+				for sx in range(SS):
+					ux = (px + (sx + 0.5) / SS) * scale - off_x
+					r, g, b, a = sample(ux, uy)
+					# Premultiply so partially covered edges blend correctly.
+					acc[0] += r * a
+					acc[1] += g * a
+					acc[2] += b * a
+					acc[3] += a
+			n = SS * SS
+			alpha = acc[3] / n
+			if alpha < 0.5:
+				row += bytes((0, 0, 0, 0))
+			else:
+				row += bytes(
+					(
+						min(255, round(acc[0] / acc[3])),
+						min(255, round(acc[1] / acc[3])),
+						min(255, round(acc[2] / acc[3])),
+						min(255, round(alpha)),
+					)
+				)
+		rows.append(bytes(row))
+	return rows
 
 
 def write_png(path, size):
-    rows = render(size)
-    # Filter type 0 (None) on every scanline.
-    raw = b"".join(b"\x00" + r for r in rows)
+	rows = render(size)
+	# Filter type 0 (None) on every scanline.
+	raw = b"".join(b"\x00" + r for r in rows)
 
-    def chunk(tag, data):
-        body = tag + data
-        return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body))
+	def chunk(tag, data):
+		body = tag + data
+		return struct.pack(">I", len(data)) + body + struct.pack(">I", zlib.crc32(body))
 
-    png = (
-        b"\x89PNG\r\n\x1a\n"
-        + chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0))
-        + chunk(b"IDAT", zlib.compress(raw, 9))
-        + chunk(b"IEND", b"")
-    )
-    Path(path).write_bytes(png)
-    print(f"  {path}  {size}x{size}  {len(png)} bytes")
+	png = (
+		b"\x89PNG\r\n\x1a\n"
+		+ chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0))
+		+ chunk(b"IDAT", zlib.compress(raw, 9))
+		+ chunk(b"IEND", b"")
+	)
+	Path(path).write_bytes(png)
+	print(f"  {path}  {size}x{size}  {len(png)} bytes")
 
 
 if __name__ == "__main__":
-    # .../frontend/tailwind/cds/render-logo.py -> repo root is three levels up.
-    root = Path(__file__).resolve().parents[3]
-    print("rendering Learno mark:")
-    for rel, size in [
-        ("frontend/public/favicon.png", 144),
-        ("frontend/public/manifest/apple-icon-180.png", 180),
-        ("lms/public/images/lms-logo.png", 469),
-    ]:
-        write_png(root / rel, size)
+	# .../frontend/tailwind/cds/render-logo.py -> repo root is three levels up.
+	root = Path(__file__).resolve().parents[3]
+	print("rendering Learno mark:")
+	for rel, size in [
+		("frontend/public/favicon.png", 144),
+		("frontend/public/manifest/apple-icon-180.png", 180),
+		("lms/public/images/lms-logo.png", 469),
+	]:
+		write_png(root / rel, size)

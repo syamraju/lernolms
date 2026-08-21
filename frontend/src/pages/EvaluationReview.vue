@@ -44,9 +44,7 @@
 						{{ evaluation.data.quiz_title }}
 					</h1>
 					<Badge
-						:label="
-							isEvaluated ? __('Evaluated') : __('Waiting on you')
-						"
+						:label="isEvaluated ? __('Evaluated') : __('Waiting on you')"
 						variant="subtle"
 						:theme="isEvaluated ? 'green' : 'orange'"
 					/>
@@ -92,9 +90,7 @@
 						</strong>
 						<span class="text-ink-gray-5">
 							{{
-								__('pass mark {0}%').format(
-									evaluation.data.passing_percentage
-								)
+								__('pass mark {0}%').format(evaluation.data.passing_percentage)
 							}}
 						</span>
 					</span>
@@ -140,9 +136,7 @@
 							:max="answer.marks_out_of"
 							variant="outline"
 							v-model="answer.marks"
-							:label="
-								__('Marks (out of {0})').format(answer.marks_out_of)
-							"
+							:label="__('Marks (out of {0})').format(answer.marks_out_of)"
 						/>
 						<FormControl
 							type="textarea"

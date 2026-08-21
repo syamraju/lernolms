@@ -57,9 +57,7 @@
 				type="video"
 				:modelValue="doc.test_video"
 				:label="__('Test video')"
-				:description="
-					__('MP4 or WebM. Around a minute of footage is plenty.')
-				"
+				:description="__('MP4 or WebM. Around a minute of footage is plenty.')"
 				@update:modelValue="setTestVideo"
 			/>
 		</div>
@@ -83,7 +81,9 @@ const FEEDBACK_AREAS = ['Video production', 'Audio production', 'Delivery']
 const CHECKLIST = [
 	{ body: __('Your face is evenly lit with no hard shadows or backlight') },
 	{ body: __('Audio is clear, close-miked and free of room echo') },
-	{ body: __('You are framed from the chest up, with the camera at eye level') },
+	{
+		body: __('You are framed from the chest up, with the camera at eye level'),
+	},
 	{ body: __('The background is tidy and not competing for attention') },
 	{ body: __('You speak at a steady pace and look into the lens') },
 ]

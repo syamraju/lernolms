@@ -38,8 +38,14 @@
 				<span class="text-ink-gray-5">{{ __('of 30min required') }}</span>
 			</span>
 			<span v-if="practiceCount" class="text-ink-gray-7">
-				<strong class="tabular-nums text-ink-gray-9">{{ practiceCount }}</strong>
-				{{ practiceCount === 1 ? __('practice activity') : __('practice activities') }}
+				<strong class="tabular-nums text-ink-gray-9">{{
+					practiceCount
+				}}</strong>
+				{{
+					practiceCount === 1
+						? __('practice activity')
+						: __('practice activities')
+				}}
 			</span>
 			<span v-if="draftCount" class="text-ink-amber-3">
 				{{
@@ -112,7 +118,10 @@
 			</template>
 		</Draggable>
 
-		<div v-if="addingSection" class="space-y-3 rounded-md border border-dashed p-4">
+		<div
+			v-if="addingSection"
+			class="space-y-3 rounded-md border border-dashed p-4"
+		>
 			<FormControl
 				ref="sectionTitleInput"
 				v-model="newSection.title"
@@ -138,7 +147,12 @@
 				/>
 			</div>
 		</div>
-		<Button v-else variant="outline" :label="__('Section')" @click="openAddSection">
+		<Button
+			v-else
+			variant="outline"
+			:label="__('Section')"
+			@click="openAddSection"
+		>
 			<template #prefix>
 				<span class="lucide-plus size-4" />
 			</template>
@@ -272,11 +286,20 @@ async function openAddSection() {
 
 async function submitSection() {
 	if (!newSection.title.trim()) return
-	await curriculum.addSection(newSection.title.trim(), newSection.objective.trim())
+	await curriculum.addSection(
+		newSection.title.trim(),
+		newSection.objective.trim()
+	)
 	addingSection.value = false
 }
 
-function onRenameSection({ section, title }: { section: Section; title: string }) {
+function onRenameSection({
+	section,
+	title,
+}: {
+	section: Section
+	title: string
+}) {
 	void curriculum.updateSection(section.name, title, section.learning_objective)
 }
 
@@ -349,7 +372,13 @@ async function onAddItem({
 	if (result?.lesson) expandedItem.value = result.lesson
 }
 
-function onRenameItem({ item, title }: { item: CurriculumItem; title: string }) {
+function onRenameItem({
+	item,
+	title,
+}: {
+	item: CurriculumItem
+	title: string
+}) {
 	void curriculum.updateItem(item.name, { title })
 }
 

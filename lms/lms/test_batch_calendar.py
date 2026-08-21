@@ -33,9 +33,9 @@ class CalendarTestCase(FrappeTestCase):
 	def _enrol(self, email):
 		user = _user(email, ["LMS Student"])
 		frappe.set_user(self.moderator)
-		frappe.get_doc(
-			{"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": user}
-		).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "LMS Batch Enrollment", "batch": self.batch, "member": user}).insert(
+			ignore_permissions=True
+		)
 		return user
 
 	def _live_class(self, title, date=None, batch=None):

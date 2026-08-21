@@ -5,7 +5,9 @@
 -->
 <template>
 	<div class="mb-[19px] flex items-center gap-[6px]">
-		<h2 class="text-[16px] font-semibold leading-[19px] text-[var(--learno-ink-strong)]">
+		<h2
+			class="text-[16px] font-semibold leading-[19px] text-[var(--learno-ink-strong)]"
+		>
 			{{ title }}
 		</h2>
 		<span class="learno-rule" aria-hidden="true" />

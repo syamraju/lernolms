@@ -19,16 +19,28 @@
 		<div class="flex flex-col gap-6 py-2">
 			<fieldset v-if="repeats" class="flex flex-col gap-4">
 				<label class="flex items-center gap-4">
-					<input v-model="scope" type="radio" value="this" class="size-5 accent-[#1e3a8a]" />
+					<input
+						v-model="scope"
+						type="radio"
+						value="this"
+						class="size-5 accent-[#1e3a8a]"
+					/>
 					<span class="text-[16px]">{{ __('This Event') }}</span>
 				</label>
 				<label class="flex items-center gap-4">
-					<input v-model="scope" type="radio" value="all" class="size-5 accent-[#1e3a8a]" />
+					<input
+						v-model="scope"
+						type="radio"
+						value="all"
+						class="size-5 accent-[#1e3a8a]"
+					/>
 					<span class="text-[16px]">{{ __('All Events') }}</span>
 				</label>
 			</fieldset>
 
-			<div class="flex items-center gap-3 border-t border-[var(--learno-line-soft)] pt-6">
+			<div
+				class="flex items-center gap-3 border-t border-[var(--learno-line-soft)] pt-6"
+			>
 				<span
 					class="lucide-video size-6 shrink-0 text-[var(--learno-ink-subtle)]"
 					aria-hidden="true"

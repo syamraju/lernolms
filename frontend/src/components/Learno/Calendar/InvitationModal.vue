@@ -19,16 +19,29 @@
 		<div class="flex flex-col">
 			<fieldset v-if="repeats" class="flex flex-col gap-4 pb-5">
 				<label class="flex items-center gap-4">
-					<input v-model="scope" type="radio" value="this" class="size-5 accent-[#1e3a8a]" />
+					<input
+						v-model="scope"
+						type="radio"
+						value="this"
+						class="size-5 accent-[#1e3a8a]"
+					/>
 					<span class="text-[16px]">{{ __('This Event') }}</span>
 				</label>
 				<label class="flex items-center gap-4">
-					<input v-model="scope" type="radio" value="all" class="size-5 accent-[#1e3a8a]" />
+					<input
+						v-model="scope"
+						type="radio"
+						value="all"
+						class="size-5 accent-[#1e3a8a]"
+					/>
 					<span class="text-[16px]">{{ __('All Events') }}</span>
 				</label>
 			</fieldset>
 
-			<div v-if="draft.length" class="border-t border-[var(--learno-line-soft)] pt-5">
+			<div
+				v-if="draft.length"
+				class="border-t border-[var(--learno-line-soft)] pt-5"
+			>
 				<p class="mb-4 text-[14px] text-[var(--learno-ink-muted)]">
 					{{ __('Invited') }}
 				</p>
@@ -48,14 +61,22 @@
 							v-else
 							class="grid size-10 shrink-0 place-items-center rounded-full bg-[var(--learno-primary-soft)] text-[13px] font-semibold text-[var(--learno-primary)]"
 						>
-							{{ (person.full_name || person.participant).charAt(0).toUpperCase() }}
+							{{
+								(person.full_name || person.participant).charAt(0).toUpperCase()
+							}}
 						</span>
 						<span class="flex min-w-0 flex-1 flex-col">
-							<span class="truncate text-[15px] text-[var(--learno-ink-strong)]">
+							<span
+								class="truncate text-[15px] text-[var(--learno-ink-strong)]"
+							>
 								{{ person.full_name || person.participant }}
 							</span>
 							<span class="text-[12px] text-[var(--learno-ink-subtle)]">
-								{{ person.participant_role === 'Instructor' ? __('Instructor') : __('Student') }}
+								{{
+									person.participant_role === 'Instructor'
+										? __('Instructor')
+										: __('Student')
+								}}
 							</span>
 						</span>
 						<button
@@ -102,7 +123,11 @@
 								{{ person.full_name || person.name }}
 							</span>
 							<span class="text-[11px] text-[var(--learno-ink-subtle)]">
-								{{ person.participant_role === 'Instructor' ? __('Instructor') : __('Student') }}
+								{{
+									person.participant_role === 'Instructor'
+										? __('Instructor')
+										: __('Student')
+								}}
 							</span>
 						</button>
 					</li>
@@ -149,7 +174,10 @@ const scope = ref<'this' | 'all'>('this')
 
 const invitees = createResource({
 	url: 'lms.lms.calendar_api.get_event_invitees',
-	makeParams: () => ({ course: props.course || undefined, search: search.value || undefined }),
+	makeParams: () => ({
+		course: props.course || undefined,
+		search: search.value || undefined,
+	}),
 })
 
 watch(
@@ -182,7 +210,9 @@ watch(
 
 const candidates = computed(() => {
 	const already = new Set(draft.value.map((person) => person.participant))
-	return (invitees.data || []).filter((person: any) => !already.has(person.name))
+	return (invitees.data || []).filter(
+		(person: any) => !already.has(person.name)
+	)
 })
 
 function add(person: any) {
@@ -199,7 +229,9 @@ function add(person: any) {
 }
 
 function remove(participant: string) {
-	draft.value = draft.value.filter((person) => person.participant !== participant)
+	draft.value = draft.value.filter(
+		(person) => person.participant !== participant
+	)
 }
 
 function save() {

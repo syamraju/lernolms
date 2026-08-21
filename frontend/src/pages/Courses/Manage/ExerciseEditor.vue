@@ -1,6 +1,8 @@
 <template>
 	<div class="flex h-dvh flex-col bg-surface-gray-1">
-		<header class="flex shrink-0 items-center gap-3 border-b bg-surface-base px-5 py-3">
+		<header
+			class="flex shrink-0 items-center gap-3 border-b bg-surface-base px-5 py-3"
+		>
 			<button
 				type="button"
 				class="flex shrink-0 items-center gap-1.5 rounded px-1 py-1 text-p-sm text-ink-gray-7 transition-colors hover:text-ink-gray-9 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-outline-gray-4"
@@ -17,7 +19,11 @@
 				:label="doc?.is_published ? __('Published') : __('Draft')"
 			/>
 			<div class="ms-auto flex shrink-0 items-center gap-2">
-				<span v-if="isDirty" class="text-p-sm text-ink-amber-3" aria-live="polite">
+				<span
+					v-if="isDirty"
+					class="text-p-sm text-ink-amber-3"
+					aria-live="polite"
+				>
 					{{ __('Unsaved') }}
 				</span>
 				<Button
@@ -185,7 +191,11 @@
 									)
 								}}
 							</p>
-							<Button variant="outline" :label="__('Test case')" @click="addTestCase">
+							<Button
+								variant="outline"
+								:label="__('Test case')"
+								@click="addTestCase"
+							>
 								<template #prefix>
 									<span class="lucide-plus size-4" />
 								</template>
@@ -264,7 +274,7 @@ interface Exercise {
 const props = defineProps<{ courseName: string; exerciseName: string }>()
 
 const router = useRouter()
-const activeTab = ref<(typeof TABS)[number]['key']>('plan')
+const activeTab = ref<typeof TABS[number]['key']>('plan')
 const isDirty = ref(false)
 const saving = ref(false)
 const publishing = ref(false)
@@ -289,11 +299,14 @@ const hasStatement = computed(() =>
 // Both are enforced server-side — the statement through
 // `mandatory_depends_on`, the test cases in the controller's validate. Naming
 // them here turns a failed save into a disabled button with a reason.
-const canPublish = computed(() => hasStatement.value && testCases.value.length > 0)
+const canPublish = computed(
+	() => hasStatement.value && testCases.value.length > 0
+)
 
 const publishTooltip = computed(() => {
 	if (doc.value?.is_published) return __('Hide this exercise from learners')
-	if (!hasStatement.value) return __('Write a problem statement before publishing.')
+	if (!hasStatement.value)
+		return __('Write a problem statement before publishing.')
 	if (!testCases.value.length) return __('Add at least one test case.')
 	return __('Show this exercise to learners')
 })
@@ -319,7 +332,10 @@ function onCodeChange(field: 'starter_code' | 'solution_code', event: Event) {
 
 function addTestCase() {
 	if (!resource.doc) return
-	resource.doc.test_cases = [...testCases.value, { input: '', expected_output: '' }]
+	resource.doc.test_cases = [
+		...testCases.value,
+		{ input: '', expected_output: '' },
+	]
 	markDirty()
 }
 

@@ -1,6 +1,8 @@
 <template>
 	<div class="flex h-dvh flex-col bg-surface-gray-1">
-		<header class="flex shrink-0 items-center gap-3 border-b bg-surface-base px-5 py-3">
+		<header
+			class="flex shrink-0 items-center gap-3 border-b bg-surface-base px-5 py-3"
+		>
 			<button
 				type="button"
 				class="flex shrink-0 items-center gap-1.5 rounded px-1 py-1 text-p-sm text-ink-gray-7 transition-colors hover:text-ink-gray-9 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-outline-gray-4"
@@ -17,7 +19,11 @@
 				:label="doc?.is_published ? __('Published') : __('Draft')"
 			/>
 			<div class="ms-auto flex shrink-0 items-center gap-2">
-				<span v-if="isDirty" class="text-p-sm text-ink-amber-3" aria-live="polite">
+				<span
+					v-if="isDirty"
+					class="text-p-sm text-ink-amber-3"
+					aria-live="polite"
+				>
 					{{ __('Unsaved') }}
 				</span>
 				<Button
@@ -135,9 +141,7 @@
 					<section v-show="activeTab === 'questions'" class="space-y-3">
 						<p class="text-p-base text-ink-gray-6">
 							{{
-								__(
-									'The task itself. This is what learners answer and submit.'
-								)
+								__('The task itself. This is what learners answer and submit.')
 							}}
 						</p>
 						<RichTextEditor
@@ -168,7 +172,9 @@
 							:modelValue="Boolean(doc.grade_assignment)"
 							:label="__('Grade this assignment')"
 							:description="
-								__('Submissions go to an evaluator instead of being auto-accepted.')
+								__(
+									'Submissions go to an evaluator instead of being auto-accepted.'
+								)
 							"
 							@update:modelValue="setCheck('grade_assignment', $event)"
 						/>
@@ -232,7 +238,7 @@ interface Assignment {
 const props = defineProps<{ courseName: string; assignmentName: string }>()
 
 const router = useRouter()
-const activeTab = ref<(typeof TABS)[number]['key']>('basic')
+const activeTab = ref<typeof TABS[number]['key']>('basic')
 const isDirty = ref(false)
 const saving = ref(false)
 const publishing = ref(false)
@@ -326,7 +332,9 @@ async function togglePublished() {
 		// Through the normal save so the server's publish-time validation runs
 		// and a missing question or duration is refused with its own message.
 		await save({ silent: true })
-		toast.success(next ? __('Assignment published') : __('Assignment unpublished'))
+		toast.success(
+			next ? __('Assignment published') : __('Assignment unpublished')
+		)
 	} finally {
 		publishing.value = false
 	}

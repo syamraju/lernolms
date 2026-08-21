@@ -74,7 +74,10 @@ import { Button, call, createResource, toast, usePageMeta } from 'frappe-ui'
 import CertificateDesigner from '@/components/Certificates/CertificateDesigner.vue'
 import SkeletonLoader from '@/components/SkeletonLoader.vue'
 import { missingRequirements } from '@/utils/certificate'
-import type { CertificateTemplate, CertificateVariable } from '@/utils/certificate'
+import type {
+	CertificateTemplate,
+	CertificateVariable,
+} from '@/utils/certificate'
 import { errorMessage } from '@/utils/courseCreation'
 import { sessionStore } from '@/stores/session'
 
@@ -143,7 +146,7 @@ const missing = computed(() =>
 				designer.data.variables,
 				template.value.background_image,
 				template.value.elements
-			)
+		  )
 		: []
 )
 
@@ -161,7 +164,9 @@ async function save() {
 		// invitation, not on this button.
 		toast.success(
 			missing.value.length
-				? __('Certificate saved. {0} still to place.').format(missing.value.length)
+				? __('Certificate saved. {0} still to place.').format(
+						missing.value.length
+				  )
 				: __('Certificate saved')
 		)
 		await designer.reload()

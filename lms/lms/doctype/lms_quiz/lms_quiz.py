@@ -130,9 +130,7 @@ class LMSQuiz(Document):
 				unresolved.append(row.question)
 
 		if unresolved:
-			types |= set(
-				frappe.get_all("LMS Question", filters={"name": ("in", unresolved)}, pluck="type")
-			)
+			types |= set(frappe.get_all("LMS Question", filters={"name": ("in", unresolved)}, pluck="type"))
 
 		types.discard(None)
 		return types
@@ -257,8 +255,7 @@ def submit_quiz(quiz: str, results: str | None = None):
 		"percentage": percentage,
 		"is_open_ended": is_open_ended,
 		"pending_evaluation": pending_evaluation,
-		"blocks_progress": pending_evaluation
-		and bool(cint(quiz_details.block_progress_until_evaluated)),
+		"blocks_progress": pending_evaluation and bool(cint(quiz_details.block_progress_until_evaluated)),
 	}
 
 

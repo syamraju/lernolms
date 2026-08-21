@@ -42,9 +42,7 @@ def can_review_courses(user: str | None = None) -> bool:
 
 def enforce_reviewer() -> None:
 	if not can_review_courses():
-		frappe.throw(
-			_("Only a moderator or an evaluator can review courses."), frappe.PermissionError
-		)
+		frappe.throw(_("Only a moderator or an evaluator can review courses."), frappe.PermissionError)
 
 
 def course_instructors(course: str) -> list[str]:
@@ -67,9 +65,7 @@ def reviewers() -> list[str]:
 		filters={"role": ("in", ["Moderator", "Batch Evaluator"]), "parenttype": "User"},
 		pluck="parent",
 	)
-	enabled = frappe.get_all(
-		"User", filters={"name": ("in", rows or [""]), "enabled": 1}, pluck="name"
-	)
+	enabled = frappe.get_all("User", filters={"name": ("in", rows or [""]), "enabled": 1}, pluck="name")
 	# Administrator and Guest are not people with a review queue to read.
 	return [user for user in dict.fromkeys(enabled) if user not in ("Administrator", "Guest")]
 
@@ -221,7 +217,16 @@ def get_review_state(course: str) -> dict:
 	state = frappe.db.get_value(
 		"LMS Course",
 		course,
-		["name", "title", "status", "published", "submitted_on", "review_feedback", "reviewed_by", "reviewed_on"],
+		[
+			"name",
+			"title",
+			"status",
+			"published",
+			"submitted_on",
+			"review_feedback",
+			"reviewed_by",
+			"reviewed_on",
+		],
 		as_dict=True,
 	)
 	if not state:

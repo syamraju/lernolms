@@ -276,7 +276,9 @@
 							:name="`correct-${editorKey}`"
 							:checked="Boolean(answer.is_correct)"
 							:aria-label="__('Answer {0} is correct').format(index + 1)"
-							@change="setCorrect(index, ($event.target as HTMLInputElement).checked)"
+							@change="
+								setCorrect(index, ($event.target as HTMLInputElement).checked)
+							"
 						/>
 						<div class="min-w-0 flex-1 space-y-1.5">
 							<input
@@ -321,7 +323,9 @@
 								<span class="lucide-plus size-4" />
 							</template>
 						</Button>
-						<label class="flex cursor-pointer items-center gap-2 text-p-sm text-ink-gray-7">
+						<label
+							class="flex cursor-pointer items-center gap-2 text-p-sm text-ink-gray-7"
+						>
 							<input
 								v-model="draft.multiple"
 								type="checkbox"
@@ -367,7 +371,9 @@ const MAX_QUESTION_MARKS = 100
 
 // Held in script rather than inlined: the apostrophe would otherwise have to be
 // escaped inside the attribute's own quoting.
-const explanationPlaceholder = __("Explain why this is or isn't the best answer.")
+const explanationPlaceholder = __(
+	"Explain why this is or isn't the best answer."
+)
 
 const props = defineProps<{ quizName: string }>()
 const emit = defineEmits<{ changed: [] }>()
@@ -404,9 +410,8 @@ watch(
 		settings.max_attempts = data.max_attempts ?? 0
 		settings.show_answers = data.show_answers ? 1 : 0
 		settings.shuffle_questions = data.shuffle_questions ? 1 : 0
-		settings.block_progress_until_evaluated = data.block_progress_until_evaluated
-			? 1
-			: 0
+		settings.block_progress_until_evaluated =
+			data.block_progress_until_evaluated ? 1 : 0
 	},
 	{ immediate: true }
 )
@@ -477,7 +482,9 @@ const ruleSummary = computed(() => {
 					'With a pass mark of 0, submitting the quiz is enough — it will not hold anyone back.'
 			  )
 	if (isSubjective.value) {
-		return __('{0} The lesson stays open until an evaluator marks it.').format(bar)
+		return __('{0} The lesson stays open until an evaluator marks it.').format(
+			bar
+		)
 	}
 	const attempts =
 		settings.max_attempts > 0
@@ -487,7 +494,8 @@ const ruleSummary = computed(() => {
 })
 
 async function onSettingChange(field: keyof typeof settings, value: unknown) {
-	const raw = value instanceof Event ? (value.target as HTMLInputElement).value : value
+	const raw =
+		value instanceof Event ? (value.target as HTMLInputElement).value : value
 	let next = Number(raw) || 0
 	// Clamp here as well as on the server: a number input still accepts a typed
 	// 500, and sending it only to be refused loses the author's other edits.
@@ -519,12 +527,16 @@ const draft = reactive<{
 
 const validationError = computed(() => {
 	if (!stripHtml(draft.question)) {
-		return isSubjective.value ? __('Write the task.') : __('Write the question.')
+		return isSubjective.value
+			? __('Write the task.')
+			: __('Write the question.')
 	}
 	if (isSubjective.value) {
 		const marks = Number(draft.marks)
 		if (!Number.isInteger(marks) || marks < 1 || marks > MAX_QUESTION_MARKS) {
-			return __('Marks have to be between 1 and {0}.').format(MAX_QUESTION_MARKS)
+			return __('Marks have to be between 1 and {0}.').format(
+				MAX_QUESTION_MARKS
+			)
 		}
 		return ''
 	}

@@ -10,7 +10,11 @@
 <template>
 	<Teleport to="body">
 		<div v-if="open" class="learno fixed inset-0 z-50 flex justify-end">
-			<div class="absolute inset-0 bg-black/40" @click="close" aria-hidden="true" />
+			<div
+				class="absolute inset-0 bg-black/40"
+				@click="close"
+				aria-hidden="true"
+			/>
 
 			<aside
 				class="relative flex h-full w-full max-w-[516px] flex-col bg-white shadow-2xl"
@@ -35,7 +39,9 @@
 				</header>
 
 				<div class="learno-scroll min-h-0 flex-1 overflow-y-auto px-6 py-5">
-					<label class="mb-1.5 block text-[12px] text-[var(--learno-ink-muted)]">
+					<label
+						class="mb-1.5 block text-[12px] text-[var(--learno-ink-muted)]"
+					>
 						{{ __('Event Title') }}
 					</label>
 					<input
@@ -61,7 +67,9 @@
 							edge="start"
 							class="flex-1"
 						/>
-						<span class="text-[13px] text-[var(--learno-ink-muted)]">{{ __('to') }}</span>
+						<span class="text-[13px] text-[var(--learno-ink-muted)]">{{
+							__('to')
+						}}</span>
 						<TimeSelect
 							v-model="form.end_time"
 							:counterpart="form.start_time"
@@ -86,7 +94,9 @@
 					<label class="mt-5 flex cursor-pointer items-center gap-3">
 						<span
 							class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition"
-							:class="form.all_day ? 'bg-[var(--learno-primary)]' : 'bg-[#d9dbe3]'"
+							:class="
+								form.all_day ? 'bg-[var(--learno-primary)]' : 'bg-[#d9dbe3]'
+							"
 						>
 							<input v-model="form.all_day" type="checkbox" class="sr-only" />
 							<span
@@ -102,7 +112,9 @@
 					<!-- Course scope. Not in the design, but the invite list has to be
 					     scoped to something, and the brief is "colleagues and
 					     instructors that are available in the course". -->
-					<label class="mb-1.5 mt-6 block text-[12px] text-[var(--learno-ink-muted)]">
+					<label
+						class="mb-1.5 mt-6 block text-[12px] text-[var(--learno-ink-muted)]"
+					>
 						{{ __('Course') }}
 					</label>
 					<select
@@ -110,7 +122,11 @@
 						class="w-full rounded-[var(--learno-r-sm)] border border-[var(--learno-line)] px-4 py-3 text-[14px]"
 					>
 						<option value="">{{ __('Any of my courses') }}</option>
-						<option v-for="course in courses" :key="course.name" :value="course.name">
+						<option
+							v-for="course in courses"
+							:key="course.name"
+							:value="course.name"
+						>
 							{{ course.title }}
 						</option>
 					</select>
@@ -120,7 +136,9 @@
 						class="mt-6 flex w-full items-center justify-between rounded-[var(--learno-r-sm)] border border-[var(--learno-line)] px-4 py-3 text-[14px] transition hover:border-[#d8dae3]"
 						@click="showRepeat = true"
 					>
-						<span :class="repeatSummary ? '' : 'text-[var(--learno-ink-subtle)]'">
+						<span
+							:class="repeatSummary ? '' : 'text-[var(--learno-ink-subtle)]'"
+						>
 							{{ repeatSummary || __('Repeat') }}
 						</span>
 						<span
@@ -163,14 +181,22 @@
 									v-else
 									class="grid size-9 shrink-0 place-items-center rounded-full bg-[var(--learno-primary-soft)] text-[12px] font-semibold text-[var(--learno-primary)]"
 								>
-									{{ (person.full_name || person.participant).charAt(0).toUpperCase() }}
+									{{
+										(person.full_name || person.participant)
+											.charAt(0)
+											.toUpperCase()
+									}}
 								</span>
 								<span class="flex min-w-0 flex-1 flex-col">
 									<span class="truncate text-[14px]">
 										{{ person.full_name || person.participant }}
 									</span>
 									<span class="text-[11px] text-[var(--learno-ink-subtle)]">
-										{{ person.participant_role === 'Instructor' ? __('Instructor') : __('Student') }}
+										{{
+											person.participant_role === 'Instructor'
+												? __('Instructor')
+												: __('Student')
+										}}
 									</span>
 								</span>
 								<button
@@ -206,7 +232,9 @@
 					</button>
 
 					<div class="mt-6 border-t border-[var(--learno-line-soft)] pt-5">
-						<label class="mb-1.5 block text-[12px] text-[var(--learno-ink-muted)]">
+						<label
+							class="mb-1.5 block text-[12px] text-[var(--learno-ink-muted)]"
+						>
 							{{ __('Description') }}
 						</label>
 						<textarea
@@ -222,7 +250,9 @@
 					</p>
 				</div>
 
-				<footer class="shrink-0 border-t border-[var(--learno-line-soft)] px-6 py-5">
+				<footer
+					class="shrink-0 border-t border-[var(--learno-line-soft)] px-6 py-5"
+				>
 					<button
 						type="button"
 						class="learno-btn learno-btn-primary w-full py-3 text-[14px]"
@@ -334,7 +364,9 @@ const repeatSummary = computed(() => {
 	const every = form.value.repeat_every || 1
 	const unit = String(form.value.repeat_unit || 'Weeks').toLowerCase()
 	const base =
-		every === 1 ? __('Every {0}').format(unit.replace(/s$/, '')) : `${__('Every')} ${every} ${unit}`
+		every === 1
+			? __('Every {0}').format(unit.replace(/s$/, ''))
+			: `${__('Every')} ${every} ${unit}`
 	if (form.value.repeat_ends === 'On Date' && form.value.repeat_until) {
 		return `${base} · ${__('until')} ${form.value.repeat_until}`
 	}
@@ -401,7 +433,8 @@ async function submit() {
 		emit('created')
 		close()
 	} catch (e: any) {
-		error.value = e?.messages?.[0] || e?.message || __('Could not create the event')
+		error.value =
+			e?.messages?.[0] || e?.message || __('Could not create the event')
 	} finally {
 		busy.value = false
 	}

@@ -173,7 +173,11 @@
 
 		<template #actions>
 			<div class="flex items-center justify-end gap-2">
-				<Button :label="running ? __('Close when finished') : __('Close')" :disabled="running" @click="close" />
+				<Button
+					:label="running ? __('Close when finished') : __('Close')"
+					:disabled="running"
+					@click="close"
+				/>
 				<Button
 					variant="solid"
 					:disabled="!canStart"
@@ -245,10 +249,16 @@ const sectionOptions = computed(() => [
 ])
 
 const pendingCount = computed(
-	() => queue.value.filter((e) => e.status === 'queued' || e.status === 'failed').length
+	() =>
+		queue.value.filter((e) => e.status === 'queued' || e.status === 'failed')
+			.length
 )
-const doneCount = computed(() => queue.value.filter((e) => e.status === 'done').length)
-const failedCount = computed(() => queue.value.filter((e) => e.status === 'failed').length)
+const doneCount = computed(
+	() => queue.value.filter((e) => e.status === 'done').length
+)
+const failedCount = computed(
+	() => queue.value.filter((e) => e.status === 'failed').length
+)
 
 const summary = computed(() => {
 	if (!queue.value.length) return ''
@@ -260,7 +270,8 @@ const summary = computed(() => {
 const canStart = computed(() => {
 	if (running.value || !pendingCount.value) return false
 	if (!targetChapter.value) return false
-	if (targetChapter.value === NEW_SECTION && !newSectionTitle.value.trim()) return false
+	if (targetChapter.value === NEW_SECTION && !newSectionTitle.value.trim())
+		return false
 	return true
 })
 

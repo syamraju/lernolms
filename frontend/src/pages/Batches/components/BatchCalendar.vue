@@ -17,18 +17,28 @@
 				</div>
 			</div>
 			<div class="flex items-center gap-1">
-				<Button variant="ghost" :label="__('Previous month')" @click="shift(-1)">
+				<Button
+					variant="ghost"
+					:label="__('Previous month')"
+					@click="shift(-1)"
+				>
 					<template #icon><span class="lucide-chevron-left size-4" /></template>
 				</Button>
 				<Button variant="subtle" @click="today">{{ __('Today') }}</Button>
 				<Button variant="ghost" :label="__('Next month')" @click="shift(1)">
-					<template #icon><span class="lucide-chevron-right size-4" /></template>
+					<template #icon
+						><span class="lucide-chevron-right size-4"
+					/></template>
 				</Button>
 			</div>
 		</div>
 
 		<div class="flex flex-wrap gap-3 mb-3 text-xs text-ink-gray-6">
-			<span v-for="kind in legend" :key="kind.key" class="flex items-center gap-1.5">
+			<span
+				v-for="kind in legend"
+				:key="kind.key"
+				class="flex items-center gap-1.5"
+			>
 				<span class="size-2.5 rounded-full" :class="kind.dot" />
 				{{ kind.label }}
 			</span>
@@ -73,10 +83,7 @@
 			</div>
 		</div>
 
-		<div
-			v-if="calendar.loading"
-			class="text-sm text-ink-gray-6 mt-3"
-		>
+		<div v-if="calendar.loading" class="text-sm text-ink-gray-6 mt-3">
 			{{ __('Loading…') }}
 		</div>
 	</div>

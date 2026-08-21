@@ -240,7 +240,10 @@
 							<Avatar :image="item.image" :label="item.label" size="sm" />
 						</template>
 					</MultiLink>
-					<p v-if="!certificateMissing.length" class="text-p-sm text-ink-gray-6">
+					<p
+						v-if="!certificateMissing.length"
+						class="text-p-sm text-ink-gray-6"
+					>
 						{{
 							draft.instructors.length
 								? __(
@@ -443,7 +446,7 @@ const certificateMissing = computed(() =>
 				certificateMeta.data.variables,
 				draft.certificate.background_image,
 				draft.certificate.elements
-			)
+		  )
 		: []
 )
 
@@ -457,7 +460,9 @@ const sampleValues = computed(() => ({
 	course_end_date: new Date().toISOString().slice(0, 10),
 	issue_date: new Date().toISOString().slice(0, 10),
 	certificate_id: 'LRN-SAMPLE-0000',
-	verification_url: `${window.location.origin}${getLmsRoute('/verify/LRN-SAMPLE-0000')}`,
+	verification_url: `${window.location.origin}${getLmsRoute(
+		'/verify/LRN-SAMPLE-0000'
+	)}`,
 	organisation_name: certificateMeta.data?.organisation_name || '',
 	instructor_name: __('Instructor Name'),
 	batch_name: '',
@@ -529,17 +534,20 @@ async function next() {
 async function createCourse() {
 	creating.value = true
 	try {
-		const courseName = await call('lms.lms.course_creation.create_course_draft', {
-			title: draft.title.trim(),
-			course_type: draft.course_type,
-			category: draft.category || null,
-			time_commitment: draft.time_commitment || null,
-			instructors: draft.instructors,
-			// Sent whenever there is anything to keep. A half-finished design is
-			// still worth storing: the moderator picks it up from the course's
-			// certificate screen rather than starting the artwork again.
-			certificate: hasCertificateWork.value ? draft.certificate : null,
-		})
+		const courseName = await call(
+			'lms.lms.course_creation.create_course_draft',
+			{
+				title: draft.title.trim(),
+				course_type: draft.course_type,
+				category: draft.category || null,
+				time_commitment: draft.time_commitment || null,
+				instructors: draft.instructors,
+				// Sent whenever there is anything to keep. A half-finished design is
+				// still worth storing: the moderator picks it up from the course's
+				// certificate screen rather than starting the artwork again.
+				certificate: hasCertificateWork.value ? draft.certificate : null,
+			}
+		)
 		toast.success(__('Course created'))
 		// A brand-new course has nothing to edit yet, so land on Settings with
 		// the audience fields in view — the first thing the setup checklist

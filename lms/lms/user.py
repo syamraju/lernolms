@@ -8,7 +8,6 @@ from frappe.website.utils import cleanup_page_name, is_signup_disabled
 
 from lms.lms.utils import get_country_code, get_lms_route
 
-
 #: `while` needs a floor. Each pass appends a number to a candidate that already
 #: exists, so a handful of rounds settles any real collision; more than this means
 #: the candidate is not converging and the loop would never end.
@@ -133,9 +132,7 @@ def on_login(login_manager):
 	# A provisioned account has a working password that somebody else generated
 	# and mailed. Sending it anywhere but the set-password screen would leave that
 	# credential valid for as long as the user ignored the prompt.
-	if user not in ("Guest", "Administrator") and frappe.db.get_value(
-		"User", user, "must_reset_password"
-	):
+	if user not in ("Guest", "Administrator") and frappe.db.get_value("User", user, "must_reset_password"):
 		frappe.local.response["home_page"] = SET_PASSWORD_ROUTE
 		return
 

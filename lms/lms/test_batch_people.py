@@ -61,7 +61,12 @@ class TestTheRoster(PeopleTestCase):
 	def test_the_roster_reads_top_down(self):
 		self._enrol("people-roster-order@example.com")
 		relations = [row["relation"] for row in get_batch_people(self.batch)]
-		self.assertEqual(relations, sorted(relations, key=lambda r: {"moderator": 0, "instructor": 1, "evaluator": 2, "student": 3}[r]))
+		self.assertEqual(
+			relations,
+			sorted(
+				relations, key=lambda r: {"moderator": 0, "instructor": 1, "evaluator": 2, "student": 3}[r]
+			),
+		)
 
 	def test_a_student_does_not_see_administrative_columns(self):
 		"""'Why can this person not get in' is not a question one student gets to
@@ -93,9 +98,7 @@ class TestRemoval(PeopleTestCase):
 		student = self._enrol("people-remove-student@example.com")
 		remove_from_batch(self.batch, student)
 
-		self.assertFalse(
-			frappe.db.exists("LMS Batch Enrollment", {"batch": self.batch, "member": student})
-		)
+		self.assertFalse(frappe.db.exists("LMS Batch Enrollment", {"batch": self.batch, "member": student}))
 
 	def test_removing_somebody_who_is_not_enrolled_says_so(self):
 		stranger = _user("people-remove-stranger@example.com", ["LMS Student"])
@@ -128,17 +131,15 @@ class TestCrossBatchRoster(PeopleTestCase):
 	def test_one_person_in_two_batches_is_listed_once(self):
 		second = _batch("People Cross Second", self.moderator)
 		student = self._enrol("people-cross-student@example.com")
-		frappe.get_doc(
-			{"doctype": "LMS Batch Enrollment", "batch": second, "member": student}
-		).insert(ignore_permissions=True)
+		frappe.get_doc({"doctype": "LMS Batch Enrollment", "batch": second, "member": student}).insert(
+			ignore_permissions=True
+		)
 
 		frappe.set_user(self.moderator)
 		rows = [row for row in get_my_people() if row["user"] == student]
 
 		self.assertEqual(len(rows), 1)
-		self.assertEqual(
-			{entry["batch"] for entry in rows[0]["batches"]}, {self.batch, second}
-		)
+		self.assertEqual({entry["batch"] for entry in rows[0]["batches"]}, {self.batch, second})
 
 	def test_a_batch_the_caller_only_studies_in_is_not_included(self):
 		"""get_my_people is the moderator's roster. Being a student somewhere does
@@ -152,9 +153,9 @@ class TestCrossBatchRoster(PeopleTestCase):
 		# test_batch_invite and would fail here for the right reason.
 		frappe.set_user(other_mod)
 		for member in (self.moderator, classmate):
-			frappe.get_doc(
-				{"doctype": "LMS Batch Enrollment", "batch": other, "member": member}
-			).insert(ignore_permissions=True)
+			frappe.get_doc({"doctype": "LMS Batch Enrollment", "batch": other, "member": member}).insert(
+				ignore_permissions=True
+			)
 
 		frappe.set_user(self.moderator)
 		self.assertNotIn(classmate, {row["user"] for row in get_my_people()})

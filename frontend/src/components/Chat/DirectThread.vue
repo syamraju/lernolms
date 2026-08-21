@@ -8,7 +8,10 @@
 -->
 <template>
 	<div class="flex h-full min-h-0 flex-col">
-		<div ref="scroller" class="learno-scroll min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-6">
+		<div
+			ref="scroller"
+			class="learno-scroll min-h-0 flex-1 overflow-y-auto px-4 py-4 lg:px-6"
+		>
 			<p
 				v-if="messages.loading && !rows.length"
 				class="py-10 text-center text-[13px] text-[var(--learno-ink-subtle)]"
@@ -51,12 +54,18 @@
 									: 'bg-white text-[var(--learno-ink-strong)]'
 							"
 						>
-							<p class="whitespace-pre-wrap break-words text-[13px] leading-[1.5]">
+							<p
+								class="whitespace-pre-wrap break-words text-[13px] leading-[1.5]"
+							>
 								{{ message.content }}
 							</p>
 							<p
 								class="mt-1 text-[10px]"
-								:class="isMine(message) ? 'text-white/70' : 'text-[var(--learno-ink-subtle)]'"
+								:class="
+									isMine(message)
+										? 'text-white/70'
+										: 'text-[var(--learno-ink-subtle)]'
+								"
 							>
 								{{ timeAgo(message.creation) }}
 							</p>
@@ -77,7 +86,11 @@
 				class="learno-scroll max-h-32 min-h-[38px] flex-1 resize-none rounded-[var(--learno-r-md)] border border-[var(--learno-line)] px-3 py-2 text-[13px] outline-none focus:border-[var(--learno-primary)]"
 				@keydown.enter.exact.prevent="send"
 			/>
-			<Button variant="solid" :disabled="!draft.trim() || sending" @click="send">
+			<Button
+				variant="solid"
+				:disabled="!draft.trim() || sending"
+				@click="send"
+			>
 				{{ __('Send') }}
 			</Button>
 		</form>
@@ -85,7 +98,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import {
+	computed,
+	inject,
+	nextTick,
+	onMounted,
+	onUnmounted,
+	ref,
+	watch,
+} from 'vue'
 import { Avatar, Button, call, createResource } from 'frappe-ui'
 import { timeAgo } from '@/utils'
 import { sessionStore } from '@/stores/session'
@@ -150,7 +171,9 @@ watch(
 	() => {
 		live.value = []
 		messages.reload()
-		void call('lms.lms.direct_message.mark_read', { conversation: props.conversation }).catch(() => {})
+		void call('lms.lms.direct_message.mark_read', {
+			conversation: props.conversation,
+		}).catch(() => {})
 	}
 )
 
@@ -158,7 +181,9 @@ watch(() => messages.data, scrollToEnd)
 
 onMounted(() => {
 	socket?.on('lms_direct_message', onMessage)
-	void call('lms.lms.direct_message.mark_read', { conversation: props.conversation }).catch(() => {})
+	void call('lms.lms.direct_message.mark_read', {
+		conversation: props.conversation,
+	}).catch(() => {})
 })
 
 onUnmounted(() => socket?.off('lms_direct_message', onMessage))
