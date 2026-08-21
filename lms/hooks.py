@@ -99,6 +99,12 @@ permission_query_conditions = {
 	"LMS Batch": "lms.lms.doctype.lms_batch.lms_batch.get_permission_query_conditions",
 	"LMS Program": "lms.lms.doctype.lms_program.lms_program.get_permission_query_conditions",
 	"Course Lesson": "lms.lms.doctype.course_lesson.course_lesson.get_permission_query_conditions",
+	# The chat doctypes grant read to LMS Student / Course Creator / Batch
+	# Evaluator. Without these two, that grant is unscoped: the generic REST API
+	# would hand any signed-in student every cohort's messages, staff room
+	# included. The whitelisted API in lms.lms.chat checks access itself.
+	"LMS Chat Channel": "lms.lms.doctype.lms_chat_channel.lms_chat_channel.get_permission_query_conditions",
+	"LMS Chat Message": "lms.lms.doctype.lms_chat_message.lms_chat_message.get_permission_query_conditions",
 }
 
 has_permission = {
@@ -108,6 +114,8 @@ has_permission = {
 	"LMS Certificate": "lms.lms.doctype.lms_certificate.lms_certificate.has_permission",
 	"Course Lesson": "lms.lms.doctype.course_lesson.course_lesson.has_permission",
 	"File": "lms.lms.permissions.file_has_permission",
+	"LMS Chat Channel": "lms.lms.doctype.lms_chat_channel.lms_chat_channel.has_permission",
+	"LMS Chat Message": "lms.lms.doctype.lms_chat_message.lms_chat_message.has_permission",
 }
 
 # DocType Class

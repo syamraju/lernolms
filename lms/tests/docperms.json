@@ -303,6 +303,16 @@
 			"export"
 		]
 	},
+	"LMS Batch Invite Link": {
+		"Moderator#0": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"share",
+			"report"
+		]
+	},
 	"LMS Category": {
 		"Batch Evaluator#0": [
 			"read",
@@ -406,6 +416,71 @@
 			"share",
 			"report",
 			"export"
+		]
+	},
+	"LMS Chat Channel": {
+		"Batch Evaluator#0": [
+			"read"
+		],
+		"Course Creator#0": [
+			"read"
+		],
+		"LMS Student#0": [
+			"read"
+		],
+		"Moderator#0": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"share",
+			"report"
+		]
+	},
+	"LMS Chat Message": {
+		"Batch Evaluator#0": [
+			"read",
+			"write",
+			"create"
+		],
+		"Course Creator#0": [
+			"read",
+			"write",
+			"create"
+		],
+		"LMS Student#0": [
+			"read",
+			"write",
+			"create"
+		],
+		"Moderator#0": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"report"
+		]
+	},
+	"LMS Chat Read State": {
+		"Batch Evaluator#0": [
+			"read",
+			"write",
+			"create"
+		],
+		"Course Creator#0": [
+			"read",
+			"write",
+			"create"
+		],
+		"LMS Student#0": [
+			"read",
+			"write",
+			"create"
+		],
+		"Moderator#0": [
+			"read",
+			"write",
+			"create"
 		]
 	},
 	"LMS Coupon": {
