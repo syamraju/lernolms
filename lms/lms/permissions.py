@@ -10,6 +10,7 @@ core (frappe/permissions.py), CRM (crm.permissions.*), and Raven (raven.permissi
 """
 
 import frappe
+from frappe.utils import cint
 
 from lms.lms.utils import (
 	can_modify_batch,
@@ -23,12 +24,29 @@ from lms.lms.utils import (
 INSTRUCTOR_FIELDS = {"instructor_content", "instructor_notes"}
 
 
+def curriculum_item_is_live(lesson_row) -> bool:
+	"""Whether a curriculum item is revealed to learners.
+
+	Both the item and the section holding it have to be published. Rows created
+	before the curriculum builder existed carry NULL for both flags; those are
+	treated as published, so adding the feature does not retroactively hide
+	every lesson on every existing course.
+	"""
+	if lesson_row.is_published is not None and not cint(lesson_row.is_published):
+		return False
+	if not lesson_row.chapter:
+		return True
+	section_published = frappe.db.get_value("Course Chapter", lesson_row.chapter, "is_published")
+	return section_published is None or bool(cint(section_published))
+
+
 def resolve_lesson_access(lesson: str, *, user: str | None = None) -> tuple[bool, bool]:
 	"""Return ``(is_instructor, can_access)`` for a lesson, computed in a single pass.
 
 	- ``is_instructor``: can author the lesson's course → all media, incl. instructor files.
 	- ``can_access``: ``is_instructor`` OR enrolled member OR (published course AND
-	  include_in_preview AND guest access allowed).
+	  include_in_preview AND guest access allowed) — and, for everyone but the
+	  instructor, the item and its section must both be published.
 
 	Callers needing only one flag should use :func:`can_access_lesson`; this exists so a
 	caller needing both (e.g. get_lesson, which decides instructor-field visibility on top
@@ -37,7 +55,9 @@ def resolve_lesson_access(lesson: str, *, user: str | None = None) -> tuple[bool
 	if not isinstance(lesson, str) or not lesson:
 		return False, False
 
-	lesson_row = frappe.db.get_value("Course Lesson", lesson, ["course", "include_in_preview"], as_dict=True)
+	lesson_row = frappe.db.get_value(
+		"Course Lesson", lesson, ["course", "include_in_preview", "is_published", "chapter"], as_dict=True
+	)
 	if not lesson_row:
 		return False, False
 
@@ -48,6 +68,14 @@ def resolve_lesson_access(lesson: str, *, user: str | None = None) -> tuple[bool
 		frappe.session.user = user
 		if can_modify_course(lesson_row.course):
 			return True, True
+
+		# Draft curriculum. Filtering it out of the outline is presentation;
+		# this is the gate, so a guessed or stale lesson URL can't reach an item
+		# the author has not revealed yet. Instructors returned above, so this
+		# never locks an author out of their own work in progress.
+		if not curriculum_item_is_live(lesson_row):
+			return False, False
+
 		if get_membership(lesson_row.course, user):
 			return False, True
 		# Preview is for prospective students of a LIVE course. Require the course to be

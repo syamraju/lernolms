@@ -217,11 +217,14 @@ def get_lesson_details(chapter: dict, progress: bool = False):
 				"course",
 				"chapter",
 				"content",
+				"item_type",
 			],
 			as_dict=True,
 		)
 		lesson_details.number = f"{chapter.idx}-{row.idx}"
-		lesson_details.icon = get_lesson_icon(lesson_details.body, lesson_details.content)
+		lesson_details.icon = get_lesson_icon(
+			lesson_details.body, lesson_details.content, lesson_details.item_type
+		)
 
 		if progress:
 			lesson_details.is_complete = get_progress(lesson_details.course, lesson_details.name)
@@ -230,7 +233,20 @@ def get_lesson_details(chapter: dict, progress: bool = False):
 	return lessons
 
 
-def get_lesson_icon(body: str, content: str):
+# A typed curriculum item says what it is, so its icon comes from the type
+# rather than from sniffing the body. Lectures keep the content-derived icon:
+# the type alone can't tell a video lecture from an article.
+ITEM_TYPE_ICONS = {
+	"Quiz": "icon-quiz",
+	"Assignment": "icon-assignment",
+	"Coding Exercise": "icon-code",
+}
+
+
+def get_lesson_icon(body: str, content: str, item_type: str | None = None):
+	if item_type in ITEM_TYPE_ICONS:
+		return ITEM_TYPE_ICONS[item_type]
+
 	if content:
 		for block in get_editorjs_blocks(content):
 			data = block.get("data") or {}
@@ -1219,6 +1235,19 @@ def get_course_outline(course: str, progress: bool = False) -> list:
 		return []
 
 	lesson_rows = get_outline_lessons([c.name for c in chapters])
+
+	# Authors build sections and items in the open and reveal them when ready,
+	# so the outline a learner sees is the published subset. Anyone who may
+	# edit the course sees everything — the curriculum editor and the student
+	# preview both read this endpoint, and an author has to be able to reach
+	# the draft item they are working on.
+	if not can_modify_course(course):
+		chapters = [c for c in chapters if cint(c.is_published)]
+		visible = {c.name for c in chapters}
+		lesson_rows = [
+			row for row in lesson_rows if cint(row.is_published) and row.chapter_name in visible
+		]
+
 	files_by_name = get_scorm_files(chapters)
 	completed = get_completed_lessons(course, lesson_rows) if progress else set()
 
@@ -1240,6 +1269,8 @@ def get_outline_chapter(course: str) -> list:
 			ChapterReference.idx.as_("idx"),
 			CourseChapter.name.as_("name"),
 			CourseChapter.title.as_("title"),
+			CourseChapter.learning_objective.as_("learning_objective"),
+			CourseChapter.is_published.as_("is_published"),
 			CourseChapter.is_scorm_package.as_("is_scorm_package"),
 			CourseChapter.launch_file.as_("launch_file"),
 			CourseChapter.scorm_package.as_("scorm_package"),
@@ -1270,6 +1301,10 @@ def get_outline_lessons(chapter_names: list) -> list:
 			CourseLesson.file_type.as_("file_type"),
 			CourseLesson.course.as_("course"),
 			CourseLesson.chapter.as_("chapter"),
+			CourseLesson.item_type.as_("item_type"),
+			CourseLesson.is_published.as_("is_published"),
+			CourseLesson.duration_minutes.as_("duration_minutes"),
+			CourseLesson.video_duration.as_("video_duration"),
 		)
 		.where(LessonReference.parent.isin(chapter_names))
 		.orderby(LessonReference.idx)
@@ -1383,13 +1418,19 @@ def build_outline(
 			name=lr.name,
 			title=lr.title,
 			include_in_preview=lr.include_in_preview,
-			icon=get_lesson_icon(lr.body, lr.content),
+			icon=get_lesson_icon(lr.body, lr.content, lr.item_type),
 			youtube=lr.youtube,
 			quiz_id=lr.quiz_id,
 			question=lr.question,
 			file_type=lr.file_type,
 			course=lr.course,
 			chapter=lr.chapter,
+			# Rows predating the curriculum builder have no item_type; they are
+			# lectures. Defaulting here avoids a data patch over every course.
+			item_type=lr.item_type or "Lecture",
+			is_published=lr.is_published,
+			duration_minutes=lr.duration_minutes,
+			video_duration=lr.video_duration,
 			number=f"{chapter_idx_by_name[lr.chapter_name]}-{lr.lesson_idx}",
 		)
 		if progress:
@@ -1412,6 +1453,8 @@ def build_outline(
 		chapter = frappe._dict(
 			name=c.name,
 			title=c.title,
+			learning_objective=c.get("learning_objective"),
+			is_published=c.get("is_published"),
 			is_scorm_package=c.is_scorm_package,
 			launch_file=c.launch_file,
 			scorm_package=c.scorm_package,
@@ -1503,6 +1546,13 @@ def get_lesson(course: str, chapter: int, lesson: int) -> dict:
 			"course",
 			"content",
 			"instructor_content",
+			"item_type",
+			"is_published",
+			"duration_minutes",
+			"description",
+			"quiz",
+			"assignment",
+			"exercise",
 		],
 		as_dict=1,
 	)
@@ -1570,7 +1620,14 @@ def get_lesson(course: str, chapter: int, lesson: int) -> dict:
 	lesson_details.progress = progress
 	lesson_details.prev = neighbours["prev"]
 	lesson_details.membership = membership
-	lesson_details.icon = get_lesson_icon(lesson_details.body, lesson_details.content)
+	lesson_details.icon = get_lesson_icon(
+		lesson_details.body, lesson_details.content, lesson_details.get("item_type")
+	)
+	# Attached files and links are their own section under the player, so they
+	# travel with the lesson rather than being fetched separately per view.
+	from lms.lms.curriculum import get_lesson_resources
+
+	lesson_details.resources = get_lesson_resources(lesson_name)
 	lesson_details.instructors = get_instructors("LMS Course", course)
 	lesson_details.course_title = course_info.title
 	lesson_details.paid_certificate = course_info.paid_certificate

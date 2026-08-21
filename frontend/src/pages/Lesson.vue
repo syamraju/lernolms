@@ -268,6 +268,24 @@
 								:content="lesson.data.instructor_notes"
 							/>
 						</div>
+						<!-- A typed curriculum item (quiz, assignment, coding
+						     exercise) puts its activity above the body; a lecture
+						     renders nothing here and the body carries it. -->
+						<div
+							v-if="
+								lesson.data.item_type && lesson.data.item_type !== 'Lecture'
+							"
+							class="mt-8"
+						>
+							<LessonActivity
+								:key="lesson.data.name"
+								:itemType="lesson.data.item_type"
+								:description="lesson.data.description"
+								:quiz="lesson.data.quiz"
+								:assignment="lesson.data.assignment"
+								:exercise="lesson.data.exercise"
+							/>
+						</div>
 						<div
 							v-if="lesson.data.content"
 							@mouseup="toggleInlineMenu"
@@ -287,6 +305,10 @@
 								:quizId="lesson.data.quiz_id"
 							/>
 						</div>
+						<LessonResources
+							class="mt-8"
+							:resources="lesson.data.resources"
+						/>
 					</div>
 					<div
 						v-if="lesson.data && (allowDiscussions || tabs.length > 1)"
@@ -409,6 +431,8 @@ import {
 } from '@/utils/lessonProgress'
 import EditorJS from '@editorjs/editorjs'
 import LessonContent from '@/components/LessonContent.vue'
+import LessonActivity from '@/components/LessonActivity.vue'
+import LessonResources from '@/components/LessonResources.vue'
 import CourseInstructors from '@/components/CourseInstructors.vue'
 import ProgressBar from '@/components/ProgressBar.vue'
 import Discussions from '@/components/Discussions.vue'
