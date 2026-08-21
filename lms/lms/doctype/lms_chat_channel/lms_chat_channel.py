@@ -54,9 +54,14 @@ class LMSChatChannel(Document):
 	def on_trash(self):
 		"""Deleting a channel takes its sub-channels and messages with it.
 
-		Only ever reached through `lms.lms.chat.delete_channel`, which is
-		moderator-gated; archiving is the ordinary path and the one the curriculum
-		hooks use.
+		Reached from `lms.lms.chat.delete_channel`, which is moderator-gated, and
+		from `lms.lms.chat.remove_channels_for`, the on_trash hook that clears a
+		batch's or a course's channels when the record they belong to is deleted.
+
+		Archiving is the ordinary path and the one the curriculum hooks use: a
+		course dropped from a batch keeps its channel, because the course still
+		exists and the discussion is still about something. This runs when the
+		batch or course itself is going.
 		"""
 		for child in frappe.get_all("LMS Chat Channel", filters={"parent_channel": self.name}, pluck="name"):
 			frappe.delete_doc("LMS Chat Channel", child, ignore_permissions=True, force=True)
