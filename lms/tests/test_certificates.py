@@ -213,3 +213,51 @@ class TestDesignAccess(FrappeTestCase):
 			frappe.get_hooks("has_permission").get("LMS Certificate Template"),
 			["lms.lms.doctype.lms_certificate_template.lms_certificate_template.has_permission"],
 		)
+
+
+class TestSnapshotFieldExposure(FrappeTestCase):
+	"""The frozen design carries the verification code, so it is guarded too.
+
+	`member` and `verification_code` were put at permlevel 1 to stop a signed-in
+	student bulk-exporting every certificate's holder and code. `snapshot` has to
+	go with them: `course_certificate_values` resolves `certificate_id` and
+	`verification_url` into the design, so any certificate whose layout places
+	either element stores the code as plain text inside this field. Guarding two
+	fields and leaving the third would move the same enumeration one column over.
+
+	The code's unguessability is the only access control on the public page, so a
+	list of codes is a list of certificates.
+	"""
+
+	def field(self, fieldname):
+		return frappe.get_meta("LMS Certificate").get_field(fieldname)
+
+	def test_the_snapshot_is_not_readable_at_permlevel_zero(self):
+		self.assertEqual(self.field("snapshot").permlevel, 1)
+
+	def test_it_is_guarded_alongside_the_fields_it_can_contain(self):
+		# Stated as one assertion rather than three so that adding a field which
+		# resolves into the snapshot, and forgetting to guard it, reads as a
+		# failure here rather than as a silent gap.
+		for fieldname in ("member", "verification_code", "snapshot"):
+			with self.subTest(fieldname=fieldname):
+				self.assertEqual(
+					self.field(fieldname).permlevel, 1, f"{fieldname} is exposed at permlevel 0"
+				)
+
+	def test_no_low_privilege_role_can_reach_permlevel_one(self):
+		# Export is the one that matters: a single request returns every row.
+		exposed = [
+			perm.role
+			for perm in frappe.get_meta("LMS Certificate").permissions
+			if perm.permlevel == 1 and (perm.export or perm.report)
+		]
+		self.assertEqual(exposed, [], f"permlevel 1 is bulk-readable by {exposed}")
+
+	def test_a_student_holds_no_permlevel_one_grant_at_all(self):
+		student_perms = [
+			perm
+			for perm in frappe.get_meta("LMS Certificate").permissions
+			if perm.role == "LMS Student" and perm.permlevel == 1
+		]
+		self.assertEqual(student_perms, [])

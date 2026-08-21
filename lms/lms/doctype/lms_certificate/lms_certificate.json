@@ -156,6 +156,7 @@
    "fieldname": "snapshot",
    "fieldtype": "Long Text",
    "label": "Frozen Design",
+   "permlevel": 1,
    "read_only": 1
   }
  ],
