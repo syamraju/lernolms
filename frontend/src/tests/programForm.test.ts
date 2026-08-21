@@ -170,6 +170,17 @@ const makeRouter = (): Router =>
 					},
 				],
 			},
+			// The form links to the certificate designer, and `router-link`
+			// resolves its target at render time — an unregistered name throws
+			// during setup and takes the whole component down, so leaving this
+			// out fails every test in the file for a reason that looks nothing
+			// like a missing route. Registered rather than stubbed so that
+			// renaming the route in src/routes.js surfaces here.
+			{
+				path: '/programs/:programName/certificate',
+				name: 'ProgramCertificateDesigner',
+				component: { render: () => h('div') },
+			},
 		],
 	})
 

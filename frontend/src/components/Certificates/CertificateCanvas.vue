@@ -62,7 +62,7 @@
 			-->
 			<span
 				v-if="editable && index === selectedIndex"
-				class="absolute -bottom-1 -end-1 size-3 cursor-se-resize rounded-full border border-white bg-blue-500"
+				class="absolute -bottom-1 -end-1 size-3 cursor-se-resize rounded-full border border-white bg-surface-blue-7"
 				@pointerdown.stop="startResize($event, index)"
 			/>
 		</component>
