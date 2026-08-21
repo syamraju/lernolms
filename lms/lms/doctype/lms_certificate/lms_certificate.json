@@ -20,7 +20,12 @@
   "course_title",
   "column_break_ywee",
   "batch_name",
-  "batch_title"
+  "batch_title",
+  "verification_section",
+  "verification_code",
+  "certificate_template",
+  "column_break_verify",
+  "snapshot"
  ],
  "fields": [
   {
@@ -48,6 +53,7 @@
    "in_standard_filter": 1,
    "label": "Member",
    "options": "User",
+   "permlevel": 1,
    "reqd": 1
   },
   {
@@ -73,11 +79,11 @@
    "label": "Publish on Participant Page"
   },
   {
+   "description": "Legacy print format. Left blank when the certificate is drawn from a designed template.",
    "fieldname": "template",
    "fieldtype": "Link",
    "label": "Template",
-   "options": "Print Format",
-   "reqd": 1
+   "options": "Print Format"
   },
   {
    "fetch_from": "course.title",
@@ -118,12 +124,45 @@
    "fieldtype": "Data",
    "label": "Batch Title",
    "read_only": 1
+  },
+  {
+   "fieldname": "verification_section",
+   "fieldtype": "Section Break",
+   "label": "Verification"
+  },
+  {
+   "description": "Printed on the certificate and used by the public verification page.",
+   "fieldname": "verification_code",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Verification Code",
+   "permlevel": 1,
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "certificate_template",
+   "fieldtype": "Link",
+   "label": "Designed Template",
+   "options": "LMS Certificate Template",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_verify",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "The design and the values as they were the day this certificate was issued. Never rewritten.",
+   "fieldname": "snapshot",
+   "fieldtype": "Long Text",
+   "label": "Frozen Design",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-20 17:32:34.580862",
+ "modified": "2026-08-21 10:00:00.000000",
  "modified_by": "sayali@frappe.io",
  "module": "LMS",
  "name": "LMS Certificate",
@@ -185,6 +224,30 @@
    "report": 1,
    "role": "LMS Student",
    "share": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Moderator",
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Batch Evaluator",
+   "write": 1
+  },
+  {
+   "permlevel": 1,
+   "read": 1,
+   "role": "Course Creator",
+   "write": 1
   }
  ],
  "row_format": "Dynamic",

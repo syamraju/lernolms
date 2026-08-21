@@ -6,11 +6,19 @@
     {{ _("I am delighted to inform you that you have successfully earned your certification for the {0} course. Congratulations!").format(frappe.bold(course_title)) }}
 </p>
 <br>
+{% if verification_url %}
+<p>
+    {{ _("With this certification, you can now showcase your updated skills and share your achievement with your colleagues and on LinkedIn. Your certificate has a page of its own at the link below. Anyone you send it to can open it — no account needed — and see that it was issued by us.") }}
+</p>
+<br>
+<a href="{{ verification_url }}">{{ verification_url }}</a>
+{% else %}
 <p>
     {{ _("With this certification, you can now showcase your updated skills and share your achievement with your colleagues and on LinkedIn. To access your certificate, please click on the link provided below. Make sure you are logged in to the portal.") }}
 </p>
 <br>
 <a href="/api/method/frappe.utils.print_format.download_pdf?doctype=LMS+Certificate&name={{name}}&format={{template | urlencode }}">{{ _("Certificate Link") }}</a>
+{% endif %}
 <br>
 <p>
     {{ _("Once again, congratulations on this significant accomplishment.")}}
