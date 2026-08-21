@@ -748,6 +748,22 @@ def get_certificates(member: str | None = None, course: str | None = None) -> li
 	)
 
 
+# nosemgrep: guest-whitelisted-method
+# Reviewed, and guest access is the feature rather than an oversight: a
+# certificate whose proof only works for people who already have an account here
+# proves nothing to the employer it is shown to. The rule asks for a human
+# review, so this records one.
+#
+# What an anonymous caller can reach: one certificate, by a 12-character
+# unguessable code, returning only the frozen snapshot — the participant's name
+# and the course title as printed on the artwork, the dates, and the issuing
+# organisation. Never the holder's email, never the certificate's document name,
+# never anything about the course beyond its title, and no way to enumerate.
+# `snapshot`, `member` and `verification_code` are all permlevel 1 so the same
+# data cannot be reached in bulk through /api/resource by a signed-in student.
+#
+# Also listed in lms/tests/guest_endpoints.txt, which freezes the guest surface
+# so a NEW allow_guest endpoint cannot arrive unreviewed.
 @frappe.whitelist(allow_guest=True)
 def get_public_certificate(code: str) -> dict:
 	"""The digital copy anyone with the link can check.

@@ -49,6 +49,16 @@ def drop_orphan_tables(doctypes) -> list[str]:
 		if not frappe.db.table_exists(doctype, cached=False):
 			continue
 
+		# Interpolated rather than parameterised because a table name cannot be
+		# bound as a parameter. Safe here for reasons a reader should not have to
+		# reconstruct: the only value that reaches this line comes from a
+		# module-level literal tuple in the calling patch, never from a request,
+		# and the backtick guard above rejects the one character that could break
+		# out of the quoting.
+		#
+		# Worth knowing that no scanner is checking this: `frappe-sql-format-
+		# injection` matches `frappe.db.sql` and `frappe.db.multisql` only, so
+		# `sql_ddl` slips past it. This line is reviewed by hand or not at all.
 		frappe.db.sql_ddl(f"DROP TABLE IF EXISTS `tab{doctype}`")
 		dropped.append(doctype)
 
