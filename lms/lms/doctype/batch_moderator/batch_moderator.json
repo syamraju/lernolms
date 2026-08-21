@@ -1,0 +1,53 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2026-08-21 08:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "moderator",
+  "full_name",
+  "user_image"
+ ],
+ "fields": [
+  {
+   "description": "Frappe indexes a child table on `parent` only. The reverse lookup (\"which batches does this user moderate?\") runs inside LMS Batch.get_permission_query_conditions on every batch list read, so this column carries its own index.",
+   "fieldname": "moderator",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Moderator",
+   "options": "User",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fetch_from": "moderator.full_name",
+   "fieldname": "full_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Full Name",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "moderator.user_image",
+   "fieldname": "user_image",
+   "fieldtype": "Attach Image",
+   "label": "User Image",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-08-21 08:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "LMS",
+ "name": "Batch Moderator",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
