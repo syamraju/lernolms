@@ -41,10 +41,26 @@ class FakePeerConnection {
 		FakePeerConnection.instances.push(this)
 	}
 
-	addTransceiver(kind: string) {
-		const transceiver = { sender: { replaceTrack: vi.fn(() => Promise.resolve()) }, receiver: { track: { kind } } }
+	addTransceiver(kind: string, init?: any) {
+		const transceiver = {
+			direction: init?.direction ?? 'sendrecv',
+			sender: { replaceTrack: vi.fn(() => Promise.resolve()) },
+			receiver: { track: { kind } },
+		}
 		this.transceivers.push(transceiver)
 		return transceiver
+	}
+
+	/** What a browser does on setRemoteDescription(offer): it derives
+	 *  transceivers from the offer, and they start `recvonly`. */
+	receiveOfferTransceivers() {
+		for (const kind of ['audio', 'video']) {
+			this.transceivers.push({
+				direction: 'recvonly',
+				sender: { replaceTrack: vi.fn(() => Promise.resolve()) },
+				receiver: { track: { kind } },
+			})
+		}
 	}
 
 	getTransceivers() {
@@ -67,6 +83,7 @@ class FakePeerConnection {
 
 	setRemoteDescription(description: any) {
 		this.remoteDescription = description
+		if (description.type === 'offer' && !this.transceivers.length) this.receiveOfferTransceivers()
 		return Promise.resolve()
 	}
 
@@ -223,6 +240,33 @@ describe('useHuddle', () => {
 		})
 
 		await vi.waitFor(() => expect(signalsTo('alice@x.com', 'answer')).toHaveLength(1))
+	})
+
+	it('turns the answering side sendrecv, so its microphone actually transmits', async () => {
+		// A transceiver derived from a remote offer starts `recvonly`, and
+		// replaceTrack does not change that. Without the fix the call connects,
+		// ICE succeeds, and audio flows one way only — with no error anywhere.
+		// Found by running a real call between two browsers; no fake could have
+		// surfaced it, so this test encodes what the browser actually does.
+		joinResponse = {
+			huddle: roster([{ user: 'bob@x.com', peer_id: 'p-bob' }]),
+			self: { user: 'bob@x.com', peer_id: 'p-bob' },
+		}
+		const { socket, huddle } = build('bob@x.com')
+		await huddle.join('batch:B1')
+
+		socket.emit('lms_huddle_signal', {
+			conversation: 'batch:B1',
+			kind: 'offer',
+			from_user: 'alice@x.com',
+			from_peer: 'p-alice',
+			to_peer: myPeerId(),
+			payload: { sdp: 'their-offer' },
+		})
+
+		await vi.waitFor(() => expect(signalsTo('alice@x.com', 'answer')).toHaveLength(1))
+		const pc = FakePeerConnection.instances[0]
+		expect(pc.getTransceivers().map((t: any) => t.direction)).toEqual(['sendrecv', 'sendrecv'])
 	})
 
 	it('ignores a frame addressed to a different tab of mine', async () => {

@@ -193,8 +193,23 @@ export function useHuddle({ socket, currentUser }: UseHuddleOptions) {
 		// a transceiver has neither a sender nor a receiver track to identify it
 		// by, but the offer always puts audio first.
 		const [first, second] = transceivers
-		void (audioT || first)?.sender.replaceTrack(micTrack).catch(() => {})
-		void (videoT || second)?.sender.replaceTrack(video).catch(() => {})
+		const audio = audioT || first
+		const cam = videoT || second
+
+		// A transceiver the browser derived from a REMOTE offer starts out
+		// `recvonly`, and replaceTrack attaches a track without changing that.
+		// Without this line the answering side wires its microphone to a sender
+		// that never transmits: the call connects, ICE succeeds, one direction
+		// carries audio and the other is silent, and nothing anywhere reports an
+		// error. Set before createAnswer it costs no extra negotiation.
+		for (const transceiver of [audio, cam]) {
+			if (transceiver && transceiver.direction !== 'sendrecv') {
+				transceiver.direction = 'sendrecv'
+			}
+		}
+
+		void audio?.sender.replaceTrack(micTrack).catch(() => {})
+		void cam?.sender.replaceTrack(video).catch(() => {})
 	}
 
 	// --- mesh ------------------------------------------------------------------
