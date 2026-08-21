@@ -21,6 +21,15 @@ export interface SetupTarget {
 	/** Query params the receiving tab reads, e.g. `{ focus: 'audience' }`. */
 	query?: Record<string, string>
 	label: string
+	/**
+	 * A named route to send the author to instead of a tab of the course page.
+	 *
+	 * The certificate is the only item so far that is not a field on the course
+	 * — it is a canvas with its own screen — so it needs somewhere else to go.
+	 * `tab` is still required, and is what a caller that cannot route by name
+	 * falls back to.
+	 */
+	route?: string
 }
 
 export interface SetupItem {
@@ -165,6 +174,21 @@ export const SETUP_ITEMS: SetupItem[] = [
 			tab: 'settings',
 			query: { focus: 'messages' },
 			label: 'Edit in Settings',
+		},
+	},
+	// Optional in the sense the checklist uses the word — it does not gate
+	// "Submit for Review". It gates something earlier and stricter: no
+	// instructor can be invited to the course until it is finished.
+	{
+		key: 'certificate',
+		label: 'Certificate',
+		group: 'publish',
+		optional: true,
+		hint: 'Artwork, with the learner’s name, the dates and the course name placed on it.',
+		target: {
+			tab: 'settings',
+			route: 'CourseCertificateDesigner',
+			label: 'Open the designer',
 		},
 	},
 ]
