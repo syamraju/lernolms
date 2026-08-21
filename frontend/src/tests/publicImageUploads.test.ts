@@ -196,7 +196,6 @@ const MANIFEST: Record<string, Privacy[]> = {
 	'components/Courses/CourseCaptionsSection.vue': ['public'],
 	// Deliberately not readable by other users.
 	'components/Assignment.vue': ['private', 'private', 'private'],
-	'components/Modals/JobApplicationModal.vue': ['private'],
 	'pages/Forms/ChapterForm.vue': ['private'],
 	'components/Notes/Notes.vue': ['private'],
 	// Lecture video, uploaded from the curriculum editor. Private and attached
@@ -247,8 +246,6 @@ const MANIFEST: Record<string, Privacy[]> = {
 	],
 	'pages/Courses/Manage/ExerciseEditor.vue': ['undeclared', 'undeclared'],
 	'pages/Forms/NewCourseForm.vue': ['undeclared'],
-	'pages/JobApplications.vue': ['undeclared'],
-	'pages/Forms/JobForm.vue': ['undeclared'],
 	'pages/Forms/ProfileEditForm.vue': ['undeclared'],
 	'pages/Forms/ProgrammingExerciseForm.vue': ['undeclared'],
 	'pages/Forms/QuizQuestionForm.vue': ['undeclared'],

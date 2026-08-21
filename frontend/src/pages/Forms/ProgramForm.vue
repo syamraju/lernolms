@@ -330,8 +330,8 @@ const programs = createListResource({
 // C4: edit mode used to be seeded from the parent's in-memory array. On a cold
 // deep link that array is empty, so the form rendered as if the program had no
 // title and no child rows — and a Save from that state posted the emptiness
-// back over the real record. Fetch our own document instead, exactly as
-// JobForm.vue:182-190 does. createDocumentResource returns undefined when
+// back over the real record. Fetch our own document instead.
+// createDocumentResource returns undefined when
 // `name` is falsy (documentResource.js:15), hence the optional chaining.
 const programDoc = createDocumentResource({
 	doctype: 'LMS Program',

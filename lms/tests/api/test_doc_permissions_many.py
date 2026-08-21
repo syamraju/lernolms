@@ -53,20 +53,14 @@ class TestDocPermissionsMany(BaseTestUtils):
 	def test_an_unreadable_document_is_indistinguishable_from_a_missing_one(self):
 		"""Otherwise the endpoint enumerates inaccessible records: submit guessed
 		names, and a permission map back means the row is real while {} means it
-		is not. Job Opportunity is read-if_owner for LMS Student, so one owned by
-		somebody else is a real row this caller must not be able to confirm."""
-		job = frappe.get_doc(
+		is not. LMS Program.has_permission hides an unpublished program from a
+		student who is not enrolled, so it is a real row this caller must not be
+		able to confirm."""
+		program = frappe.get_doc(
 			{
-				"doctype": "Job Opportunity",
-				"job_title": f"Perm Many Job {frappe.generate_hash(length=6)}",
-				"location": "Remote",
-				"type": "Full Time",
-				"description": "<p>Work</p>",
-				"company_name": "Acme",
-				"company_website": "https://acme.test",
-				"company_logo": "/files/acme.png",
-				"company_email_address": "jobs@acme.test",
-				"country": "India",
+				"doctype": "LMS Program",
+				"title": f"Perm Many Program {frappe.generate_hash(length=6)}",
+				"published": 0,
 			}
 		).insert(ignore_permissions=True)
 
@@ -78,9 +72,9 @@ class TestDocPermissionsMany(BaseTestUtils):
 		)
 		frappe.set_user(student.name)
 
-		result = get_doc_permissions_many("Job Opportunity", [job.name, "does-not-exist-xyz"])
-		self.assertEqual(result[job.name], {})
-		self.assertEqual(result[job.name], result["does-not-exist-xyz"])
+		result = get_doc_permissions_many("LMS Program", [program.name, "does-not-exist-xyz"])
+		self.assertEqual(result[program.name], {})
+		self.assertEqual(result[program.name], result["does-not-exist-xyz"])
 
 	def test_unreadable_document_reports_zero_not_an_error(self):
 		student = self._create_user(

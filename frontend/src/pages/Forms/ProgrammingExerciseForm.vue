@@ -230,8 +230,7 @@ const languageOptions = [
 ]
 
 // C4 — edit mode used to be seeded from the list page's in-memory rows, which
-// are empty when this route is opened cold. Fetch the record instead, following
-// JobForm.vue:182-190.
+// are empty when this route is opened cold. Fetch the record instead.
 //
 // Constructed conditionally rather than with `name: undefined`, as
 // CouponDetails.vue:116-121 does: createDocumentResource bails out and returns

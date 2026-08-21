@@ -139,7 +139,7 @@ const assignment = reactive<AssignmentFields>({
 // C4: edit mode used to copy its values out of the parent list's in-memory
 // array, which is empty when someone lands here by link or reload — the form
 // then rendered blank and a Save would have written those blanks back. Fetch
-// the record ourselves instead, the same way JobForm.vue:182-190 does.
+// the record ourselves instead.
 // createDocumentResource returns undefined when `name` is falsy
 // (documentResource.js:15), so in create mode there is simply no resource.
 const editingName =
@@ -147,8 +147,8 @@ const editingName =
 const assignmentDoc = createDocumentResource({
 	doctype: 'LMS Assignment',
 	// frappe-ui types `name` as required even though documentResource.js:15
-	// returns undefined for a falsy one — which is the create-mode contract
-	// JobForm.vue:184 already relies on. Cast rather than invent a name.
+	// returns undefined for a falsy one, which is the create-mode contract
+	// relied on here. Cast rather than invent a name.
 	name: editingName as string,
 	auto: Boolean(editingName),
 	onError(err: any) {

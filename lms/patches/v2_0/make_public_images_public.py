@@ -18,7 +18,6 @@ PUBLIC_FILE_FIELDS = (
 	("LMS Batch", "meta_image"),
 	("LMS Batch", "video_link"),
 	("LMS Badge", "image"),
-	("Job Opportunity", "company_logo"),
 	("User", "user_image"),
 	("User", "cover_image"),
 )

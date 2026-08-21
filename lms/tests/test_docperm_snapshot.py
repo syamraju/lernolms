@@ -19,8 +19,7 @@ PTYPES = ("read", "write", "create", "delete", "submit", "cancel", "share", "rep
 
 def _snapshot():
 	# The app's own modules, read from lms/modules.txt rather than matched with a
-	# LIKE pattern: the app ships both "LMS" and "Job", and a "%LMS%" filter drops
-	# every Job doctype without saying so.
+	# LIKE pattern, so a module added later is covered without editing this file.
 	modules = get_module_list("lms")
 	out = {}
 	for name in frappe.get_all("DocType", filters={"module": ("in", modules)}, pluck="name"):
@@ -39,11 +38,11 @@ def _snapshot():
 
 
 class TestDocPermSnapshot(FrappeTestCase):
-	def test_snapshot_covers_both_app_modules(self):
+	def test_snapshot_covers_every_app_module(self):
 		modules = set(get_module_list("lms"))
 		self.assertEqual(
 			modules,
-			{"LMS", "Job"},
+			{"LMS"},
 			"lms/modules.txt changed. Regenerate lms/tests/docperms.json so the new "
 			"module's doctypes are covered — a module missing from the snapshot is "
 			"invisible to the test below, not absent from the REST API.",

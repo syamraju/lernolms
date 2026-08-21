@@ -6,7 +6,6 @@ def execute():
 		"courses",
 		"batches",
 		"certified_participants",
-		"jobs",
 		"statistics",
 		"notifications",
 	]

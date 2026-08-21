@@ -60,8 +60,6 @@ export interface LMSSettings {
 	courses?: 0 | 1
 	/**	Batches : Check	*/
 	batches?: 0 | 1
-	/**	Jobs : Check	*/
-	jobs?: 0 | 1
 	/**	Statistics : Check	*/
 	statistics?: 0 | 1
 	/**	Notifications : Check	*/
@@ -104,8 +102,6 @@ export interface LMSSettings {
 	send_notification_for_published_courses?: '' | 'Email' | 'In-app'
 	/**	Send Notification for Published Batches : Select	*/
 	send_notification_for_published_batches?: '' | 'Email' | 'In-app'
-	/**	Allow Job Posting : Check	*/
-	allow_job_posting?: 0 | 1
 	/**	Demo Data Present : Check	*/
 	demo_data_present?: 0 | 1
 	/**	Send Payment Reminders for Batch : Check	*/

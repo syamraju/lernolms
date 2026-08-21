@@ -37,12 +37,6 @@ export const GUEST_TABS: readonly NavLink[] = [
 		activeFor: ['Batches', 'BatchDetail'],
 	},
 	{
-		label: 'Jobs',
-		icon: 'Briefcase',
-		to: 'Jobs',
-		activeFor: ['Jobs', 'JobDetail'],
-	},
-	{
 		label: 'Statistics',
 		icon: 'TrendingUp',
 		to: 'Statistics',
@@ -77,7 +71,7 @@ const SECTION_MAP: Record<string, readonly string[]> = {
 		'Assignments',
 		'Programming Exercises',
 	],
-	DISCOVER: ['Jobs', 'Statistics'],
+	DISCOVER: ['Statistics'],
 }
 
 // Session actions belong to the account group no matter which list they

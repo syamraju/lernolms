@@ -19,7 +19,6 @@ plus the generic Frappe REST layer they sit alongside.
 | [Users & profiles](./users.md) | Signup, session user, members, roles, profiles, streaks, badges |
 | [Certifications & evaluations](./certifications.md) | Certificates, evaluators, slots, scheduling, requests |
 | [Payments & billing](./payments.md) | Order summary, billing access, payment links, gateways |
-| [Jobs](./jobs.md) | Job opportunities, applicants, reporting |
 | [Programs](./programs.md) | Program listing, details, enrollment |
 | [Discussions & notifications](./discussions.md) | Topics, replies, announcements, notification log |
 | [Platform & admin](./admin.md) | Settings, sidebar, branding, PWA, search, SEO meta, integrations |
@@ -152,10 +151,9 @@ filters, so the footer count and the rows agree:
 | --- | --- |
 | `get_courses` | `get_course_count` |
 | `get_batches` | `get_batch_count` |
-| `get_job_opportunities` | `get_job_opportunities_count` |
 | `get_certified_participants` | `get_count_of_certified_members` |
 
-**Job/certification style** — `start` + `page_length`, with `limit_start` /
+**Certification style** — `start` + `page_length`, with `limit_start` /
 `limit_page_length` accepted as aliases (they win when both are sent). Default page
 size **40**.
 
@@ -174,10 +172,6 @@ JSON-encoded string:
 Several endpoints add **pseudo-filters** that are not real fields and get rewritten
 server-side (`enrolled`, `created`, `live`, `certification`, `title`) — see
 [Courses](./courses.md#get_courses) and [Batches](./batches.md#get_batches).
-
-`get_job_opportunities` allow-lists filter keys and silently drops the rest:
-`status`, `type`, `work_mode`, `country` for `filters`; `job_title`, `company_name`,
-`location` for `or_filters`.
 
 ### Errors
 

@@ -49,7 +49,6 @@ field to LMS Settings does not automatically expose it here.
 | `contact_us_email`, `contact_us_url` | `str` | Support links. |
 | `livecode_url` | `str` | Code-execution service endpoint. |
 | `disable_pwa` | `bool` | |
-| `allow_job_posting` | `bool` | Enables the job board. |
 | `demo_data_present` | `bool` | Whether seeded demo content is still installed. |
 | `is_payments_app_installed` | `bool` | Computed — whether the `payments` app is installed. |
 
@@ -103,7 +102,7 @@ off. Handle both shapes.
 
 ```json
 {
-  "courses": 1, "batches": 1, "certifications": 1, "jobs": 0,
+  "courses": 1, "batches": 1, "certifications": 1,
   "statistics": 1, "notifications": 1, "programming_exercises": 0,
   "web_pages": [
     { "name": "si-001", "web_page": "handbook", "route": "/handbook",
@@ -181,10 +180,10 @@ restricted to titles.
 | Name | Type | Required | Description |
 | --- | --- | --- | --- |
 | `query` | `str` | yes | Search text. |
-| `category` | `str` | no | One of `courses`, `batches`, `jobs`, `quizzes`, `assignments`, `programs`. Any other value throws. |
+| `category` | `str` | no | One of `courses`, `batches`, `quizzes`, `assignments`, `programs`. Any other value throws. |
 
-**Returns** — results grouped in fixed order (Courses, Batches, Job Opportunities,
-Quizzes, Assignments, Programs), deduplicated, newest-modified first:
+**Returns** — results grouped in fixed order (Courses, Batches, Quizzes,
+Assignments, Programs), deduplicated, newest-modified first:
 
 ```json
 [{

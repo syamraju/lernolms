@@ -134,12 +134,11 @@ Private lesson media is **not** served from `/private/files/` — see
 | `LMS Certificate Evaluation` | Write via [`save_evaluation_details`](./certifications.md#save_evaluation_details). |
 | `Course Evaluator`, `Evaluator Schedule` | Manage through the evaluator-slot endpoints — direct writes can grant the Batch Evaluator role as a side effect. |
 
-### Commerce, jobs & social
+### Commerce & social
 
 | Doctype | Notes |
 | --- | --- |
 | `LMS Payment`, `LMS Coupon` | Payments are written by [`get_payment_link`](./payments.md#get_payment_link). |
-| `Job Opportunity`, `LMS Job Application` | |
 | `Discussion Topic`, `Discussion Reply` | Insert here; read via the [discussion endpoints](./discussions.md). |
 | `LMS Course Review` | |
 | `LMS Badge`, `LMS Badge Assignment` | Manual awards via [`assign_badge`](./users.md#assign_badge). |

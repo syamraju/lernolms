@@ -39,7 +39,7 @@ export interface PaletteRouteContext {
 
 /**
  * Where a search hit opens. Every doctype but LMS Course used to fall through to
- * the batch route, so a job hit navigated to /batches/JOB-0001; an unmapped
+ * the batch route, so a quiz hit navigated to /batches/<quiz-name>; an unmapped
  * doctype now yields nothing and its row is dropped instead.
  */
 const ROUTE_BUILDERS: Record<
@@ -54,7 +54,6 @@ const ROUTE_BUILDERS: Record<
 		name: 'BatchDetail',
 		params: { batchName: name },
 	}),
-	'Job Opportunity': (name) => ({ name: 'JobDetail', params: { job: name } }),
 	'LMS Quiz': (name) => ({ name: 'QuizForm', params: { quizID: name } }),
 	'LMS Assignment': (name) => ({
 		name: 'AssignmentForm',

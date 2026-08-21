@@ -8,7 +8,6 @@ from frappe.utils import nowdate
 CATEGORY_DOCTYPES = {
 	"courses": "LMS Course",
 	"batches": "LMS Batch",
-	"jobs": "Job Opportunity",
 	"quizzes": "LMS Quiz",
 	"assignments": "LMS Assignment",
 	"programs": "LMS Program",
@@ -18,13 +17,12 @@ CATEGORY_DOCTYPES = {
 DOCTYPE_GROUPS = {
 	"LMS Course": "Courses",
 	"LMS Batch": "Batches",
-	"Job Opportunity": "Job Opportunities",
 	"LMS Quiz": "Quizzes",
 	"LMS Assignment": "Assignments",
 	"LMS Program": "Programs",
 }
 
-# Courses, batches and jobs keep their hand-written visibility rules below.
+# Courses and batches keep their hand-written visibility rules below.
 PERMISSION_CHECKED_DOCTYPES = ("LMS Quiz", "LMS Assignment", "LMS Program")
 
 # LMS Quiz and LMS Assignment grant `read` to LMS Student with no
@@ -128,8 +126,6 @@ def is_visible(row, doctype, roles, permitted):
 		return can_access_course(row, roles)
 	if doctype == "LMS Batch":
 		return can_access_batch(row, roles)
-	if doctype == "Job Opportunity":
-		return can_access_job(row, roles)
 	return row.get("name") in permitted.get(doctype, ())
 
 
@@ -222,12 +218,6 @@ def can_access_batch(batch, roles):
 	elif batch.get("published") and batch.get("start_date") >= nowdate():
 		return True
 	return False
-
-
-def can_access_job(job, roles):
-	if "Moderator" in roles:
-		return True
-	return job.get("status") == "Open"
 
 
 def can_create_course(roles):

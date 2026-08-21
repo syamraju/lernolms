@@ -86,10 +86,6 @@ class TestResultVisibility(FrappeTestCase):
 		course = row("LMS Course", "draft-course", published=0)
 		self.assertFalse(is_visible(course, "LMS Course", ["LMS Student"], {}))
 
-	def test_a_closed_job_is_hidden_from_a_student(self):
-		job = row("Job Opportunity", "JOB-0001", status="Closed")
-		self.assertFalse(is_visible(job, "Job Opportunity", ["LMS Student"], {}))
-
 	# The doctypes added for the palette are gated by frappe.get_list, so what
 	# reaches `permitted` is the whole of their visibility rule.
 	def test_a_permission_checked_row_needs_its_name_permitted(self):

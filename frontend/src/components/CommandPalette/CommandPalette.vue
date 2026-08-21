@@ -157,8 +157,8 @@ const hasSettled = ref(false)
 const search = createResource({ url: 'lms.command_palette.search_sqlite' })
 
 // `getSidebarLinks()` is the list before the site's own on/off flags are applied
-// — AppSidebar filters it a second time against these — so a site with Jobs
-// switched off was still offered a Jobs row here.
+// — AppSidebar filters it a second time against these — so a site with
+// Statistics switched off was still offered a Statistics row here.
 const sidebarVisibility = computed(() => settingsStore.sidebarSettings.data)
 
 const runSearch = async (token: number) => {

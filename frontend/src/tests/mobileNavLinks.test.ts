@@ -41,7 +41,7 @@ const SIDEBAR = [
 		items: [
 			{ label: 'Courses', icon: 'BookOpen', to: 'Courses' },
 			{ label: 'Batches', icon: 'Users', to: 'Batches' },
-			{ label: 'Jobs', icon: 'Briefcase', to: 'Jobs' },
+			{ label: 'Statistics', icon: 'TrendingUp', to: 'Statistics' },
 		],
 	},
 ]
@@ -70,11 +70,16 @@ beforeEach(() => {
 describe('loadMobileNavLinks', () => {
 	it('flattens the sidebar groups into one list', async () => {
 		await loadMobileNavLinks(LEARNER)
-		expect(labels(sidebarLinks)).toEqual(['Home', 'Courses', 'Batches', 'Jobs'])
+		expect(labels(sidebarLinks)).toEqual([
+			'Home',
+			'Courses',
+			'Batches',
+			'Statistics',
+		])
 	})
 
 	it('drops a destination the admin has switched off', async () => {
-		settings.data = { batches: 0, jobs: '0' }
+		settings.data = { batches: 0, statistics: '0' }
 		await loadMobileNavLinks(LEARNER)
 		expect(labels(sidebarLinks)).toEqual(['Home', 'Courses'])
 	})
@@ -84,7 +89,12 @@ describe('loadMobileNavLinks', () => {
 		// links are added either, because the load has not really happened yet.
 		settings.data = undefined
 		await loadMobileNavLinks(MODERATOR)
-		expect(labels(sidebarLinks)).toEqual(['Home', 'Courses', 'Batches', 'Jobs'])
+		expect(labels(sidebarLinks)).toEqual([
+			'Home',
+			'Courses',
+			'Batches',
+			'Statistics',
+		])
 		expect(labels(otherLinks)).toEqual([])
 	})
 
@@ -95,7 +105,7 @@ describe('loadMobileNavLinks', () => {
 			'Programs',
 			'Courses',
 			'Batches',
-			'Jobs',
+			'Statistics',
 		])
 		expect(call).not.toHaveBeenCalled()
 	})

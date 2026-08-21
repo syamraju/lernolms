@@ -152,22 +152,6 @@ no users.
 
 ---
 
-## `get_application_users`
-
-`lms.lms.api.get_application_users` — **Guest: no**
-
-User details for a set of job applicants, filtered through the caller's read
-permission on `LMS Job Application` — names the caller cannot see are dropped
-before the User lookup.
-
-**Parameters** — `user_names` (`list` \| `str`, required — array of user names, or a
-JSON-encoded array).
-
-**Returns** — array of `{name, user_image, full_name, email}`. `[]` when the input
-is empty or nothing is visible.
-
----
-
 ## `search_users_by_role`
 
 `lms.lms.api.search_users_by_role` — **Guest: no** · *Roles: Moderator, Course Creator, Batch Evaluator*

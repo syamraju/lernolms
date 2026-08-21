@@ -89,16 +89,6 @@
 			"export"
 		]
 	},
-	"Job Opportunity": {
-		"LMS Student#0#if_owner": [
-			"read",
-			"write",
-			"create",
-			"share",
-			"report",
-			"export"
-		]
-	},
 	"LMS Assignment": {
 		"Batch Evaluator#0": [
 			"read",
@@ -546,16 +536,6 @@
 			"write",
 			"create",
 			"delete",
-			"share",
-			"report",
-			"export"
-		]
-	},
-	"LMS Job Application": {
-		"LMS Student#0#if_owner": [
-			"read",
-			"write",
-			"create",
 			"share",
 			"report",
 			"export"

@@ -248,29 +248,6 @@ export const routes = [
 		],
 	},
 	{
-		path: '/job-openings',
-		name: 'Jobs',
-		component: () => import('@/pages/Jobs.vue'),
-	},
-	{
-		path: '/job-openings/:job',
-		name: 'JobDetail',
-		component: () => import('@/pages/JobDetail.vue'),
-		props: true,
-	},
-	{
-		path: '/job-openings/:job/applications',
-		name: 'JobApplications',
-		component: () => import('@/pages/JobApplications.vue'),
-		props: true,
-	},
-	{
-		path: '/job-opening/:jobName/edit',
-		name: 'JobForm',
-		component: () => import('@/pages/Forms/JobForm.vue'),
-		props: true,
-	},
-	{
 		path: '/certified-participants',
 		name: 'CertifiedParticipants',
 		component: () => import('@/pages/CertifiedParticipants.vue'),

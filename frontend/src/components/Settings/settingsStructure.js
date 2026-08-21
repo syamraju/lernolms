@@ -153,25 +153,6 @@ export const settingsStructure = [
 						],
 					},
 					{
-						label: 'Jobs',
-						columns: [
-							{
-								fields: [
-									{
-										label: 'Allow Job Posting',
-										name: 'allow_job_posting',
-										type: 'checkbox',
-										description:
-											'If enabled, users can post job openings on the job board. Else only admins can post jobs.',
-									},
-								],
-							},
-							{
-								fields: [],
-							},
-						],
-					},
-					{
 						label: 'Integrations',
 						columns: [
 							{
@@ -500,13 +481,6 @@ export const settingsStructure = [
 							},
 							{
 								fields: [
-									{
-										label: 'Jobs',
-										name: 'jobs',
-										type: 'checkbox',
-										description:
-											'Show the Jobs link in the sidebar.',
-									},
 									{
 										label: 'Statistics',
 										name: 'statistics',

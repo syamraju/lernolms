@@ -101,8 +101,6 @@ declare module 'vue' {
     InstallPrompt: typeof import('./src/components/InstallPrompt.vue')['default']
     InvitationModal: typeof import('./src/components/Learno/Calendar/InvitationModal.vue')['default']
     InviteIcon: typeof import('./src/components/Icons/InviteIcon.vue')['default']
-    JobApplicationModal: typeof import('./src/components/Modals/JobApplicationModal.vue')['default']
-    JobCard: typeof import('./src/components/JobCard.vue')['default']
     LearnoCourseCard: typeof import('./src/components/Learno/LearnoCourseCard.vue')['default']
     LearnoDialog: typeof import('./src/components/Learno/LearnoDialog.vue')['default']
     LearnoMark: typeof import('./src/components/Learno/LearnoMark.vue')['default']

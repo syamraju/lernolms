@@ -17,7 +17,6 @@ const sidebarLinks = [
 	link('Programs'),
 	link('Courses'),
 	link('Batches'),
-	link('Jobs'),
 	link('Statistics'),
 	link('Certifications'),
 ]
@@ -80,7 +79,7 @@ describe('pickPrimaryTabs', () => {
 })
 
 describe('pickPrimaryTabs for a signed-out visitor', () => {
-	const guestLabels = ['Courses', 'Batches', 'Jobs', 'Statistics', 'Log in']
+	const guestLabels = ['Courses', 'Batches', 'Statistics', 'Log in']
 
 	it('shows the whole bar before any sidebar link has loaded', () => {
 		// Regression: the guest bar used to be matched out of `sidebarLinks`,
@@ -98,8 +97,8 @@ describe('pickPrimaryTabs for a signed-out visitor', () => {
 
 	it('hides a destination the admin has switched off', () => {
 		// Greptile P1 on #2630: the guest bar was hardcoded, so a visitor could
-		// see and open Batches or Jobs after LMS Settings had turned them off.
-		const visibility = { courses: 1, batches: 0, jobs: 0, statistics: 1 }
+		// see and open Batches after LMS Settings had turned it off.
+		const visibility = { courses: 1, batches: 0, statistics: 1 }
 		expect(pickPrimaryTabs([], false, visibility).map((t) => t.label)).toEqual([
 			'Courses',
 			'Statistics',
@@ -150,11 +149,11 @@ describe('pickPrimaryTabs for a signed-out visitor', () => {
 		// `lms_settings.get(item)` hands back an int, but the resource has been
 		// seen carrying strings; both mean the same thing.
 		expect(
-			pickPrimaryTabs([], false, { jobs: '0' }).map((t) => t.label)
-		).not.toContain('Jobs')
+			pickPrimaryTabs([], false, { statistics: '0' }).map((t) => t.label)
+		).not.toContain('Statistics')
 		expect(
-			pickPrimaryTabs([], false, { jobs: '1' }).map((t) => t.label)
-		).toContain('Jobs')
+			pickPrimaryTabs([], false, { statistics: '1' }).map((t) => t.label)
+		).toContain('Statistics')
 	})
 
 	it('gives every tab an icon, and a route unless it leaves the SPA', () => {
@@ -163,7 +162,6 @@ describe('pickPrimaryTabs for a signed-out visitor', () => {
 		expect(tabs.filter((t) => t.to).map((t) => t.to)).toEqual([
 			'Courses',
 			'Batches',
-			'Jobs',
 			'Statistics',
 		])
 	})
@@ -198,7 +196,6 @@ describe('overflowLinks', () => {
 		expect(labels()).toEqual([
 			'Programs',
 			'Batches',
-			'Jobs',
 			'Statistics',
 			'Quizzes',
 			'Assignments',
