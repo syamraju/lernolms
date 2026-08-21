@@ -9,6 +9,9 @@
 	course's availability rather than of each window, because that is what the
 	student-facing grid divides by and a per-window length would make two
 	adjacent windows produce a ragged grid.
+
+	The footer is hidden until a course is loaded: with nothing to publish
+	against, Publish can only produce "Pick a course."
 -->
 <template>
 	<LearnoDialog
@@ -17,6 +20,7 @@
 		:width="640"
 		:busy="busy"
 		:save-label="__('Publish')"
+		:hide-footer="!courses.data?.length"
 		@update:open="$emit('update:open', $event)"
 		@save="save"
 	>

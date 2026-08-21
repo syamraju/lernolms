@@ -36,10 +36,26 @@ class LMSAppointment(Document):
 	def validate(self):
 		self.set_day()
 		self.validate_times()
-		self.validate_not_in_the_past()
-		self.validate_student_is_enrolled()
-		self.validate_within_availability()
+
+		# The three checks below answer "may this slot be taken?", which is a
+		# question about the booking, not about the row. Re-running them on every
+		# save would make an appointment impossible to cancel or complete once the
+		# instructor edited their hours, withdrew them, or the student's enrolment
+		# ended — all of which happen after a booking is already made. Gate them on
+		# the slot actually moving, so a reschedule is still held to the same rules.
+		if self.is_new() or self.slot_has_changed():
+			self.validate_not_in_the_past()
+			self.validate_student_is_enrolled()
+			self.validate_within_availability()
+
+		# Not gated: two live appointments must never overlap, whatever moved.
 		self.validate_slot_is_free()
+
+	def slot_has_changed(self) -> bool:
+		return any(
+			self.has_value_changed(field)
+			for field in ("course", "instructor", "student", "date", "start_time", "end_time")
+		)
 
 	def set_day(self):
 		self.day = getdate(self.date).strftime("%A")
@@ -49,11 +65,9 @@ class LMSAppointment(Document):
 			frappe.throw(_("The appointment ends before it starts."))
 
 	def validate_not_in_the_past(self):
-		# Only on the way in. An appointment that has since passed must stay
-		# saveable so its status can be moved to Completed or Cancelled.
-		if not self.is_new():
-			return
-
+		# Only reached for a new or rescheduled booking — an appointment that has
+		# since passed must stay saveable so its status can be moved to Completed
+		# or Cancelled. `validate` is what draws that line.
 		starts_at = get_datetime(f"{getdate(self.date)} {self.start_time}")
 		if starts_at < now_datetime():
 			frappe.throw(_("That slot is in the past."))

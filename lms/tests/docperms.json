@@ -89,6 +89,33 @@
 			"export"
 		]
 	},
+	"LMS Appointment": {
+		"Course Creator#0": [
+			"read",
+			"write",
+			"create",
+			"share",
+			"report",
+			"export"
+		],
+		"LMS Student#0#if_owner": [
+			"read",
+			"write",
+			"create",
+			"share",
+			"report",
+			"export"
+		],
+		"Moderator#0": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"share",
+			"report",
+			"export"
+		]
+	},
 	"LMS Assignment": {
 		"Batch Evaluator#0": [
 			"read",
@@ -541,6 +568,32 @@
 			"export"
 		]
 	},
+	"LMS Instructor Availability": {
+		"Course Creator#0#if_owner": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"share",
+			"report",
+			"export"
+		],
+		"LMS Student#0": [
+			"read",
+			"share",
+			"report",
+			"export"
+		],
+		"Moderator#0": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"share",
+			"report",
+			"export"
+		]
+	},
 	"LMS Lesson Note": {
 		"Course Creator#0": [
 			"read",
@@ -797,6 +850,35 @@
 	"LMS Source": {
 		"LMS Student#0": [
 			"read",
+			"share",
+			"report",
+			"export"
+		],
+		"Moderator#0": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"share",
+			"report",
+			"export"
+		]
+	},
+	"LMS Student Event": {
+		"Course Creator#0#if_owner": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"share",
+			"report",
+			"export"
+		],
+		"LMS Student#0#if_owner": [
+			"read",
+			"write",
+			"create",
+			"delete",
 			"share",
 			"report",
 			"export"
