@@ -13,25 +13,29 @@ BASELINE = Path(__file__).parent / "docperms.json"
 # an administrator's involvement. A grant to any of these is the interesting case.
 WATCHED_ROLES = ("LMS Student", "Course Creator", "Batch Evaluator", "Moderator", "All", "Guest")
 
-# The permission types this guard watches. `print` and `email` are in the set
-# because a grant of either is a real enumeration path — the query-report
-# builder, the email dialog and a print view all read the same rows the REST
-# list does — and they were outside it until 2026-08-21, so a commit granting
-# them to a watched role passed in silence. LMS Certificate and LMS Appointment
-# both grant them to LMS Student today.
+# The permission types this guard watches. `print`, `email` and `import` were
+# all outside it until 2026-08-21, so a grant of any of them to a watched role
+# passed the baseline in silence while looking covered.
 #
-# Still outside the set: `amend` (no doctype in the app is submittable, so no
-# role can hold it — checked, not assumed), `select` (a link-field lookup; the
-# eleven grants of it all sit beside a `read` on the same row, so it adds no
-# reach) and `mask`.
+# `print` and `email` are enumeration paths: the query-report builder, the email
+# dialog and a print view read the same rows the REST list does. LMS Certificate
+# and LMS Appointment grant both to LMS Student today.
 #
-# `import` is the notable omission and is NOT here for a good reason. Twenty-two
-# grants of it are live to watched roles — LMS Course to Course Creator, LMS
-# Batch Enrollment to Batch Evaluator, LMS Coupon to all three — and it is a
-# bulk WRITE, a bigger step than any read path in this tuple. Adding it is the
-# same purely-additive change print and email were; it is left out only because
-# nobody has decided whether those grants are intended, and recording them here
-# would read as blessing them.
+# `import` is the heaviest thing here and the odd one out — it is a bulk WRITE,
+# not a read. Twenty-two grants of it are live, to Course Creator, Batch
+# Evaluator and Moderator across LMS Course, LMS Batch Enrollment, LMS Coupon
+# and others; LMS Student holds it nowhere, which is the only reason this was
+# not urgent. Recording them is not blessing them: it means the next change to
+# any of them has to be argued for in a diff.
+#
+# Still outside the set, with the reasoning checked rather than assumed: `amend`
+# (no doctype in the app is submittable, so no role can hold it), `select` (a
+# link-field lookup; all eleven grants sit beside a `read` on the same row, so
+# it reaches nothing new) and `mask`.
+#
+# New ptypes are APPENDED, never slotted in: each entry then grows at the end
+# and the regeneration diff stays additive within every key, which is what makes
+# it reviewable in a file several sessions hold hunks in.
 PTYPES = (
 	"read",
 	"write",
@@ -44,6 +48,7 @@ PTYPES = (
 	"export",
 	"print",
 	"email",
+	"import",
 )
 
 # The modules lms/modules.txt is expected to list. Kept here rather than derived

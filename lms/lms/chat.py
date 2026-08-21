@@ -226,6 +226,30 @@ def sync_course_channels(doc, method=None) -> None:
 			frappe.db.set_value("LMS Chat Channel", row.name, "is_archived", int(should_archive))
 
 
+def remove_channels_for(doc, method=None) -> None:
+	"""Take a batch's or a course's channels with it when it is deleted.
+
+	`LMS Chat Channel` holds a Link to both, so without this frappe refuses the
+	delete: seeding a channel per batch made **every batch undeletable**, and a
+	course that had ever been in one could not be deleted either. What reached a
+	user was a raw LinkExistsError naming an internal channel id.
+
+	Hooked on the doctypes rather than patched into `lms.lms.api.delete_course`,
+	so a delete from the desk is covered by the same sweep as the API path.
+
+	`delete_doc` rather than `db.delete`: the channel's own `on_trash` is what
+	removes its messages, read states and sub-channels, and a bare row delete
+	would orphan all three.
+
+	Deleting, not archiving — the opposite of dropping a course from a
+	curriculum. There the course outlives the channel and the discussion is still
+	about something; here the thing the channel belongs to is going.
+	"""
+	field = "batch" if doc.doctype == "LMS Batch" else "course"
+	for channel in frappe.get_all("LMS Chat Channel", {field: doc.name}, pluck="name"):
+		frappe.delete_doc("LMS Chat Channel", channel, ignore_permissions=True, force=True)
+
+
 # --- reads ------------------------------------------------------------------
 
 

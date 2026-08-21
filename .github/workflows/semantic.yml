@@ -1,19 +1,36 @@
 name: Semantic Pull Request
 
+# `zeke/semantic-pull-requests` used to be here and had stopped working: it is a
+# GitHub App, not an Action, so its repository has no `action.yml` and the step
+# died at setup with "Can't find 'action.yml'". The job failed before it ever
+# read a PR title, so a red check said nothing at all about the title — which is
+# the trap: it reads as "your title is wrong" and invites you to retitle the PR,
+# which would not have turned it green.
+#
+# `amannn/action-semantic-pull-request` is the maintained Action that does what
+# the name promises.
+
+# Dropped the `push: branches: [main]` trigger along with it. A push carries no
+# pull request, so there was no title for this job to validate there — it could
+# only ever have passed vacuously or failed for the wrong reason.
 on:
-  push:
-    branches: [ main ]
-  pull_request: {}
+  pull_request:
+    # `edited` is the one that matters: a title fixed after the fact has to
+    # re-run the check, or the PR stays red until an unrelated push.
+    types: [opened, edited, synchronize, reopened]
+
+permissions:
+  pull-requests: read
 
 jobs:
-  # This workflow contains a single job called "build"
   semantic:
     name: Validate PR title
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-
-      - uses: zeke/semantic-pull-requests@main
+      # No checkout step. The title comes from the webhook payload, so cloning
+      # the repository was only ever cost — and it was pinned at actions/checkout@v2,
+      # which is retired.
+      - uses: amannn/action-semantic-pull-request@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

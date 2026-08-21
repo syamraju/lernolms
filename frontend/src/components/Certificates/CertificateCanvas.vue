@@ -7,7 +7,7 @@
 	>
 		<img
 			v-if="background"
-			:src="background"
+			:src="safeUrl(background)"
 			alt=""
 			class="pointer-events-none absolute inset-0 h-full w-full object-fill"
 			draggable="false"
@@ -40,8 +40,8 @@
 			@keydown="onKeydown($event, index)"
 		>
 			<img
-				v-if="element.element_type === 'Image' && element.image"
-				:src="element.image"
+				v-if="element.element_type === 'Image' && safeUrl(element.image)"
+				:src="safeUrl(element.image)"
 				alt=""
 				class="h-full w-full object-contain"
 				draggable="false"
@@ -62,7 +62,7 @@
 			-->
 			<span
 				v-if="editable && index === selectedIndex"
-				class="absolute -bottom-1 -end-1 size-3 cursor-se-resize rounded-full border border-white bg-blue-500"
+				class="absolute -bottom-1 -end-1 size-3 cursor-se-resize rounded-full border border-white bg-surface-blue-7"
 				@pointerdown.stop="startResize($event, index)"
 			/>
 		</component>
@@ -85,6 +85,7 @@
  */
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import dayjs from '@/utils/dayjs'
+import { safeUrl } from '@/utils/safeUrl'
 import {
 	clampElement,
 	elementStyle,
@@ -119,7 +120,10 @@ const renderedWidth = ref(0)
 
 const canvasWidth = computed(() => props.template.canvas_width || 1754)
 const canvasHeight = computed(() => props.template.canvas_height || 1240)
-const background = computed(() => props.template.background_image || '')
+// Sanitised at the source, not just at the binding: `background` also drives the
+// `v-if` and the ring, so if the URL is rejected the placeholder is what shows —
+// rather than an <img> with no src, which renders as a broken-image icon.
+const background = computed(() => safeUrl(props.template.background_image))
 const scale = computed(() => scaleFor(canvasWidth.value, renderedWidth.value))
 
 let observer: ResizeObserver | null = null

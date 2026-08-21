@@ -301,6 +301,13 @@ const selectedTitle = computed(() => {
 })
 
 const selectedSubtitle = computed(() => {
+	// The roster when we are in the call, the badge otherwise. A lifecycle event
+	// only fires when a call STARTS or ENDS, so `activeCalls` still says 1 after
+	// a second person joins -- accurate enough for a badge on a thread you are
+	// not in, and visibly wrong in the header of one you are.
+	if (inThisCall.value) {
+		return __('{0} in a call').format(huddle.roster.value.length)
+	}
 	const active = activeCalls.value[selected.value]
 	if (active) return __('{0} in a call').format(active.participant_count)
 	if (isDirect.value) return __('Direct message')

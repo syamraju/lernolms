@@ -92,7 +92,20 @@ Guest.
 
 `lms.lms.api.get_all_users` — **Guest: no** · *Roles: Moderator, Course Creator, Batch Evaluator*
 
-Every enabled user, keyed by name — for client-side avatar and mention lookups.
+The people the caller shares a batch **or a course** with, keyed by name — for
+client-side avatar and mention lookups.
+
+Scoped rather than site-wide: a name here **is** an email address, so an unscoped
+list would let any Course Creator or Batch Evaluator enumerate every learner on
+the site. The batch half of the audience is the same one
+[`get_people`](./calls.md#get_people) uses — batch members, instructors and
+batch moderators. The course half is that course's enrolled members and
+instructors, and it is needed because a discussion thread hangs off a
+`Course Lesson` as well as an `LMS Batch`, and a course need not have a batch at
+all. The caller is included; `Guest` and `Administrator` never are.
+
+A **System Manager** still gets every enabled user, since administering the user
+table is that role's job. Moderator does not.
 
 **Returns**
 
