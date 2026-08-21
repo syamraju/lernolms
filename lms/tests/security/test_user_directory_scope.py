@@ -14,7 +14,6 @@ import frappe
 from lms.lms.api import get_all_users
 from lms.lms.test_helpers import BaseTestUtils
 
-
 # Fixed rather than randomised, and never torn down. Frappe throttles `User`
 # creation site-wide (60/hour in core), so a suite that mints and deletes an
 # account per test spends that budget on behalf of every other suite.

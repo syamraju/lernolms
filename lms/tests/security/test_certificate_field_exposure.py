@@ -64,9 +64,7 @@ class TestCertificateFieldExposure(BaseTestUtils):
 		# field" must not pass or fail on the history of the site.
 		self.holder = self._create_user_with_exact_roles(HOLDER, "Hana", "Holder", ["LMS Student"]).name
 		self.snooper = self._create_user_with_exact_roles(SNOOPER, "Sam", "Snooper", ["LMS Student"]).name
-		self.moderator = self._create_user_with_exact_roles(
-			MODERATOR, "Mia", "Moderator", ["Moderator"]
-		).name
+		self.moderator = self._create_user_with_exact_roles(MODERATOR, "Mia", "Moderator", ["Moderator"]).name
 		# Accounts outlive the test; only the certificate under test is
 		# registered for cleanup, which is what `published` mutations rely on.
 		self.cleanup_items = [i for i in self.cleanup_items if i[0] != "User"]
@@ -98,9 +96,7 @@ class TestCertificateFieldExposure(BaseTestUtils):
 		# exception because absence is the property that matters and the one
 		# that would actually regress.
 		frappe.set_user(self.snooper)
-		rows = frappe.get_list(
-			"LMS Certificate", fields=["name", *GUARDED_FIELDS], limit_page_length=0
-		)
+		rows = frappe.get_list("LMS Certificate", fields=["name", *GUARDED_FIELDS], limit_page_length=0)
 		self.assertTrue(rows, "the published row should still be readable")
 		for row in rows:
 			for fieldname in GUARDED_FIELDS:
@@ -192,13 +188,27 @@ class TestCertificateFieldExposure(BaseTestUtils):
 		frappe.db.set_value("LMS Course", course.name, "enable_certification", 1)
 
 		elements = [
-			{"element_type": "Variable", "variable": key, "left": 10, "top": 10 * i, "width": 200, "height": 30}
+			{
+				"element_type": "Variable",
+				"variable": key,
+				"left": 10,
+				"top": 10 * i,
+				"width": 200,
+				"height": 30,
+			}
 			for i, key in enumerate(mandatory_keys("LMS Course"))
 		]
 		# The element that carries the leak. Placing it is the ordinary thing to
 		# do -- it is why the variable is offered at all.
 		elements.append(
-			{"element_type": "Variable", "variable": "verification_url", "left": 10, "top": 400, "width": 400, "height": 30}
+			{
+				"element_type": "Variable",
+				"variable": "verification_url",
+				"left": 10,
+				"top": 400,
+				"width": 400,
+				"height": 30,
+			}
 		)
 
 		template = frappe.new_doc("LMS Certificate Template")

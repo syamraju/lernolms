@@ -20,9 +20,7 @@ class TestGetMembers(BaseTestUtils):
 		# students here. These cases are about paging and search, so they need an
 		# actor the endpoint accepts; that the endpoint now refuses a moderator is
 		# covered in lms.lms.test_batch_people.
-		self.operator = self._create_user(
-			"members-operator@example.com", "Ops", "Erator", ["System Manager"]
-		)
+		self.operator = self._create_user("members-operator@example.com", "Ops", "Erator", ["System Manager"])
 		self.members = [
 			self._create_user(f"member{index}@example.com", "Member", str(index), ["LMS Student"])
 			for index in range(MEMBERS_PAGE_LENGTH + 3)
@@ -111,9 +109,7 @@ class TestGetMember(BaseTestUtils):
 		# students here. These cases are about paging and search, so they need an
 		# actor the endpoint accepts; that the endpoint now refuses a moderator is
 		# covered in lms.lms.test_batch_people.
-		self.operator = self._create_user(
-			"members-operator@example.com", "Ops", "Erator", ["System Manager"]
-		)
+		self.operator = self._create_user("members-operator@example.com", "Ops", "Erator", ["System Manager"])
 		self.members = [
 			self._create_user(f"member{index}@example.com", "Member", str(index), ["LMS Student"])
 			for index in range(MEMBERS_PAGE_LENGTH + 3)
