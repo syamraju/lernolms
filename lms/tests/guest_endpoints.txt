@@ -7,15 +7,32 @@
 # get_sidebar_settings -- already carries a finding in the
 # 2026-08-06 audit (apps/lms-security-audit.md). This file freezes the surface so a
 # NEW one cannot arrive unreviewed; it does not close the open ones.
+#
+# Baselined 2026-08-21 after review, having drifted in unbaselined (the test was
+# already red before this commit): get_login_options -- the SPA login page needs it
+# and it returns only what Frappe's own /login already shows; get_course_materials
+# -- gated on guest_access_allowed() and returns [] whenever get_course_details()
+# refuses the course; get_student_courses -- gated the same way, and the catalogue
+# underneath it now scopes to published for anyone without authoring rights.
+#
+# get_chart_details, get_chart_data and get_course_completion_data are being closed
+# -- guards requiring Moderator/System Manager are written -- but those guards are
+# not on this branch yet, so the three stay listed. Removing them here first would
+# take three endpoints that ARE still allow_guest off the reviewed surface, which is
+# the one thing this file exists to prevent. They come off in the commit that lands
+# the guards, not before.
 lms.lms.api.get_branding
 lms.lms.api.get_chart_details
 lms.lms.api.get_lms_settings
+lms.lms.api.get_login_options
 lms.lms.api.get_own_assignment_submission
 lms.lms.api.get_pwa_manifest
 lms.lms.api.get_sidebar_settings
 lms.lms.api.get_translations
 lms.lms.certificates.get_public_certificate
 lms.lms.doctype.course_lesson.course_lesson.serve_resource
+lms.lms.student_api.get_course_materials
+lms.lms.student_api.get_student_courses
 lms.lms.user.sign_up
 lms.lms.utils.get_batch_count
 lms.lms.utils.get_batch_courses
