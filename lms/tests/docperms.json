@@ -7,13 +7,17 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0": [
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -22,7 +26,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"Course Evaluator": {
@@ -33,7 +39,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -42,7 +50,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -51,7 +61,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"Course Lesson": {
@@ -61,7 +73,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -70,7 +84,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"Function": {
@@ -78,7 +94,9 @@
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"Industry": {
@@ -86,7 +104,9 @@
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Appointment": {
@@ -96,7 +116,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -104,7 +126,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -113,7 +137,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Assignment": {
@@ -123,7 +149,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -131,13 +159,17 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0": [
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -146,7 +178,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Assignment Submission": {
@@ -156,7 +190,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -164,7 +200,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -172,7 +210,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -181,7 +221,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Badge": {
@@ -192,7 +234,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Badge Assignment": {
@@ -203,7 +247,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -212,7 +258,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -225,7 +273,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Batch": {
@@ -236,7 +286,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0": [
 			"read"
@@ -248,7 +300,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Batch Enrollment": {
@@ -259,7 +313,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -272,7 +328,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Batch Feedback": {
@@ -283,7 +341,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -291,7 +351,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -300,7 +362,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Batch Invite Link": {
@@ -310,7 +374,9 @@
 			"create",
 			"delete",
 			"share",
-			"report"
+			"report",
+			"print",
+			"email"
 		]
 	},
 	"LMS Category": {
@@ -318,13 +384,17 @@
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -333,7 +403,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Certificate": {
@@ -344,7 +416,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Batch Evaluator#1": [
 			"read",
@@ -357,7 +431,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#1": [
 			"read",
@@ -367,7 +443,9 @@
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -376,7 +454,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#1": [
 			"read",
@@ -391,7 +471,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Certificate Request": {
@@ -402,7 +484,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -411,14 +495,18 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -427,7 +515,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Certificate Template": {
@@ -438,7 +528,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -447,7 +539,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Chat Channel": {
@@ -466,7 +560,8 @@
 			"create",
 			"delete",
 			"share",
-			"report"
+			"report",
+			"print"
 		]
 	},
 	"LMS Chat Message": {
@@ -523,7 +618,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -532,7 +629,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -541,7 +640,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Course": {
@@ -552,7 +653,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -561,7 +664,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Course Progress": {
@@ -572,13 +677,17 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -587,7 +696,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Course Review": {
@@ -598,7 +709,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -607,7 +720,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -615,7 +730,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -624,7 +741,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Direct Message": {
@@ -645,7 +764,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -653,7 +774,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -662,7 +785,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Google Meet Settings": {
@@ -673,7 +798,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -682,7 +809,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Instructor Availability": {
@@ -693,13 +822,17 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0": [
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -708,7 +841,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Lesson Note": {
@@ -719,7 +854,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -728,7 +865,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -737,7 +876,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Live Class": {
@@ -748,13 +889,17 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0": [
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -763,7 +908,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Live Class Participant": {
@@ -774,7 +921,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -783,7 +932,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Payment": {
@@ -794,7 +945,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Program": {
@@ -805,7 +958,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0": [
 			"read"
@@ -817,7 +972,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Programming Exercise": {
@@ -828,7 +985,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -837,13 +996,17 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0": [
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -852,7 +1015,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Programming Exercise Submission": {
@@ -863,7 +1028,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -872,7 +1039,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -880,7 +1049,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -889,7 +1060,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Question": {
@@ -900,7 +1073,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -909,7 +1084,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Quiz": {
@@ -920,7 +1097,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Course Creator#0": [
 			"read",
@@ -929,13 +1108,17 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0": [
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -944,7 +1127,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Quiz Submission": {
@@ -952,7 +1137,9 @@
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Settings": {
@@ -961,7 +1148,9 @@
 			"write",
 			"create",
 			"delete",
-			"share"
+			"share",
+			"print",
+			"email"
 		]
 	},
 	"LMS Source": {
@@ -969,7 +1158,9 @@
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -978,7 +1169,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Student Event": {
@@ -989,7 +1182,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -998,7 +1193,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -1007,7 +1204,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Timetable Template": {
@@ -1018,7 +1217,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Video Watch Duration": {
@@ -1029,7 +1230,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -1037,7 +1240,9 @@
 			"create",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -1046,7 +1251,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"LMS Zoom Settings": {
@@ -1057,7 +1264,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		],
 		"Moderator#0": [
 			"read",
@@ -1066,7 +1275,9 @@
 			"delete",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	},
 	"User Skill": {
@@ -1074,7 +1285,9 @@
 			"read",
 			"share",
 			"report",
-			"export"
+			"export",
+			"print",
+			"email"
 		]
 	}
 }

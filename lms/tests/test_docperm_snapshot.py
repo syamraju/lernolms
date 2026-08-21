@@ -13,19 +13,38 @@ BASELINE = Path(__file__).parent / "docperms.json"
 # an administrator's involvement. A grant to any of these is the interesting case.
 WATCHED_ROLES = ("LMS Student", "Course Creator", "Batch Evaluator", "Moderator", "All", "Guest")
 
-# The permission types this guard watches. NOT exhaustive, and the omission is
-# the part worth knowing: `print` and `email` are absent, so a commit granting
-# either to a watched role passes this test in silence. Several doctypes already
-# grant them — LMS Certificate and LMS Appointment both give LMS Student `print`
-# and `email` — so the baseline says less about those rows than it looks like it
-# does. Both act on a document you can already read, where `export` and `report`
-# turn one read into a bulk one, which is why they were left out; that is a
-# judgement about escalation, not an oversight, and it is written here so the
-# next reader re-makes it rather than inherits it. Adding them re-derives every
-# entry in docperms.json, so it wants coordinating: the diff must be purely
-# additive within each key, and a key that loses a ptype, appears or vanishes
-# means somebody else's uncommitted work was swept into the regeneration.
-PTYPES = ("read", "write", "create", "delete", "submit", "cancel", "share", "report", "export")
+# The permission types this guard watches. `print` and `email` are in the set
+# because a grant of either is a real enumeration path — the query-report
+# builder, the email dialog and a print view all read the same rows the REST
+# list does — and they were outside it until 2026-08-21, so a commit granting
+# them to a watched role passed in silence. LMS Certificate and LMS Appointment
+# both grant them to LMS Student today.
+#
+# Still outside the set: `amend` (no doctype in the app is submittable, so no
+# role can hold it — checked, not assumed), `select` (a link-field lookup; the
+# eleven grants of it all sit beside a `read` on the same row, so it adds no
+# reach) and `mask`.
+#
+# `import` is the notable omission and is NOT here for a good reason. Twenty-two
+# grants of it are live to watched roles — LMS Course to Course Creator, LMS
+# Batch Enrollment to Batch Evaluator, LMS Coupon to all three — and it is a
+# bulk WRITE, a bigger step than any read path in this tuple. Adding it is the
+# same purely-additive change print and email were; it is left out only because
+# nobody has decided whether those grants are intended, and recording them here
+# would read as blessing them.
+PTYPES = (
+	"read",
+	"write",
+	"create",
+	"delete",
+	"submit",
+	"cancel",
+	"share",
+	"report",
+	"export",
+	"print",
+	"email",
+)
 
 # The modules lms/modules.txt is expected to list. Kept here rather than derived
 # so that adding a module is a deliberate edit to this file: a module nobody
