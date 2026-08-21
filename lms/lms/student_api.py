@@ -144,8 +144,10 @@ def _scope_to_visible_courses(filters: dict | None) -> dict:
 	return filters
 
 
-@frappe.whitelist(allow_guest=True)
-def get_student_courses(filters: dict | str = None, start: int = 0, limit_page_length=None) -> list:
+@frappe.whitelist(allow_guest=True)  # nosemgrep: frappe-semgrep-rules.rules.security.guest-whitelisted-method
+def get_student_courses(
+	filters: dict | str = None, start: int = 0, limit_page_length: int | str = None
+) -> list:
 	"""`lms.lms.utils.get_courses` plus the two fields the student card needs.
 
 	Kept as a wrapper rather than a change to `get_courses` because the admin
