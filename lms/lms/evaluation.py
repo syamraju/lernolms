@@ -126,12 +126,21 @@ def _acting_as(user: str):
 	completes a lesson, the write still belongs to the learner, so the session is
 	borrowed for exactly that call.
 	"""
+	# Audited, per the semgrep rule's own instruction. The user borrowed is never
+	# request input: it is `LMS Quiz Submission.member` read from the row, and only
+	# after enforce_evaluation_access() has already established that the caller may
+	# touch that submission. The swap wraps a single save_progress() call and is
+	# undone in `finally`, so no later work in the request runs as the learner.
+	# frappe.set_user is used rather than assigning frappe.session.user directly
+	# (the pattern in permissions.py) because it also resets the role and
+	# permission caches — the progress write does permission-checked saves, and a
+	# stale cache there would evaluate them against the evaluator's roles.
 	original = frappe.session.user
-	frappe.set_user(user)
+	frappe.set_user(user)  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-setuser
 	try:
 		yield
 	finally:
-		frappe.set_user(original)
+		frappe.set_user(original)  # nosemgrep: frappe-semgrep-rules.rules.security.frappe-setuser
 
 
 @frappe.whitelist()
