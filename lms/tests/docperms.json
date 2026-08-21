@@ -151,7 +151,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"Course Creator#0": [
 			"read",
@@ -161,7 +162,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"LMS Student#0": [
 			"read",
@@ -180,7 +182,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Assignment Submission": {
@@ -236,7 +239,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Badge Assignment": {
@@ -315,7 +319,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"LMS Student#0#if_owner": [
 			"read",
@@ -330,7 +335,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Batch Feedback": {
@@ -620,7 +626,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"Course Creator#0": [
 			"read",
@@ -631,7 +638,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"Moderator#0": [
 			"read",
@@ -642,7 +650,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Course": {
@@ -655,7 +664,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"Moderator#0": [
 			"read",
@@ -666,7 +676,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Course Progress": {
@@ -891,7 +902,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"LMS Student#0": [
 			"read",
@@ -910,7 +922,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Live Class Participant": {
@@ -947,7 +960,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Program": {
@@ -960,7 +974,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"LMS Student#0": [
 			"read"
@@ -974,7 +989,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Programming Exercise": {
@@ -987,7 +1003,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"Course Creator#0": [
 			"read",
@@ -998,7 +1015,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"LMS Student#0": [
 			"read",
@@ -1017,7 +1035,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Programming Exercise Submission": {
@@ -1171,7 +1190,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"LMS Student Event": {
@@ -1266,7 +1286,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		],
 		"Moderator#0": [
 			"read",
@@ -1277,7 +1298,8 @@
 			"report",
 			"export",
 			"print",
-			"email"
+			"email",
+			"import"
 		]
 	},
 	"User Skill": {
