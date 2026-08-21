@@ -9,6 +9,7 @@ evaluation booking pipeline.
 | --- | --- | --- |
 | [`create_certificate`](#create_certificate) | no | yes |
 | [`save_certificate_details`](#save_certificate_details) | no | yes |
+| [`get_certificates`](#get_certificates) | no | — |
 | [`get_certified_participants`](#get_certified_participants) | no | — |
 | [`get_count_of_certified_members`](#get_count_of_certified_members) | no | — |
 | [`get_certification_categories`](#get_certification_categories) | no | — |
@@ -77,6 +78,31 @@ otherwise `PermissionError`.
 Upserts on the `(member, course)` pair.
 
 **Returns** — the certificate docname.
+
+---
+
+## `get_certificates`
+
+`lms.lms.certificates.get_certificates` — **Guest: no**
+
+One person's certificates, for the profile tab and the course certificate page.
+
+Use this rather than filtering `LMS Certificate` by `member` through the generic
+list API: `member`, `verification_code` and `snapshot` all sit at **permlevel 1**
+so that a signed-in student cannot enumerate every holder's email address and
+code, and Frappe refuses a filter on a field the caller's roles cannot read.
+(`snapshot` is on that list because the frozen design carries the verification
+code as plain text whenever the certificate places the "Verification link" or
+"Certificate ID" element.) None of the three is returned here.
+
+Scoping matches the doctype's own rule — staff (Moderator, Course Creator, Batch
+Evaluator) see every row, everyone else sees published ones.
+
+**Parameters** — `member` (`str`, optional; defaults to the session user),
+`course` (`str`, optional).
+
+**Returns** — `[{name, course, course_title, batch_title, issue_date, template}, …]`,
+newest issue date first.
 
 ---
 

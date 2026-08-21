@@ -60,17 +60,17 @@ onMounted(() => {
 	fetchCourseDetails()
 })
 
+// Not `frappe.client.get_value` filtered by `member`: that field sits at
+// permlevel 1 on LMS Certificate so a student cannot enumerate every holder's
+// email, and Frappe refuses a filter on a field the caller cannot read. The
+// endpoint defaults to the session user, which is who this page is about.
 const certificate = createResource({
-	url: 'frappe.client.get_value',
+	url: 'lms.lms.certificates.get_certificates',
 	params: {
-		doctype: 'LMS Certificate',
-		filters: {
-			member: user.data?.name,
-			course: props.courseName,
-		},
-		fieldname: ['name', 'template', 'issue_date'],
+		course: props.courseName,
 	},
 	cache: [user.data?.name, props.courseName],
+	transform: (data) => (data && data.length ? data[0] : null),
 })
 
 const fetchEnrollmentDetails = () => {

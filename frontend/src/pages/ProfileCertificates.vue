@@ -29,7 +29,7 @@
 	</div>
 </template>
 <script setup>
-import { createListResource } from 'frappe-ui'
+import { createResource } from 'frappe-ui'
 import { inject, onMounted } from 'vue'
 
 const dayjs = inject('$dayjs')
@@ -46,12 +46,15 @@ onMounted(() => {
 	}
 })
 
-const certificates = createListResource({
-	doctype: 'LMS Certificate',
-	filters: {
-		member: props.profile.data?.name,
+// Not a list resource filtered by `member`: that field sits at permlevel 1 on
+// LMS Certificate so a student cannot enumerate every holder's email, and
+// Frappe refuses a filter on a field the caller cannot read. The endpoint
+// applies the same published/staff scoping the list API did.
+const certificates = createResource({
+	url: 'lms.lms.certificates.get_certificates',
+	makeParams() {
+		return { member: props.profile.data?.name }
 	},
-	fields: ['name', 'course_title', 'batch_title', 'issue_date', 'template'],
 	cache: ['certificates', props.profile.data?.name],
 })
 
