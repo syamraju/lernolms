@@ -32,10 +32,20 @@ from lms.lms.test_helpers import BaseTestUtils
 # docname stored here IS the evaluator's address. Same leak class as `member`,
 # one doctype further out.
 #
-# `member_name` and `evaluator_name` are deliberately NOT here. They are full
-# names rather than addresses, they enumerate nothing contactable, and the
-# holder's name is on the public verification page already.
-GUARDED_FIELDS = ("member", "verification_code", "snapshot", "evaluator")
+# `evaluator_name` is here and `member_name` is not, and the asymmetry is the
+# point. The holder's name is genuinely public: `get_public_certificate` returns
+# it to any guest and the artwork prints it, so guarding it would protect
+# something a stranger can already read from the link. Nothing about the
+# evaluator reaches that page -- the payload carries participant name, title,
+# dates, organisation and the snapshot, and the design catalogue offers
+# `instructor_name`, never the evaluator. A student meets their own evaluator's
+# name through the booking mail in `lms_certificate_request.py`, which is
+# per-relationship disclosure; at permlevel 0 here it was instead a staff roster
+# any self-signup account could assemble in one `get_list`.
+#
+# Caught by learno-management-system-b8, who pointed out that "the name is public
+# already" is load-bearing for `member_name` and simply untrue of this one.
+GUARDED_FIELDS = ("member", "verification_code", "snapshot", "evaluator", "evaluator_name")
 
 # Fixed rather than randomised, and never torn down. Frappe throttles `User`
 # creation site-wide (60/hour in core), so a suite that mints and deletes an
@@ -156,10 +166,14 @@ class TestCertificateFieldExposure(BaseTestUtils):
 		).insert()
 		self.cleanup_items.append(("LMS Certificate", doc.name))
 		stored = frappe.db.get_value(
-			"LMS Certificate", doc.name, ["member", "evaluator"], as_dict=True
+			"LMS Certificate", doc.name, ["member", "evaluator", "evaluator_name"], as_dict=True
 		)
 		self.assertEqual(stored.member, self.snooper)
 		self.assertEqual(stored.evaluator, self.evaluator)
+		# Control for the guard below: `evaluator_name` is `fetch_from` and a
+		# permlevel must not stop it populating, or "a student cannot read the
+		# evaluator's name" would hold because nobody can write it either.
+		self.assertTrue(stored.evaluator_name, "fetch_from should still populate")
 
 	# -- the positive control -------------------------------------------------
 
@@ -263,6 +277,14 @@ class TestCertificateFieldExposure(BaseTestUtils):
 		self.assertNotIn("evaluator", rows[0])
 		for row in rows:
 			self.assertNotIn(email, str(row))
+
+	def test_the_holders_name_stays_public(self):
+		# `member_name` is deliberately NOT guarded: the public verification page
+		# returns it to any guest, so hiding it from a signed-in student would
+		# protect nothing while breaking the certificate lists that render it.
+		frappe.set_user(self.snooper)
+		rows = frappe.get_list("LMS Certificate", fields=["name", "member_name"], limit_page_length=0)
+		self.assertIn("member_name", rows[0])
 
 	def test_a_moderator_still_reads_the_evaluator(self):
 		email = self._certificate_naming_its_evaluator()
