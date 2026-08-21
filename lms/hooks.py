@@ -108,8 +108,8 @@ permission_query_conditions = {
 	"LMS Chat Message": "lms.lms.doctype.lms_chat_message.lms_chat_message.get_permission_query_conditions",
 	# Same reasoning for direct messages, and the stakes are higher: a DM has no
 	# cohort to fall back on, so an unscoped grant is every private thread on the
-	# site. lms.lms.direct_message runs its own access check and then reads with
-	# ignore_permissions, so these exist purely to close the /api/resource door.
+	# site. lms.lms.direct_message reads with ignore_permissions after its own
+	# check, so these exist purely to close the /api/resource door.
 	"LMS Direct Message": "lms.lms.doctype.lms_direct_message.lms_direct_message.get_permission_query_conditions",
 	"LMS Direct Message Read State": "lms.lms.doctype.lms_direct_message_read_state.lms_direct_message_read_state.get_permission_query_conditions",
 }
@@ -122,6 +122,7 @@ has_permission = {
 	"Course Lesson": "lms.lms.doctype.course_lesson.course_lesson.has_permission",
 	"File": "lms.lms.permissions.file_has_permission",
 	"LMS Batch Invite Link": "lms.lms.doctype.lms_batch_invite_link.lms_batch_invite_link.has_permission",
+	"LMS Certificate Template": "lms.lms.doctype.lms_certificate_template.lms_certificate_template.has_permission",
 	"LMS Chat Channel": "lms.lms.doctype.lms_chat_channel.lms_chat_channel.has_permission",
 	"LMS Chat Message": "lms.lms.doctype.lms_chat_message.lms_chat_message.has_permission",
 	"LMS Direct Message": "lms.lms.doctype.lms_direct_message.lms_direct_message.has_permission",

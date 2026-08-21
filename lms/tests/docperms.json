@@ -346,6 +346,10 @@
 			"report",
 			"export"
 		],
+		"Batch Evaluator#1": [
+			"read",
+			"write"
+		],
 		"Course Creator#0": [
 			"read",
 			"write",
@@ -354,6 +358,10 @@
 			"share",
 			"report",
 			"export"
+		],
+		"Course Creator#1": [
+			"read",
+			"write"
 		],
 		"LMS Student#0": [
 			"read",
@@ -369,6 +377,10 @@
 			"share",
 			"report",
 			"export"
+		],
+		"Moderator#1": [
+			"read",
+			"write"
 		]
 	},
 	"LMS Certificate Evaluation": {
@@ -404,6 +416,26 @@
 		"LMS Student#0#if_owner": [
 			"read",
 			"create",
+			"share",
+			"report",
+			"export"
+		],
+		"Moderator#0": [
+			"read",
+			"write",
+			"create",
+			"delete",
+			"share",
+			"report",
+			"export"
+		]
+	},
+	"LMS Certificate Template": {
+		"Course Creator#0": [
+			"read",
+			"write",
+			"create",
+			"delete",
 			"share",
 			"report",
 			"export"
