@@ -8,6 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
+  "quiz_type",
+  "block_progress_until_evaluated",
   "max_attempts",
   "show_answers",
   "show_submission_history",
@@ -35,6 +37,24 @@
    "in_list_view": 1,
    "label": "Title",
    "reqd": 1
+  },
+  {
+   "default": "Objective",
+   "description": "Objective quizzes are scored the moment they are submitted. Subjective quizzes are held for an evaluator to read and mark.",
+   "fieldname": "quiz_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Quiz Type",
+   "options": "Objective\nSubjective",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "depends_on": "eval:doc.quiz_type==\"Subjective\"",
+   "description": "Hold the lesson open until an evaluator has marked the submission. Off means submitting is enough to move on.",
+   "fieldname": "block_progress_until_evaluated",
+   "fieldtype": "Check",
+   "label": "Block Progress Until Evaluated"
   },
   {
    "fieldname": "questions",

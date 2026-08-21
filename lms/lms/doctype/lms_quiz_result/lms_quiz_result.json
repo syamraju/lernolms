@@ -12,7 +12,8 @@
   "column_break_flus",
   "marks",
   "marks_out_of",
-  "is_correct"
+  "is_correct",
+  "evaluator_feedback"
  ],
  "fields": [
   {
@@ -62,6 +63,11 @@
    "in_list_view": 1,
    "label": "Marks out of",
    "read_only": 1
+  },
+  {
+   "fieldname": "evaluator_feedback",
+   "fieldtype": "Small Text",
+   "label": "Evaluator Feedback"
   }
  ],
  "index_web_pages_for_search": 1,

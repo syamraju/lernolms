@@ -365,14 +365,30 @@
 				{{ __('Quiz Summary') }}
 			</div>
 			<div
-				v-if="quizSubmission.data.is_open_ended"
+				v-if="
+					quizSubmission.data.pending_evaluation ??
+					quizSubmission.data.is_open_ended
+				"
 				class="leading-5 text-ink-gray-7"
 			>
-				{{
-					__(
-						"Your submission has been successfully saved. The instructor will review and grade it shortly, and you'll be notified of your final result."
-					)
-				}}
+				<p>
+					{{
+						__(
+							"Your answers have been sent to an evaluator. They will read and mark them, and you'll be notified of your result."
+						)
+					}}
+				</p>
+				<!--
+					Whether this lesson waits on the mark is the one thing a learner
+					needs from us right now, and it differs per quiz — so say which.
+				-->
+				<p class="mt-1 text-p-sm text-ink-gray-6">
+					{{
+						quizSubmission.data.blocks_progress
+							? __('This lesson stays open until your submission is marked.')
+							: __('You can carry on with the course in the meantime.')
+					}}
+				</p>
 			</div>
 			<div v-else class="text-ink-gray-7">
 				{{
