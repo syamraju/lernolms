@@ -32,11 +32,14 @@ from frappe.utils import (
 from frappe.utils.response import Response
 from pypika import functions as fn
 
+from lms.lms.calendar_api import BUILTIN_ACCOUNTS, _enrolled_courses, _taught_courses
+from lms.lms.conversation import batch_audience, batches_of
 from lms.lms.course_import_export import export_course_zip, import_course_zip
 from lms.lms.doctype.course_lesson.course_lesson import (
 	cleanup_lesson_backreferences,
 	save_progress,
 )
+from lms.lms.doctype.lms_student_event.lms_student_event import course_members
 from lms.lms.utils import (
 	DEMO_COURSE_TITLES,
 	LMS_ROLES,
@@ -764,16 +767,68 @@ def get_certification_categories():
 
 @frappe.whitelist()
 def get_all_users():
+	"""The people the caller shares a batch or a course with, keyed by email.
+
+	Scoped rather than site-wide, which is what the name still suggests. Three
+	facts make the unscoped form a leak rather than a convenience: `User.name`
+	IS the email address, `frappe.get_all` defaults `limit_page_length` to 0 so
+	there is no cap, and Course Creator and Batch Evaluator are authoring roles
+	handed out without an administrator's involvement. Together they let any
+	contract instructor enumerate every learner's email on the site in one call.
+
+	The app already draws this line elsewhere and this brings the two into
+	agreement: `lms.lms.direct_message.get_people` scopes its own people picker
+	to shared batches on purpose, saying that "who can I message" should not
+	double as a directory. The only consumer here is the mention picker in
+	`DiscussionReplies.vue`, which wants exactly the same set -- you mention
+	people in a discussion you share, so the narrower list is also the more
+	correct one.
+
+	Courses as well as batches, because `Discussions.vue` mounts against both: a
+	lesson thread hangs off a `Course Lesson` and a course need not have a batch
+	at all. Scoping to batches alone would leave the picker on a lesson thread
+	empty on a course-only site, which is a broken feature rather than a tighter
+	one.
+
+	System Manager keeps the site-wide directory: administering the user table
+	is that role's job, and it cannot be self-assigned. Moderator does NOT, and
+	that is a decision rather than an oversight -- it is a teaching role, and
+	`lms.lms.conversation.assert_access` already treats it as one when it lets a
+	Moderator into a shared thread but not into a private one.
+	"""
 	frappe.only_for(["Moderator", "Course Creator", "Batch Evaluator"])
+
+	filters = {"enabled": 1}
+	if "System Manager" not in frappe.get_roles():
+		me = frappe.session.user
+		people = set()
+		for batch in batches_of(me):
+			people.update(batch_audience(batch))
+		for course in set(_enrolled_courses(me)) | set(_taught_courses(me)):
+			people.update(course_members(course))
+		# The caller stays in: this list feeds a mention picker, where naming
+		# yourself is odd but harmless, and dropping them would be a silent
+		# change to what the picker used to offer.
+		people.add(me)
+		people -= BUILTIN_ACCOUNTS
+		if not people:
+			return {}
+		filters["name"] = ["in", sorted(people)]
+
 	users = frappe.get_all(
 		"User",
-		{
-			"enabled": 1,
-		},
+		filters,
 		["name", "full_name", "user_image"],
+		limit_page_length=0,
 	)
 
-	return {user.name: user for user in users}
+	return {user.name: user for user in users if user.name not in BUILTIN_ACCOUNTS}
+
+
+def has_statistics_access(user: str | None = None) -> bool:
+	"""Whether `user` may read site-wide statistics."""
+	roles = frappe.get_roles(user or frappe.session.user)
+	return any(role in roles for role in STATISTICS_ROLES)
 
 
 @frappe.whitelist(allow_guest=True)
