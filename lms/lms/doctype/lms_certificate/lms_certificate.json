@@ -100,7 +100,8 @@
    "fieldname": "evaluator",
    "fieldtype": "Link",
    "label": "Evaluator",
-   "options": "Course Evaluator"
+   "options": "Course Evaluator",
+   "permlevel": 1
   },
   {
    "fetch_from": "evaluator.full_name",

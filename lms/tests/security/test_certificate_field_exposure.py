@@ -27,7 +27,15 @@ from lms.lms.test_helpers import BaseTestUtils
 # enumeration reachable one field over. Found by learno-management-system-b8,
 # whose fix put the permlevel on the field; the positive control below is what
 # stops these assertions from passing on an empty snapshot.
-GUARDED_FIELDS = ("member", "verification_code", "snapshot")
+# `evaluator` is on the list because it is an email address in disguise:
+# `Course Evaluator` is `autoname: field:evaluator` over a Link to User, so the
+# docname stored here IS the evaluator's address. Same leak class as `member`,
+# one doctype further out.
+#
+# `member_name` and `evaluator_name` are deliberately NOT here. They are full
+# names rather than addresses, they enumerate nothing contactable, and the
+# holder's name is on the public verification page already.
+GUARDED_FIELDS = ("member", "verification_code", "snapshot", "evaluator")
 
 # Fixed rather than randomised, and never torn down. Frappe throttles `User`
 # creation site-wide (60/hour in core), so a suite that mints and deletes an
@@ -52,6 +60,9 @@ class TestCertificateFieldExposure(BaseTestUtils):
 		# Accounts outlive the test; only the certificate under test is
 		# registered for cleanup, which is what `published` mutations rely on.
 		self.cleanup_items = [i for i in self.cleanup_items if i[0] != "User"]
+
+		# `Course Evaluator` is named by its user, so this is the moderator's email.
+		self.evaluator = self._create_evaluator(self.moderator).name
 
 		self.course = self._create_course(title="Cert Field Guard Course", instructor=self.moderator)
 		# The doctype refuses to certify someone who was never enrolled.
@@ -137,13 +148,18 @@ class TestCertificateFieldExposure(BaseTestUtils):
 			{
 				"doctype": "LMS Certificate",
 				"member": self.snooper,
+				"evaluator": self.evaluator,
 				"course": self.course.name,
 				"issue_date": frappe.utils.nowdate(),
 				"published": 1,
 			}
 		).insert()
 		self.cleanup_items.append(("LMS Certificate", doc.name))
-		self.assertEqual(frappe.db.get_value("LMS Certificate", doc.name, "member"), self.snooper)
+		stored = frappe.db.get_value(
+			"LMS Certificate", doc.name, ["member", "evaluator"], as_dict=True
+		)
+		self.assertEqual(stored.member, self.snooper)
+		self.assertEqual(stored.evaluator, self.evaluator)
 
 	# -- the positive control -------------------------------------------------
 
@@ -221,6 +237,40 @@ class TestCertificateFieldExposure(BaseTestUtils):
 		payload = get_public_certificate(certificate.verification_code)
 		self.assertTrue(payload["canvas"], "the public page lost its design")
 		self.assertTrue(payload["canvas"]["elements"])
+
+	def _certificate_naming_its_evaluator(self):
+		"""A certificate that actually has an evaluator on it.
+
+		Same trap as the snapshot: `evaluator` is null on most rows, so
+		"a student cannot read the evaluator" holds for the wrong reason unless
+		one is set. Every certificate on the dev site had it null, which is why
+		the first probe came back clean while the field was wide open.
+		"""
+		frappe.db.set_value("LMS Certificate", self.certificate.name, "evaluator", self.evaluator)
+		return frappe.db.get_value("LMS Certificate", self.certificate.name, "evaluator")
+
+	def test_the_certificate_really_does_name_an_evaluator(self):
+		# The control. If this fails, the test below stopped proving anything.
+		self.assertEqual(self._certificate_naming_its_evaluator(), self.evaluator)
+		self.assertIn("@", self.evaluator, "the evaluator docname should be an address")
+
+	def test_a_student_cannot_read_the_evaluator_email(self):
+		email = self._certificate_naming_its_evaluator()
+
+		frappe.set_user(self.snooper)
+		rows = frappe.get_list("LMS Certificate", fields=["*"], limit_page_length=0)
+		self.assertTrue(rows, "published rows should still be readable")
+		self.assertNotIn("evaluator", rows[0])
+		for row in rows:
+			self.assertNotIn(email, str(row))
+
+	def test_a_moderator_still_reads_the_evaluator(self):
+		email = self._certificate_naming_its_evaluator()
+		frappe.set_user(self.moderator)
+		rows = frappe.get_list(
+			"LMS Certificate", filters={"name": self.certificate.name}, fields=["name", "evaluator"]
+		)
+		self.assertEqual(rows[0].evaluator, email)
 
 	# -- the replacement endpoint ---------------------------------------------
 

@@ -88,12 +88,18 @@ Upserts on the `(member, course)` pair.
 One person's certificates, for the profile tab and the course certificate page.
 
 Use this rather than filtering `LMS Certificate` by `member` through the generic
-list API: `member`, `verification_code` and `snapshot` all sit at **permlevel 1**
-so that a signed-in student cannot enumerate every holder's email address and
-code, and Frappe refuses a filter on a field the caller's roles cannot read.
-(`snapshot` is on that list because the frozen design carries the verification
-code as plain text whenever the certificate places the "Verification link" or
-"Certificate ID" element.) None of the three is returned here.
+list API: `member`, `evaluator`, `verification_code` and `snapshot` all sit at
+**permlevel 1** so that a signed-in student cannot enumerate every holder's and
+evaluator's email address, or their verification codes, and Frappe refuses a
+filter on a field the caller's roles cannot read. Two of the four are less
+obvious: `snapshot` because the frozen design carries the verification code as
+plain text whenever the certificate places the "Verification link" or
+"Certificate ID" element, and `evaluator` because `Course Evaluator` is
+`autoname: field:evaluator` over a Link to User, so the docname stored there is
+itself an email address. None of the four is returned here.
+
+`member_name` and `evaluator_name` stay readable: they are names rather than
+addresses, and the holder's name is on the public verification page anyway.
 
 Scoping matches the doctype's own rule — staff (Moderator, Course Creator, Batch
 Evaluator) see every row, everyone else sees published ones.
