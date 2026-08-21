@@ -158,4 +158,6 @@ def course_members(course: str) -> list:
 		pluck="instructor",
 		limit_page_length=0,
 	)
-	return list(set(students) | set(instructors))
+	# Guest and Administrator are not people; a seeded site can have either in
+	# an enrolment table, and neither should be attachable to an event.
+	return list((set(students) | set(instructors)) - {"Guest", "Administrator"})

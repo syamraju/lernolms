@@ -36,6 +36,10 @@ from lms.lms.utils import has_moderator_role
 # schedule is a guess rather than a commitment.
 BOOKING_HORIZON_DAYS = 60
 
+# Neither is a person: Guest is the anonymous pseudo-user and Administrator is
+# the bootstrap account. Both can appear in enrolment tables on a seeded site.
+BUILTIN_ACCOUNTS = {"Guest", "Administrator"}
+
 
 def _require_login():
 	if frappe.session.user == "Guest":
@@ -124,6 +128,10 @@ def get_event_invitees(course: str = None, search: str = None) -> list:
 			people.add(member)
 
 	people.discard(me)
+	# Frappe's two built-in accounts are not people. Guest in particular reaches
+	# this list through demo enrolments, and inviting it would attach the
+	# anonymous pseudo-user to a real event.
+	people -= BUILTIN_ACCOUNTS
 	if not people:
 		return []
 
