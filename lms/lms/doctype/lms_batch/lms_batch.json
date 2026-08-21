@@ -30,6 +30,8 @@
   "section_break_6",
   "description",
   "instructors",
+  "section_break_mods",
+  "moderators",
   "column_break_hlqw",
   "batch_details",
   "section_break_rgfj",
@@ -415,6 +417,18 @@
   {
    "fieldname": "column_break_uamg",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_mods",
+   "fieldtype": "Section Break",
+   "label": "Moderators"
+  },
+  {
+   "description": "Who administers this batch. The creator is added automatically and cannot be removed by a peer \u2014 see LMSBatch.validate_moderators.",
+   "fieldname": "moderators",
+   "fieldtype": "Table",
+   "label": "Moderators",
+   "options": "Batch Moderator"
   }
  ],
  "grid_page_length": 50,
@@ -437,7 +451,7 @@
    "link_fieldname": "payment_for_document"
   }
  ],
- "modified": "2026-02-13 14:23:51.913875",
+ "modified": "2026-08-21 08:00:00.000000",
  "modified_by": "sayali@frappe.io",
  "module": "LMS",
  "name": "LMS Batch",
