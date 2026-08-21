@@ -1016,7 +1016,15 @@ def get_member(member: str):
 
 @frappe.whitelist()
 def get_members(start: int = 0, search: str = None, role: str = "All"):
-	frappe.only_for(["Moderator"])
+	"""The site-wide user list. System Manager only.
+
+	This used to be `frappe.only_for(["Moderator"])` and unfiltered, which made
+	batch scoping meaningless: a moderator locked out of a batch could still
+	enumerate its students — and everybody else's — from Settings > Members.
+	Moderators get `lms.lms.batch_people.get_batch_people` instead, which answers
+	the same question inside the batches they actually run.
+	"""
+	frappe.only_for(["System Manager"])
 
 	lms_roles = LMS_ROLES
 	if not isinstance(role, str) or role not in (["All"] + lms_roles):

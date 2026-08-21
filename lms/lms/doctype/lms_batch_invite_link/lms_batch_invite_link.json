@@ -1,0 +1,124 @@
+{
+ "actions": [],
+ "allow_rename": 0,
+ "autoname": "hash",
+ "creation": "2026-08-21 08:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "batch",
+  "is_active",
+  "column_break_a",
+  "expires_on",
+  "section_break_b",
+  "max_uses",
+  "column_break_c",
+  "uses",
+  "section_break_d",
+  "key_hash"
+ ],
+ "fields": [
+  {
+   "fieldname": "batch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Batch",
+   "options": "LMS Batch",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "is_active",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Active"
+  },
+  {
+   "fieldname": "column_break_a",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "A link pasted into a group chat outlives the cohort it was written for.",
+   "fieldname": "expires_on",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Expires On"
+  },
+  {
+   "fieldname": "section_break_b",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "0 means unlimited. A link posted publicly with no cap is a seat leak.",
+   "fieldname": "max_uses",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Max Uses"
+  },
+  {
+   "fieldname": "column_break_c",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "uses",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Uses",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_d",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "SHA-256 of the token. The raw token is shown once at creation and never stored, so a leaked table yields no working links.",
+   "fieldname": "key_hash",
+   "fieldtype": "Data",
+   "label": "Key Hash",
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1,
+   "unique": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-21 08:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "LMS",
+ "name": "LMS Batch Invite Link",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Moderator",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -462,6 +462,26 @@ export const routes = [
 		meta: { layout: 'student' },
 	},
 	{
+		// Redeeming an invite link. Deliberately NOT `isPublic`: exactly one route
+		// is public and it is Login (see src/tests/loginRoute.test.ts). A
+		// signed-out visitor is sent to sign in with `?redirect=` carrying this
+		// path, so the token survives the round trip and they land back here —
+		// which is the only thing being public would have bought, minus a preview
+		// of the batch title that is not worth a second door.
+		path: '/batches/join/:token',
+		name: 'BatchJoin',
+		component: () => import('@/pages/BatchJoin.vue'),
+		meta: { hideSidebar: true },
+	},
+	{
+		// Where an account provisioned with a temporary password lands, and stays
+		// until it has chosen one. `beforeEach` in router.js enforces the "stays".
+		path: '/set-password',
+		name: 'SetPassword',
+		component: () => import('@/pages/SetPassword.vue'),
+		meta: { hideSidebar: true },
+	},
+	{
 		path: '/learn/calendar',
 		name: 'StudentCalendar',
 		component: () => import('@/pages/Student/StudentCalendar.vue'),

@@ -98,11 +98,27 @@ def generate_slug(title: str, doctype: str):
 	return slugify(title, used_slugs=slugs)
 
 
-def process_user_names(first_name, last_name, full_name):
+def process_user_names(first_name, last_name, full_name, email=None):
+	"""Fill in whichever of the three names the caller did not supply.
+
+	`email` is the last resort, and it matters more than it looks: with all three
+	names empty this used to return ``first_name=None`` and the *string* "None"
+	as the full name, because the fallback interpolated None into an f-string.
+	A User inserted that way has an empty ``full_name``, which sends the
+	``validate_username_duplicates`` hook below into an endless loop —
+	``cleanup_page_name("")`` is ``""``, ``append_number_if_name_exists`` hands
+	back ``""`` unchanged, and ``while not doc.username`` never becomes false.
+	Every existing caller passed a name, so nothing hit it until accounts started
+	being provisioned from an address alone.
+	"""
 	if not first_name and full_name:
 		name_parts = full_name.split()
 		first_name = name_parts[0] if name_parts else "User"
 		last_name = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
+
+	if not first_name:
+		local_part = (email or "").split("@")[0].strip()
+		first_name = local_part or "User"
 
 	if not full_name:
 		full_name = f"{first_name} {last_name or ''}".strip()
@@ -128,15 +144,11 @@ def create_user_document(email, first_name, last_name, full_name, user_image=Non
 
 def create_user(email, first_name=None, last_name=None, full_name=None, user_image=None, roles=None):
 	validate_email_address(email, True)
-	print(email)
-	print(frappe.db.exists("User", email))
 	existing_user = frappe.db.exists("User", email)
-	print("existing_user", existing_user)
 	if existing_user:
-		print("User already exists")
 		return frappe.get_doc("User", email)
 
-	first_name, last_name, full_name = process_user_names(first_name, last_name, full_name)
+	first_name, last_name, full_name = process_user_names(first_name, last_name, full_name, email)
 	user_doc = create_user_document(email, first_name, last_name, full_name, user_image, roles)
 	return user_doc
 
@@ -1687,12 +1699,18 @@ def get_batch_details(batch: str):
 	if not guest_access_allowed():
 		return {}
 
+	from lms.lms.batch_access import batch_relation, is_batch_moderator
+
 	batch_students = frappe.get_all("LMS Batch Enrollment", {"batch": batch}, pluck="member")
-	is_batch_admin = can_modify_batch(batch)
+	# Scoped to this batch. `can_modify_batch` answers "moderator anywhere, or
+	# instructor here", which is no longer the same question as "administers this
+	# cohort" — see lms.lms.batch_access.
+	is_batch_admin = bool(is_batch_moderator(batch))
+	relation = batch_relation(batch, frappe.session.user)
 	is_batch_published = frappe.db.get_value("LMS Batch", batch, "published")
 	is_student_enrolled = frappe.session.user in batch_students
 
-	if not (is_batch_published or is_batch_admin or is_student_enrolled):
+	if not (is_batch_published or is_batch_admin or relation):
 		return {}
 
 	batch_details = frappe.db.get_value(
@@ -1729,6 +1747,12 @@ def get_batch_details(batch: str):
 	)
 
 	batch_details.instructors = get_instructors("LMS Batch", batch)
+	# What the batch page gates its tabs and controls on. `is_moderator` decides
+	# every administrative surface; `is_staff` opens the inside of the cohort to
+	# instructors and evaluators derived from its curriculum.
+	batch_details.is_moderator = is_batch_admin
+	batch_details.is_staff = relation in ("moderator", "instructor", "evaluator")
+	batch_details.relation = relation
 	batch_details.accept_enrollments = batch_details.start_date > getdate()
 
 	if (
@@ -1745,7 +1769,7 @@ def get_batch_details(batch: str):
 		"LMS Assessment", {"parent": batch}, ["assessment_name", "assessment_type"]
 	)
 
-	if can_modify_batch(batch):
+	if is_batch_admin:
 		batch_details.students = batch_students
 	elif is_student_enrolled:
 		batch_details.students = [frappe.session.user]

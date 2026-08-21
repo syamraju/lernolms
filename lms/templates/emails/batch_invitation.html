@@ -1,0 +1,26 @@
+<p>{{ _("Hello,") }}</p>
+<br>
+<p>
+    {{ _("You have been added to the batch") }} <b>{{ title }}</b>.
+</p>
+<br>
+
+{% if start_date %}
+<p>
+    <b>{{ _("Starts:") }}</b> {{ frappe.utils.format_date(start_date, "medium") }}
+    {% if start_time %} {{ _("at") }} {{ frappe.utils.format_time(start_time, "hh:mm a") }}{% endif %}
+</p>
+{% endif %}
+
+{% if medium %}
+<p>
+    <b>{{ _("Medium:") }}</b> {{ medium }}
+</p>
+{% endif %}
+
+<br>
+<p>
+    <a href="{{ batch_url }}">{{ _("Open the batch") }}</a>
+</p>
+<br>
+<p>{{ _("Best Regards") }}</p>

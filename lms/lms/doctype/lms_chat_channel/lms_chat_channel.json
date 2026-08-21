@@ -1,0 +1,159 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "hash",
+ "creation": "2026-08-21 08:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "batch",
+  "title",
+  "column_break_a",
+  "parent_channel",
+  "channel_type",
+  "section_break_b",
+  "audience",
+  "column_break_c",
+  "post_permission",
+  "section_break_d",
+  "course",
+  "description",
+  "is_archived"
+ ],
+ "fields": [
+  {
+   "fieldname": "batch",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Batch",
+   "options": "LMS Batch",
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_a",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Set on a sub-channel. Depth is capped at two: a channel whose parent already has a parent is rejected.",
+   "fieldname": "parent_channel",
+   "fieldtype": "Link",
+   "label": "Parent Channel",
+   "options": "LMS Chat Channel",
+   "search_index": 1
+  },
+  {
+   "default": "Discussion",
+   "fieldname": "channel_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Type",
+   "options": "Announcement\nDiscussion\nCourse\nHelp"
+  },
+  {
+   "fieldname": "section_break_b",
+   "fieldtype": "Section Break"
+  },
+  {
+   "default": "Everyone",
+   "description": "Who can read this channel. Membership is derived from the batch roster on every request, never synced.",
+   "fieldname": "audience",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Audience",
+   "options": "Everyone\nStaff\nStudents"
+  },
+  {
+   "fieldname": "column_break_c",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Everyone",
+   "fieldname": "post_permission",
+   "fieldtype": "Select",
+   "label": "Who Can Post",
+   "options": "Everyone\nStaff"
+  },
+  {
+   "fieldname": "section_break_d",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.channel_type=='Course'",
+   "fieldname": "course",
+   "fieldtype": "Link",
+   "label": "Course",
+   "options": "LMS Course"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Small Text",
+   "label": "Description"
+  },
+  {
+   "default": "0",
+   "description": "Archived channels are read-only for everyone but a batch moderator. Dropping a course from a curriculum archives its channel rather than deleting the discussion that happened in it.",
+   "fieldname": "is_archived",
+   "fieldtype": "Check",
+   "label": "Archived"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-08-21 08:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "LMS",
+ "name": "LMS Chat Channel",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Moderator",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "read": 1,
+   "role": "LMS Student"
+  },
+  {
+   "read": 1,
+   "role": "Course Creator"
+  },
+  {
+   "read": 1,
+   "role": "Batch Evaluator"
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "title"
+}
