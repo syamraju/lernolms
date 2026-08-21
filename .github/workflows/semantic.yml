@@ -3,8 +3,9 @@ name: Semantic Pull Request
 # `zeke/semantic-pull-requests` used to be here and had stopped working: it is a
 # GitHub App, not an Action, so its repository has no `action.yml` and the step
 # died at setup with "Can't find 'action.yml'". The job failed before it ever
-# read a PR title, which made every PR look like it had a malformed one — this
-# branch's title has been valid Conventional Commits the whole time it was red.
+# read a PR title, so a red check said nothing at all about the title — which is
+# the trap: it reads as "your title is wrong" and invites you to retitle the PR,
+# which would not have turned it green.
 #
 # `amannn/action-semantic-pull-request` is the maintained Action that does what
 # the name promises.
