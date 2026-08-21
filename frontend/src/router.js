@@ -91,7 +91,11 @@ router.beforeEach(async (to, from, next) => {
 		}
 	}
 
-	if (isLoggedIn && to.meta.isPublic) {
+	// Most public pages are for signed-out visitors only — sending a signed-in
+	// user to the login form is a dead end. A page marked `allowLoggedIn` is
+	// public in the other sense: readable by anyone, including the people who
+	// already have accounts.
+	if (isLoggedIn && to.meta.isPublic && !to.meta.allowLoggedIn) {
 		return next({ name: 'Home' })
 	}
 

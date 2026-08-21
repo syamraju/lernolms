@@ -38,6 +38,34 @@
 					</div>
 				</div>
 
+				<!--
+					A program certificate is its own artwork with its own fields —
+					the program's name and dates, not a course's. It is designed on
+					the same screen a course certificate is, and this is the only
+					way in.
+				-->
+				<div
+					v-if="!isNew"
+					class="flex flex-wrap items-center gap-2 pb-5 text-p-sm text-ink-gray-6"
+				>
+					<span>
+						{{
+							__(
+								'Learners who finish this program earn a certificate of its own.'
+							)
+						}}
+					</span>
+					<router-link
+						:to="{
+							name: 'ProgramCertificateDesigner',
+							params: { programName: programId },
+						}"
+						class="font-medium text-ink-gray-8 underline"
+					>
+						{{ __('Open the designer') }}
+					</router-link>
+				</div>
+
 				<div class="pb-5">
 					<div class="flex items-center justify-between mt-5 mb-4">
 						<div class="text-lg-semibold text-ink-gray-9">
